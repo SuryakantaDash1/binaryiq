@@ -11,6 +11,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PointsModule } from './modules/points/points.module';
 import { ProfileSurveysModule } from './modules/profile-surveys/profile-surveys.module';
 import { RewardsModule } from './modules/rewards/rewards.module';
+import { SurveysModule } from './modules/surveys/surveys.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { RedisModule } from './redis/redis.module';
 
@@ -18,7 +19,7 @@ import { RedisModule } from './redis/redis.module';
   imports: [
     AppConfigModule, PrismaModule, RedisModule,
     AuthModule, PointsModule, HealthModule,
-    AccountModule, ProfileSurveysModule, RewardsModule,
+    AccountModule, ProfileSurveysModule, RewardsModule, SurveysModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },

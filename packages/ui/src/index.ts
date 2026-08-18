@@ -41,3 +41,5 @@ export { DataTable } from './data-table.js';
 export type { DataTableProps, Column } from './data-table.js';
 export { RangeFilter } from './range-filter.js';
 export type { RangeFilterProps, DateRange } from './range-filter.js';
+export { SurveyCard } from './survey-card.js';
+export type { SurveyCardProps, SurveyCardData } from './survey-card.js';

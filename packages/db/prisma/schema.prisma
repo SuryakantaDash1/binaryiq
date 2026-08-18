@@ -61,6 +61,12 @@ enum RewardType {
   MERCHANDISE
 }
 
+enum SurveyType {
+  PRIORITY
+  QUICK
+  PREMIUM
+}
+
 enum GameType {
   SPIN_WHEEL
   QUIZ
@@ -105,7 +111,8 @@ model User {
   pointsTxns      PointsTransaction[]
   pointsBalance   PointsBalance?
   redemptions     RewardRedemption[]
-  surveyResponses ProfileSurveyResponse[]
+  surveyResponses    ProfileSurveyResponse[]
+  brandSurveyResponses SurveyResponse[]
 
   @@index([email])
   @@index([username])
@@ -255,6 +262,48 @@ model RewardRedemption {
   @@index([userId, createdAt])
   @@index([status])
   @@map("reward_redemptions")
+}
+
+// ─────────────────────────────────────────────────────────────
+// SURVEYS (Phase 4)
+// ─────────────────────────────────────────────────────────────
+model Survey {
+  id             String           @id @default(uuid()) @db.Uuid
+  title          String
+  description    String?
+  type           SurveyType
+  pointsValue    Int              @map("points_value")
+  estimatedMins  Int?             @map("estimated_mins")
+  quota          Int?
+  completedCount Int              @default(0) @map("completed_count")
+  targeting      Json?            @db.JsonB
+  externalUrl    String?          @map("external_url")
+  isActive       Boolean          @default(true) @map("is_active")
+  expiresAt      DateTime?        @map("expires_at") @db.Timestamptz(6)
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  responses      SurveyResponse[]
+
+  @@index([isActive, type])
+  @@map("surveys")
+}
+
+model SurveyResponse {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  surveyId      String    @map("survey_id") @db.Uuid
+  status        String
+  pointsAwarded Int       @default(0) @map("points_awarded")
+  returnToken   String?   @unique @map("return_token")
+  completedAt   DateTime? @map("completed_at") @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  survey        Survey    @relation(fields: [surveyId], references: [id])
+
+  @@unique([userId, surveyId])
+  @@index([userId, createdAt])
+  @@map("survey_responses")
 }
 
 // ─────────────────────────────────────────────────────────────

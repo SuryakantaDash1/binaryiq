@@ -4,3 +4,4 @@ export * from './auth.js';
 export * from './profile-surveys.js';
 export * from './account.js';
 export * from './rewards.js';
+export * from './surveys.js';

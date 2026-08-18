@@ -296,12 +296,88 @@ function rewardId(key: string): string {
   return id;
 }
 
+async function seedSurveys(): Promise<void> {
+  const count = await prisma.survey.count();
+  if (count > 0) {
+    console.warn('  ⚠ Surveys already seeded, skipping');
+    return;
+  }
+
+  const surveys = [
+    // Generic (no targeting) — visible to all
+    {
+      title: 'Community Voice — Gen Z Trends',
+      description: 'Share your opinions on the latest lifestyle and entertainment trends.',
+      type: 'QUICK' as const,
+      pointsValue: 150,
+      estimatedMins: 5,
+      targeting: null,
+    },
+    {
+      title: 'Brand Awareness Study',
+      description: 'Help us understand how you discover and interact with brands online.',
+      type: 'PRIORITY' as const,
+      pointsValue: 200,
+      estimatedMins: 8,
+      targeting: null,
+    },
+    {
+      title: 'Digital India Survey — Premium',
+      description: "A comprehensive look at India's digital economy. High-value, 30-minute study.",
+      type: 'PREMIUM' as const,
+      pointsValue: 3400,
+      estimatedMins: 30,
+      targeting: null,
+    },
+    // Targeted surveys
+    {
+      title: 'Skincare Habits — Women 18-35',
+      description: 'Insights on personal care routines and product preferences.',
+      type: 'QUICK' as const,
+      pointsValue: 250,
+      estimatedMins: 7,
+      targeting: { gender: ['FEMALE'], age: { min: 18, max: 35 } },
+    },
+    {
+      title: 'Investment & Savings Study',
+      description: 'Share your views on financial products and investment habits.',
+      type: 'PRIORITY' as const,
+      pointsValue: 400,
+      estimatedMins: 12,
+      targeting: { employment: ['SALARIED', 'SELF_EMPLOYED'], income: ['5L_10L', '10L_PLUS'] },
+    },
+    {
+      title: 'Urban Mobility & EV Interest',
+      description: 'Understanding commuter preferences and electric vehicle adoption.',
+      type: 'PREMIUM' as const,
+      pointsValue: 1800,
+      estimatedMins: 20,
+      targeting: { region: { areaType: ['URBAN'] }, age: { min: 22, max: 45 } },
+    },
+  ];
+
+  await prisma.survey.createMany({
+    data: surveys.map((s) => ({
+      title: s.title,
+      description: s.description,
+      type: s.type,
+      pointsValue: s.pointsValue,
+      estimatedMins: s.estimatedMins,
+      ...(s.targeting !== null ? { targeting: s.targeting as Prisma.InputJsonValue } : {}),
+      isActive: true,
+    })),
+  });
+
+  console.warn(`  ✓ ${surveys.length} brand surveys`);
+}
+
 async function main(): Promise<void> {
   console.warn('Seeding reference data…');
   await seedProfileCategories();
   await seedSpinGame();
   await seedRewards();
   await seedSuperAdmin();
+  await seedSurveys();
   console.warn('Seed complete.');
 }
 
