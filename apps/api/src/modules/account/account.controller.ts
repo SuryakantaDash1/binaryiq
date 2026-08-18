@@ -1,8 +1,3 @@
-import { Body, Controller, Delete, Get, HttpCode, Post, Put } from '@nestjs/common';
-import { z } from 'zod';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import type { AuthenticatedUser } from '../../common/decorators/current-user.decorator';
-import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import {
   updateProfileSchema,
   changeEmailSchema,
@@ -10,6 +5,13 @@ import {
   updatePaypalSchema,
   updateAboutYouSchema,
 } from '@influencer/types';
+import { Body, Controller, Delete, Get, HttpCode, Post, Put } from '@nestjs/common';
+import { z } from 'zod';
+
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import type { AuthenticatedUser } from '../../common/decorators/current-user.decorator';
+import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
+
 import { AccountService } from './account.service';
 
 const photoSchema = z.object({ url: z.string().url() });

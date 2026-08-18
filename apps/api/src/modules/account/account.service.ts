@@ -1,16 +1,18 @@
 import { randomUUID } from 'node:crypto';
+
+import type { UpdateProfileInput, ChangeEmailInput, ChangePasswordInput, UpdatePaypalInput, UpdateAboutYouInput } from '@influencer/types';
 import { Injectable, Logger } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
+
 import {
   ConflictException,
   NotFoundException,
   UnprocessableException,
 } from '../../common/exceptions/domain.exception';
 import { EncryptionService } from '../../common/services/encryption.service';
+import { AppConfigService } from '../../config/config.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { EmailProvider } from '../notifications/email.provider';
-import { AppConfigService } from '../../config/config.service';
-import type { UpdateProfileInput, ChangeEmailInput, ChangePasswordInput, UpdatePaypalInput, UpdateAboutYouInput } from '@influencer/types';
 
 const BCRYPT_COST = 12;
 const EMAIL_CHANGE_TTL_MS = 24 * 60 * 60 * 1000;

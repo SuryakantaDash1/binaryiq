@@ -1,5 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
 import type { Prisma } from '@influencer/db';
+import type { CategorySchema } from '@influencer/types';
+import { Injectable, Logger } from '@nestjs/common';
+
 import {
   ConflictException,
   NotFoundException,
@@ -9,7 +11,7 @@ import {
 import { EncryptionService } from '../../common/services/encryption.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PointsService } from '../points/points.service';
-import type { CategorySchema } from '@influencer/types';
+
 
 function isUniqueViolation(e: unknown): boolean {
   return (e as { code?: string }).code === 'P2002';
