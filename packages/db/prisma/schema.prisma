@@ -1,0 +1,349 @@
+// Influencer Platform — Prisma schema.
+// Phase 0 slice: Identity + Points core + reference data (profile categories,
+// spin game, rewards) + staff + audit. Feature tables (surveys, polls, games
+// plays, notifications, support, consent) are added by later phases' migrations.
+// Authoritative model reference: docs/architecture/04-database-architecture.md
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// ENUMS (Phase 0)
+// ─────────────────────────────────────────────────────────────
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum AuthTokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+  EMAIL_CHANGE
+}
+
+enum PointsAction {
+  REGISTRATION_BONUS
+  PROFILE_SURVEY
+  SURVEY_COMPLETION
+  POLL_VOTE
+  GAME_SPIN
+  REDEMPTION
+  ADJUSTMENT
+  REFERRAL
+}
+
+enum PointsDirection {
+  CREDIT
+  DEBIT
+}
+
+enum RedemptionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  REJECTED
+  CANCELLED
+}
+
+enum RewardType {
+  CHARITY
+  PAYPAL
+  VOUCHER
+  MERCHANDISE
+}
+
+enum GameType {
+  SPIN_WHEEL
+  QUIZ
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  SUPPORT
+  DPO
+}
+
+enum AreaType {
+  URBAN
+  RURAL
+  SUBURBAN
+}
+
+// ─────────────────────────────────────────────────────────────
+// IDENTITY
+// ─────────────────────────────────────────────────────────────
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  username     String    @unique
+  phoneEnc     String?   @map("phone_enc")
+  isVerified   Boolean   @default(false) @map("is_verified")
+  isActive     Boolean   @default(true) @map("is_active")
+  lastLoginAt  DateTime? @map("last_login_at") @db.Timestamptz(6)
+  failedLogins Int       @default(0) @map("failed_logins")
+  lockedUntil  DateTime? @map("locked_until") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  profile         UserProfile?
+  address         UserAddress?
+  demographics    UserDemographics?
+  paypalAccount   PaypalAccount?
+  authTokens      AuthToken[]
+  pointsTxns      PointsTransaction[]
+  pointsBalance   PointsBalance?
+  redemptions     RewardRedemption[]
+  surveyResponses ProfileSurveyResponse[]
+
+  @@index([email])
+  @@index([username])
+  @@map("users")
+}
+
+model UserProfile {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @map("user_id") @db.Uuid
+  firstName String   @map("first_name")
+  surname   String
+  dobEnc    String   @map("dob_enc")
+  gender    Gender
+  photoUrl  String?  @map("photo_url")
+  country   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model UserAddress {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @unique @map("user_id") @db.Uuid
+  line1Enc  String?   @map("line1_enc")
+  city      String?
+  pinCode   String?   @map("pin_code")
+  areaType  AreaType? @map("area_type")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_addresses")
+}
+
+model UserDemographics {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @unique @map("user_id") @db.Uuid
+  educationLevel  String?  @map("education_level")
+  employmentType  String?  @map("employment_type")
+  incomeBracket   String?  @map("income_bracket")
+  householdSize   Int?     @map("household_size")
+  childrenCount   Int?     @map("children_count")
+  chiefWageEarner Boolean? @map("chief_wage_earner")
+  assets          Json?    @db.JsonB
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_demographics")
+}
+
+model PaypalAccount {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @unique @map("user_id") @db.Uuid
+  paypalEmail String    @map("paypal_email")
+  verifiedAt  DateTime? @map("verified_at") @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("paypal_accounts")
+}
+
+model AuthToken {
+  id        String        @id @default(uuid()) @db.Uuid
+  userId    String        @map("user_id") @db.Uuid
+  token     String        @unique
+  tokenType AuthTokenType @map("token_type")
+  payload   Json?         @db.JsonB
+  expiresAt DateTime      @map("expires_at") @db.Timestamptz(6)
+  usedAt    DateTime?     @map("used_at") @db.Timestamptz(6)
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, tokenType])
+  @@index([expiresAt])
+  @@map("auth_tokens")
+}
+
+// ─────────────────────────────────────────────────────────────
+// POINTS CORE (append-only ledger — see 04-database §5)
+// ─────────────────────────────────────────────────────────────
+model PointsTransaction {
+  id             String          @id @default(uuid()) @db.Uuid
+  userId         String          @map("user_id") @db.Uuid
+  direction      PointsDirection
+  action         PointsAction
+  points         Int
+  balanceAfter   Int             @map("balance_after")
+  description    String
+  refType        String?         @map("ref_type")
+  refId          String?         @map("ref_id") @db.Uuid
+  idempotencyKey String?         @unique @map("idempotency_key")
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([refType, refId])
+  @@map("points_transactions")
+}
+
+model PointsBalance {
+  userId         String   @id @map("user_id") @db.Uuid
+  balance        Int      @default(0)
+  lifetimeEarned Int      @default(0) @map("lifetime_earned")
+  lifetimeSpent  Int      @default(0) @map("lifetime_spent")
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("points_balances")
+}
+
+model Reward {
+  id             String             @id @default(uuid()) @db.Uuid
+  name           String
+  description    String
+  rewardType     RewardType         @map("reward_type")
+  pointsRequired Int                @map("points_required")
+  imageUrl       String?            @map("image_url")
+  metadata       Json?              @db.JsonB
+  stock          Int?
+  isActive       Boolean            @default(true) @map("is_active")
+  sortOrder      Int                @default(0) @map("sort_order")
+  createdAt      DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+  redemptions    RewardRedemption[]
+
+  @@index([isActive, sortOrder])
+  @@map("rewards")
+}
+
+model RewardRedemption {
+  id             String           @id @default(uuid()) @db.Uuid
+  userId         String           @map("user_id") @db.Uuid
+  rewardId       String           @map("reward_id") @db.Uuid
+  pointsSpent    Int              @map("points_spent")
+  status         RedemptionStatus @default(PENDING)
+  fulfillmentRef String?          @map("fulfillment_ref")
+  notes          String?
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reward         Reward           @relation(fields: [rewardId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("reward_redemptions")
+}
+
+// ─────────────────────────────────────────────────────────────
+// REFERENCE DATA (seeded in Phase 0, consumed by later phases)
+// ─────────────────────────────────────────────────────────────
+model ProfileSurveyCategory {
+  id          String                  @id @default(uuid()) @db.Uuid
+  key         String                  @unique
+  name        String
+  pointsValue Int                     @map("points_value")
+  sortOrder   Int                     @map("sort_order")
+  schema      Json                    @db.JsonB
+  isActive    Boolean                 @default(true) @map("is_active")
+  createdAt   DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  responses   ProfileSurveyResponse[]
+
+  @@map("profile_survey_categories")
+}
+
+model Game {
+  id        String        @id @default(uuid()) @db.Uuid
+  gameName  String        @map("game_name")
+  gameType  GameType      @map("game_type")
+  isFree    Boolean       @default(true) @map("is_free")
+  isActive  Boolean       @default(true) @map("is_active")
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  segments  GameSegment[]
+
+  @@map("games")
+}
+
+model GameSegment {
+  id          String   @id @default(uuid()) @db.Uuid
+  gameId      String   @map("game_id") @db.Uuid
+  label       String
+  pointsValue Int      @map("points_value")
+  probability Decimal  @db.Decimal(5, 4)
+  color       String   @db.VarChar(7)
+  sortOrder   Int      @default(0) @map("sort_order")
+  game        Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@index([gameId])
+  @@map("game_segments")
+}
+
+// ─────────────────────────────────────────────────────────────
+// STAFF & COMPLIANCE
+// ─────────────────────────────────────────────────────────────
+model Admin {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  name         String
+  role         AdminRole @default(ADMIN)
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("admins")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  actorType  String   @map("actor_type")
+  actorId    String?  @map("actor_id") @db.Uuid
+  action     String
+  targetType String?  @map("target_type")
+  targetId   String?  @map("target_id") @db.Uuid
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  metadata   Json?    @db.JsonB
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([actorType, actorId])
+  @@index([action, createdAt])
+  @@map("audit_logs")
+}
+
+model ProfileSurveyResponse {
+  id            String                @id @default(uuid()) @db.Uuid
+  userId        String                @map("user_id") @db.Uuid
+  categoryId    String                @map("category_id") @db.Uuid
+  responses     Json                  @db.JsonB
+  pointsAwarded Int                   @map("points_awarded")
+  createdAt     DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  user          User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category      ProfileSurveyCategory @relation(fields: [categoryId], references: [id])
+
+  @@unique([userId, categoryId])
+  @@index([userId, createdAt])
+  @@map("profile_survey_responses")
+}

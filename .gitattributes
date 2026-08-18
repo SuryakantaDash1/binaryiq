@@ -1,0 +1,15 @@
+# Normalize all text files to LF on commit
+* text=auto eol=lf
+
+# Force binary files to stay binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+pnpm-lock.yaml -diff

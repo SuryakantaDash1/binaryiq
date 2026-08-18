@@ -1,0 +1,315 @@
+/**
+ * Idempotent seed (upsert by natural key) — safe to re-run on any environment.
+ * Seeds reference/config data only: 14 profile categories, the Daily Spin game
+ * + 8 weighted segments (probabilities sum to 1.0000), the rewards catalogue,
+ * and one super-admin. No member data, no ledger rows.
+ * See docs/modules/module-00-foundation.md §4.3.
+ */
+import { PrismaClient, Prisma } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+
+const prisma = new PrismaClient();
+
+interface CategoryDef { key: string; name: string; points: number; sort: number; schema: object }
+
+const PROFILE_CATEGORIES: CategoryDef[] = [
+  {
+    key: 'about_you', name: 'About You', points: 100, sort: 1,
+    schema: { version: 1, questions: [
+      { key: 'address_line1', type: 'text', label: 'Address line 1', required: false },
+      { key: 'city', type: 'text', label: 'City', required: true },
+      { key: 'pin_code', type: 'text', label: 'PIN / Postal code', required: true },
+      { key: 'area_type', type: 'radio', label: 'Area type', required: true, options: [{ value: 'URBAN', label: 'Urban' }, { value: 'RURAL', label: 'Rural' }, { value: 'SUBURBAN', label: 'Suburban' }] },
+      { key: 'education_level', type: 'select', label: 'Highest education', required: true, options: [{ value: 'secondary', label: 'Secondary' }, { value: 'graduate', label: 'Graduate' }, { value: 'postgrad', label: 'Post-graduate' }, { value: 'other', label: 'Other' }] },
+      { key: 'employment_type', type: 'select', label: 'Employment status', required: true, options: [{ value: 'salaried', label: 'Salaried' }, { value: 'self_employed', label: 'Self-employed' }, { value: 'student', label: 'Student' }, { value: 'homemaker', label: 'Homemaker' }, { value: 'retired', label: 'Retired' }, { value: 'unemployed', label: 'Unemployed' }] },
+    ]},
+  },
+  {
+    key: 'home_and_family', name: 'Home and Family', points: 100, sort: 2,
+    schema: { version: 1, questions: [
+      { key: 'household_size', type: 'number', label: 'People in household', required: true, min: 1, max: 20 },
+      { key: 'children_count', type: 'number', label: 'Number of children', required: true, min: 0, max: 15 },
+      { key: 'marital_status', type: 'radio', label: 'Marital status', required: true, options: [{ value: 'single', label: 'Single' }, { value: 'married', label: 'Married / partnered' }, { value: 'divorced', label: 'Divorced / separated' }, { value: 'widowed', label: 'Widowed' }] },
+      { key: 'living_situation', type: 'radio', label: 'Living situation', required: true, options: [{ value: 'own', label: 'Own home' }, { value: 'rent', label: 'Renting' }, { value: 'family', label: 'With family' }, { value: 'other', label: 'Other' }] },
+    ]},
+  },
+  {
+    key: 'employment', name: 'Employment', points: 100, sort: 3,
+    schema: { version: 1, questions: [
+      { key: 'employment_type', type: 'select', label: 'Employment type', required: true, options: [{ value: 'full_time', label: 'Full-time' }, { value: 'part_time', label: 'Part-time' }, { value: 'self_employed', label: 'Self-employed' }, { value: 'freelance', label: 'Freelance / contract' }, { value: 'student', label: 'Student' }, { value: 'homemaker', label: 'Homemaker' }, { value: 'retired', label: 'Retired' }, { value: 'unemployed', label: 'Unemployed' }] },
+      { key: 'industry', type: 'select', label: 'Industry', required: false, options: [{ value: 'technology', label: 'Technology' }, { value: 'healthcare', label: 'Healthcare' }, { value: 'education', label: 'Education' }, { value: 'finance', label: 'Finance / Banking' }, { value: 'retail', label: 'Retail / E-commerce' }, { value: 'manufacturing', label: 'Manufacturing' }, { value: 'government', label: 'Government / Public sector' }, { value: 'other', label: 'Other' }] },
+      { key: 'years_experience', type: 'select', label: 'Years of experience', required: false, options: [{ value: '0-2', label: '0–2 years' }, { value: '3-5', label: '3–5 years' }, { value: '6-10', label: '6–10 years' }, { value: '11-20', label: '11–20 years' }, { value: '20+', label: '20+ years' }] },
+      { key: 'chief_wage_earner', type: 'radio', label: 'Are you the chief wage earner in your household?', required: true, options: [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }] },
+    ]},
+  },
+  {
+    key: 'finance', name: 'Finance', points: 100, sort: 4,
+    schema: { version: 1, questions: [
+      { key: 'income_bracket', type: 'select', label: 'Annual household income', required: true, options: [{ value: 'under_3l', label: 'Under ₹3 lakh' }, { value: '3l_6l', label: '₹3–6 lakh' }, { value: '6l_12l', label: '₹6–12 lakh' }, { value: '12l_25l', label: '₹12–25 lakh' }, { value: 'above_25l', label: 'Above ₹25 lakh' }] },
+      { key: 'assets', type: 'multiselect', label: 'Assets owned', required: false, maxSelections: 6, options: [{ value: 'property', label: 'Property' }, { value: 'vehicle', label: 'Vehicle' }, { value: 'mutual_funds', label: 'Mutual funds / stocks' }, { value: 'insurance', label: 'Insurance policy' }, { value: 'gold', label: 'Gold / jewellery' }, { value: 'savings', label: 'Savings account' }] },
+      { key: 'savings_habit', type: 'radio', label: 'Do you save regularly?', required: true, options: [{ value: 'yes', label: 'Yes' }, { value: 'sometimes', label: 'Sometimes' }, { value: 'no', label: 'No' }] },
+      { key: 'chief_wage_earner', type: 'radio', label: 'Chief wage earner?', required: true, options: [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }] },
+    ]},
+  },
+  {
+    key: 'health', name: 'Health', points: 100, sort: 5,
+    schema: { version: 1, questions: [
+      { key: 'general_health', type: 'radio', label: 'Overall health', required: true, options: [{ value: 'excellent', label: 'Excellent' }, { value: 'good', label: 'Good' }, { value: 'fair', label: 'Fair' }, { value: 'poor', label: 'Poor' }] },
+      { key: 'exercise_frequency', type: 'select', label: 'Exercise frequency', required: true, options: [{ value: 'daily', label: 'Daily' }, { value: '3-5week', label: '3–5 times/week' }, { value: '1-2week', label: '1–2 times/week' }, { value: 'rarely', label: 'Rarely' }, { value: 'never', label: 'Never' }] },
+      { key: 'diet_type', type: 'radio', label: 'Diet preference', required: true, options: [{ value: 'vegetarian', label: 'Vegetarian' }, { value: 'vegan', label: 'Vegan' }, { value: 'non_vegetarian', label: 'Non-vegetarian' }, { value: 'flexitarian', label: 'Flexitarian' }] },
+      { key: 'health_conditions', type: 'multiselect', label: 'Any ongoing conditions?', required: false, maxSelections: 5, options: [{ value: 'diabetes', label: 'Diabetes' }, { value: 'hypertension', label: 'Hypertension' }, { value: 'heart', label: 'Heart condition' }, { value: 'thyroid', label: 'Thyroid' }, { value: 'none', label: 'None' }] },
+    ]},
+  },
+  {
+    key: 'personal_care', name: 'Personal Care', points: 100, sort: 6,
+    schema: { version: 1, questions: [
+      { key: 'monthly_spend', type: 'select', label: 'Monthly personal care spend', required: true, options: [{ value: 'under_500', label: 'Under ₹500' }, { value: '500_1500', label: '₹500–1,500' }, { value: '1500_3000', label: '₹1,500–3,000' }, { value: 'above_3000', label: 'Above ₹3,000' }] },
+      { key: 'products_used', type: 'multiselect', label: 'Products you regularly use', required: false, maxSelections: 8, options: [{ value: 'skincare', label: 'Skincare' }, { value: 'haircare', label: 'Haircare' }, { value: 'cosmetics', label: 'Cosmetics / makeup' }, { value: 'fragrance', label: 'Perfume / fragrance' }, { value: 'oral_care', label: 'Oral care' }, { value: 'mens_grooming', label: "Men's grooming" }, { value: 'sunscreen', label: 'Sunscreen / SPF' }] },
+      { key: 'buy_frequency', type: 'select', label: 'How often do you buy personal care products?', required: true, options: [{ value: 'weekly', label: 'Weekly' }, { value: 'monthly', label: 'Monthly' }, { value: 'quarterly', label: 'Quarterly' }, { value: 'occasionally', label: 'Occasionally' }] },
+    ]},
+  },
+  {
+    key: 'lifestyle', name: 'Lifestyle', points: 100, sort: 7,
+    schema: { version: 1, questions: [
+      { key: 'hobbies', type: 'multiselect', label: 'Hobbies & interests', required: true, maxSelections: 6, options: [{ value: 'reading', label: 'Reading' }, { value: 'cooking', label: 'Cooking' }, { value: 'fitness', label: 'Fitness / sports' }, { value: 'gaming', label: 'Gaming' }, { value: 'music', label: 'Music' }, { value: 'art', label: 'Art / crafts' }, { value: 'gardening', label: 'Gardening' }, { value: 'photography', label: 'Photography' }, { value: 'travel', label: 'Travel' }] },
+      { key: 'pets', type: 'radio', label: 'Do you have pets?', required: true, options: [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }] },
+      { key: 'social_freq', type: 'select', label: 'How often do you socialise?', required: true, options: [{ value: 'daily', label: 'Daily' }, { value: 'weekly', label: 'Weekly' }, { value: 'monthly', label: 'Monthly' }, { value: 'rarely', label: 'Rarely' }] },
+    ]},
+  },
+  {
+    key: 'travel', name: 'Travel', points: 100, sort: 8,
+    schema: { version: 1, questions: [
+      { key: 'travel_frequency', type: 'select', label: 'Domestic trips per year', required: true, options: [{ value: '0', label: 'Never' }, { value: '1-2', label: '1–2' }, { value: '3-5', label: '3–5' }, { value: '6+', label: '6+' }] },
+      { key: 'intl_frequency', type: 'select', label: 'International trips per year', required: false, options: [{ value: '0', label: 'Never' }, { value: '1', label: '1' }, { value: '2-3', label: '2–3' }, { value: '4+', label: '4+' }] },
+      { key: 'travel_mode', type: 'multiselect', label: 'Preferred travel mode', required: true, maxSelections: 4, options: [{ value: 'flight', label: 'Flight' }, { value: 'train', label: 'Train' }, { value: 'road', label: 'Road / car' }, { value: 'bus', label: 'Bus' }] },
+      { key: 'travel_type', type: 'radio', label: 'Travel style', required: true, options: [{ value: 'leisure', label: 'Leisure / holiday' }, { value: 'business', label: 'Business' }, { value: 'adventure', label: 'Adventure / backpacking' }, { value: 'pilgrimage', label: 'Pilgrimage / religious' }] },
+    ]},
+  },
+  {
+    key: 'shopping', name: 'Shopping', points: 100, sort: 9,
+    schema: { version: 1, questions: [
+      { key: 'shop_channels', type: 'multiselect', label: 'Where do you shop?', required: true, maxSelections: 5, options: [{ value: 'online', label: 'Online (Amazon, Flipkart, etc.)' }, { value: 'supermarket', label: 'Supermarket / hypermarket' }, { value: 'local', label: 'Local market' }, { value: 'mall', label: 'Shopping mall' }, { value: 'd2c', label: 'Brand websites (D2C)' }] },
+      { key: 'monthly_spend', type: 'select', label: 'Monthly shopping spend', required: true, options: [{ value: 'under_2k', label: 'Under ₹2,000' }, { value: '2k_5k', label: '₹2,000–5,000' }, { value: '5k_15k', label: '₹5,000–15,000' }, { value: 'above_15k', label: 'Above ₹15,000' }] },
+      { key: 'loyalty_programs', type: 'radio', label: 'Member of loyalty programs?', required: true, options: [{ value: 'yes_active', label: 'Yes, actively use them' }, { value: 'yes_passive', label: 'Yes, but rarely use them' }, { value: 'no', label: 'No' }] },
+    ]},
+  },
+  {
+    key: 'media', name: 'Media', points: 100, sort: 10,
+    schema: { version: 1, questions: [
+      { key: 'streaming_services', type: 'multiselect', label: 'Streaming services you use', required: false, maxSelections: 6, options: [{ value: 'netflix', label: 'Netflix' }, { value: 'amazon', label: 'Amazon Prime' }, { value: 'hotstar', label: 'Disney+ Hotstar' }, { value: 'sony', label: 'SonyLIV' }, { value: 'zee5', label: 'Zee5' }, { value: 'jiocinema', label: 'JioCinema' }] },
+      { key: 'tv_hours', type: 'select', label: 'TV / streaming hours per day', required: true, options: [{ value: 'under_1', label: 'Under 1 hour' }, { value: '1-3', label: '1–3 hours' }, { value: '3-5', label: '3–5 hours' }, { value: 'above_5', label: 'Above 5 hours' }] },
+      { key: 'news_source', type: 'radio', label: 'Primary news source', required: true, options: [{ value: 'tv', label: 'TV news' }, { value: 'newspaper', label: 'Newspaper' }, { value: 'online', label: 'Online / apps' }, { value: 'social', label: 'Social media' }, { value: 'none', label: 'I don\'t follow news' }] },
+    ]},
+  },
+  {
+    key: 'technology', name: 'Technology', points: 100, sort: 11,
+    schema: { version: 1, questions: [
+      { key: 'devices', type: 'multiselect', label: 'Devices you own', required: true, maxSelections: 6, options: [{ value: 'smartphone', label: 'Smartphone' }, { value: 'laptop', label: 'Laptop / PC' }, { value: 'tablet', label: 'Tablet' }, { value: 'smartwatch', label: 'Smartwatch' }, { value: 'smart_tv', label: 'Smart TV' }, { value: 'gaming_console', label: 'Gaming console' }] },
+      { key: 'internet_hours', type: 'select', label: 'Internet usage hours per day', required: true, options: [{ value: 'under_2', label: 'Under 2 hours' }, { value: '2-4', label: '2–4 hours' }, { value: '4-8', label: '4–8 hours' }, { value: 'above_8', label: 'Above 8 hours' }] },
+      { key: 'tech_adopter', type: 'radio', label: 'Tech adoption style', required: true, options: [{ value: 'early', label: 'Early adopter (first to try)' }, { value: 'mainstream', label: 'Mainstream (when popular)' }, { value: 'late', label: 'Late adopter (when necessary)' }] },
+    ]},
+  },
+  {
+    key: 'automotive', name: 'Automotive', points: 100, sort: 12,
+    schema: { version: 1, questions: [
+      { key: 'vehicle_ownership', type: 'radio', label: 'Do you own a vehicle?', required: true, options: [{ value: 'car', label: 'Car' }, { value: 'two_wheeler', label: 'Two-wheeler' }, { value: 'both', label: 'Both' }, { value: 'none', label: 'None' }] },
+      { key: 'drive_frequency', type: 'select', label: 'How often do you drive?', required: false, options: [{ value: 'daily', label: 'Daily' }, { value: 'few_week', label: 'A few times/week' }, { value: 'weekend', label: 'Weekends only' }, { value: 'rarely', label: 'Rarely' }] },
+      { key: 'next_purchase', type: 'select', label: 'Considering buying in next 12 months?', required: true, options: [{ value: 'yes_new', label: 'Yes — new vehicle' }, { value: 'yes_used', label: 'Yes — used vehicle' }, { value: 'no', label: 'No' }, { value: 'unsure', label: 'Unsure' }] },
+    ]},
+  },
+  {
+    key: 'video_games', name: 'Video Games', points: 100, sort: 13,
+    schema: { version: 1, questions: [
+      { key: 'gamer', type: 'radio', label: 'Do you play video / mobile games?', required: true, options: [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }] },
+      { key: 'platforms', type: 'multiselect', label: 'Platforms you play on', required: false, maxSelections: 5, options: [{ value: 'mobile', label: 'Mobile' }, { value: 'pc', label: 'PC' }, { value: 'playstation', label: 'PlayStation' }, { value: 'xbox', label: 'Xbox' }, { value: 'nintendo', label: 'Nintendo' }] },
+      { key: 'hours_week', type: 'select', label: 'Gaming hours per week', required: false, options: [{ value: 'under_2', label: 'Under 2 hours' }, { value: '2-7', label: '2–7 hours' }, { value: '8-15', label: '8–15 hours' }, { value: 'above_15', label: 'Above 15 hours' }] },
+      { key: 'spend', type: 'select', label: 'Monthly spend on games', required: false, options: [{ value: 'free', label: 'Free only' }, { value: 'under_500', label: 'Under ₹500' }, { value: '500_2000', label: '₹500–2,000' }, { value: 'above_2000', label: 'Above ₹2,000' }] },
+    ]},
+  },
+  {
+    key: 'social_activities', name: 'Social Activities', points: 200, sort: 14,
+    schema: { version: 1, questions: [
+      { key: 'platforms', type: 'multiselect', label: 'Social media platforms you use', required: true, maxSelections: 8, options: [{ value: 'instagram', label: 'Instagram' }, { value: 'facebook', label: 'Facebook' }, { value: 'twitter', label: 'X (Twitter)' }, { value: 'linkedin', label: 'LinkedIn' }, { value: 'youtube', label: 'YouTube' }, { value: 'whatsapp', label: 'WhatsApp' }, { value: 'snapchat', label: 'Snapchat' }, { value: 'tiktok', label: 'TikTok' }] },
+      { key: 'daily_time', type: 'select', label: 'Daily social media time', required: true, options: [{ value: 'under_30m', label: 'Under 30 min' }, { value: '30m_1h', label: '30 min–1 hour' }, { value: '1h_3h', label: '1–3 hours' }, { value: 'above_3h', label: 'Above 3 hours' }] },
+      { key: 'content_type', type: 'multiselect', label: 'Content you create or share', required: false, maxSelections: 5, options: [{ value: 'photos', label: 'Photos / stories' }, { value: 'videos', label: 'Videos / reels' }, { value: 'opinions', label: 'Opinions / reviews' }, { value: 'memes', label: 'Memes / humour' }, { value: 'news', label: 'News / current events' }, { value: 'nothing', label: 'I mostly consume' }] },
+      { key: 'community', type: 'radio', label: 'Member of any online community / group?', required: true, options: [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }] },
+    ]},
+  },
+];
+
+// 8 segments; probabilities sum to exactly 1.0000. See overview §7.5.
+const SPIN_SEGMENTS: Array<{
+  label: string;
+  points: number;
+  prob: string;
+  color: string;
+  sort: number;
+}> = [
+  { label: 'Better luck next time!', points: 0, prob: '0.1500', color: '#94A3B8', sort: 1 },
+  { label: '40 Points', points: 40, prob: '0.2000', color: '#F9A8D4', sort: 2 },
+  { label: '80 Points', points: 80, prob: '0.2000', color: '#F472B6', sort: 3 },
+  { label: '100 Points', points: 100, prob: '0.1800', color: '#EC4899', sort: 4 },
+  { label: '200 Points', points: 200, prob: '0.1200', color: '#E91E8C', sort: 5 },
+  { label: '300 Points', points: 300, prob: '0.0800', color: '#C2186F', sort: 6 },
+  { label: '500 Points', points: 500, prob: '0.0500', color: '#9D1458', sort: 7 },
+  { label: '1000 Points', points: 1000, prob: '0.0200', color: '#6B0E3C', sort: 8 },
+];
+
+const REWARDS: Array<{
+  key: string;
+  name: string;
+  description: string;
+  type: 'CHARITY' | 'PAYPAL' | 'VOUCHER' | 'MERCHANDISE';
+  points: number;
+  sort: number;
+}> = [
+  {
+    key: 'meals-africa',
+    name: 'Offer 4 meals to kids (Africa)',
+    description: 'Donate to fight malnutrition in Africa.',
+    type: 'CHARITY',
+    points: 4500,
+    sort: 1,
+  },
+  {
+    key: 'tree-madagascar',
+    name: 'Plant 1 tree in Madagascar',
+    description: 'Reforestation charity contribution.',
+    type: 'CHARITY',
+    points: 4500,
+    sort: 2,
+  },
+  {
+    key: 'plastic-ocean',
+    name: 'Remove 100g plastic from ocean',
+    description: 'Fight plastic pollution charity.',
+    type: 'CHARITY',
+    points: 4500,
+    sort: 3,
+  },
+  {
+    key: 'paypal-usd',
+    name: 'PayPal Payout (USD)',
+    description: 'Cash payout via PayPal to your linked account.',
+    type: 'PAYPAL',
+    points: 90000,
+    sort: 4,
+  },
+];
+
+async function seedProfileCategories(): Promise<void> {
+  for (const c of PROFILE_CATEGORIES) {
+    await prisma.profileSurveyCategory.upsert({
+      where: { key: c.key },
+      update: { name: c.name, pointsValue: c.points, sortOrder: c.sort, schema: c.schema as Prisma.InputJsonValue },
+      create: {
+        key: c.key,
+        name: c.name,
+        pointsValue: c.points,
+        sortOrder: c.sort,
+        schema: c.schema as Prisma.InputJsonValue,
+      },
+    });
+  }
+  console.warn(`  ✓ ${PROFILE_CATEGORIES.length} profile survey categories`);
+}
+
+async function seedSpinGame(): Promise<void> {
+  const game = await prisma.game.upsert({
+    where: { id: SPIN_GAME_ID },
+    update: { gameName: 'Daily Spin', isActive: true },
+    create: { id: SPIN_GAME_ID, gameName: 'Daily Spin', gameType: 'SPIN_WHEEL', isFree: true },
+  });
+
+  // Replace segments deterministically so re-seeding stays consistent.
+  await prisma.gameSegment.deleteMany({ where: { gameId: game.id } });
+  await prisma.gameSegment.createMany({
+    data: SPIN_SEGMENTS.map((s) => ({
+      gameId: game.id,
+      label: s.label,
+      pointsValue: s.points,
+      probability: new Prisma.Decimal(s.prob),
+      color: s.color,
+      sortOrder: s.sort,
+    })),
+  });
+
+  const sum = SPIN_SEGMENTS.reduce((acc, s) => acc + Number(s.prob), 0);
+  if (Math.abs(sum - 1) > 1e-9) {
+    throw new Error(`Spin segment probabilities must sum to 1.0 (got ${sum})`);
+  }
+  console.warn(`  ✓ Daily Spin game + ${SPIN_SEGMENTS.length} segments (Σp = ${sum.toFixed(4)})`);
+}
+
+async function seedRewards(): Promise<void> {
+  for (const r of REWARDS) {
+    await prisma.reward.upsert({
+      where: { id: rewardId(r.key) },
+      update: {
+        name: r.name,
+        description: r.description,
+        pointsRequired: r.points,
+        sortOrder: r.sort,
+      },
+      create: {
+        id: rewardId(r.key),
+        name: r.name,
+        description: r.description,
+        rewardType: r.type,
+        pointsRequired: r.points,
+        sortOrder: r.sort,
+        metadata: { key: r.key },
+      },
+    });
+  }
+  console.warn(`  ✓ ${REWARDS.length} rewards`);
+}
+
+async function seedSuperAdmin(): Promise<void> {
+  const email = process.env.SEED_SUPERADMIN_EMAIL;
+  const password = process.env.SEED_SUPERADMIN_PASSWORD;
+  if (!email || !password) {
+    console.warn('  ⚠ SEED_SUPERADMIN_EMAIL/PASSWORD not set — skipping super-admin');
+    return;
+  }
+  const passwordHash = await bcrypt.hash(password, 12);
+  await prisma.admin.upsert({
+    where: { email },
+    update: { role: 'SUPER_ADMIN', isActive: true },
+    create: { email, passwordHash, name: 'Super Admin', role: 'SUPER_ADMIN' },
+  });
+  console.warn(`  ✓ super-admin (${email})`);
+}
+
+// Deterministic UUIDv5-ish namespacing via fixed IDs keeps upserts idempotent.
+const SPIN_GAME_ID = '00000000-0000-4000-8000-000000000001';
+function rewardId(key: string): string {
+  // Stable synthetic UUIDs for the seeded catalogue (key -> fixed id).
+  const map: Record<string, string> = {
+    'meals-africa': '00000000-0000-4000-8000-000000000101',
+    'tree-madagascar': '00000000-0000-4000-8000-000000000102',
+    'plastic-ocean': '00000000-0000-4000-8000-000000000103',
+    'paypal-usd': '00000000-0000-4000-8000-000000000104',
+  };
+  const id = map[key];
+  if (!id) throw new Error(`No fixed reward id for key ${key}`);
+  return id;
+}
+
+async function main(): Promise<void> {
+  console.warn('Seeding reference data…');
+  await seedProfileCategories();
+  await seedSpinGame();
+  await seedRewards();
+  await seedSuperAdmin();
+  console.warn('Seed complete.');
+}
+
+main()
+  .catch((e: unknown) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(() => {
+    void prisma.$disconnect();
+  });

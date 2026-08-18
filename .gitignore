@@ -1,0 +1,74 @@
+# ─── Dependencies ─────────────────────────────────────────────────────────────
+node_modules/
+.pnpm-store/
+
+# ─── Builds & compiled output ─────────────────────────────────────────────────
+dist/
+.next/
+out/
+build/
+*.tsbuildinfo
+*.js.map
+*.d.ts.map
+
+# ─── Turborepo ────────────────────────────────────────────────────────────────
+.turbo/
+
+# ─── Test & coverage ──────────────────────────────────────────────────────────
+coverage/
+*.lcov
+.nyc_output/
+test-results/
+playwright-report/
+
+# ─── Environment / secrets ────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# ─── Prisma ───────────────────────────────────────────────────────────────────
+packages/db/prisma/*.db
+packages/db/prisma/*.db-journal
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ─── OS / editor ──────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+.idea/
+*.iml
+*.iws
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+*.swp
+*.swo
+*~
+
+# ─── Storybook ────────────────────────────────────────────────────────────────
+storybook-static/
+
+# ─── Misc ─────────────────────────────────────────────────────────────────────
+docs/_extract.py
+docs/_docx.txt
+.cache/
+tmp/
+temp/

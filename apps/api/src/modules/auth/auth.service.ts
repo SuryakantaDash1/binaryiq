@@ -1,0 +1,255 @@
+import { randomUUID } from 'node:crypto';
+
+import type {
+  RegisterStep1Input,
+  RegisterStep1Result,
+  RegisterStep2Input,
+  RegisterStep2Result,
+  LoginInput,
+  AuthSession,
+  VerifyEmailResult,
+  ForgotPasswordInput,
+  ResetPasswordInput,
+} from '@influencer/types';
+import { Injectable, Logger } from '@nestjs/common';
+import bcrypt from 'bcryptjs';
+
+import {
+  ConflictException,
+  UnauthenticatedException,
+  UnprocessableException,
+} from '../../common/exceptions/domain.exception';
+import { AppConfigService } from '../../config/config.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { RedisService } from '../../redis/redis.service';
+import { EmailProvider } from '../notifications/email.provider';
+import { verificationEmail, passwordResetEmail } from '../notifications/email.templates';
+import { PointsService } from '../points/points.service';
+
+import { TokenService } from './token.service';
+
+const BCRYPT_COST = 12;
+const DRAFT_TTL_SECONDS = 60 * 60; // 1 hour
+const VERIFY_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const RESET_TTL_MS = 60 * 60 * 1000; // 1 hour
+const MAX_FAILED_LOGINS = 5;
+const LOCKOUT_MS = 30 * 60 * 1000; // 30 minutes
+
+export interface LoginResult {
+  session: AuthSession;
+  refreshToken: string;
+}
+
+@Injectable()
+export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly redis: RedisService,
+    private readonly tokens: TokenService,
+    private readonly points: PointsService,
+    private readonly email: EmailProvider,
+    private readonly config: AppConfigService,
+  ) {}
+
+  /** Step 1 — stash identity basics in a short-lived Redis draft. */
+  async registerStep1(input: RegisterStep1Input): Promise<RegisterStep1Result> {
+    const draftId = randomUUID();
+    await this.redis.instance.set(
+      this.draftKey(draftId),
+      JSON.stringify(input),
+      'EX',
+      DRAFT_TTL_SECONDS,
+    );
+    return { draftId };
+  }
+
+  /** Step 2 — create the user, send the verification email. */
+  async registerStep2(input: RegisterStep2Input): Promise<RegisterStep2Result> {
+    const raw = await this.redis.instance.get(this.draftKey(input.draftId));
+    if (!raw) {
+      throw new UnprocessableException('Registration session expired — please restart.');
+    }
+    const step1 = JSON.parse(raw) as RegisterStep1Input;
+
+    const [emailTaken, usernameTaken] = await Promise.all([
+      this.prisma.user.findUnique({ where: { email: input.email.toLowerCase() } }),
+      this.prisma.user.findUnique({ where: { username: input.username } }),
+    ]);
+    if (emailTaken) throw new ConflictException('Email is already registered');
+    if (usernameTaken) throw new ConflictException('Username is taken');
+
+    const passwordHash = await bcrypt.hash(input.password, BCRYPT_COST);
+    const token = randomUUID();
+
+    await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: input.email.toLowerCase(),
+          username: input.username,
+          passwordHash,
+          phoneEnc: input.mobile ?? null,
+          profile: {
+            create: {
+              firstName: step1.firstName,
+              surname: step1.surname,
+              dobEnc: step1.dob,
+              gender: step1.gender,
+              country: step1.country,
+            },
+          },
+          address: { create: { pinCode: input.pinCode } },
+        },
+      });
+      await tx.authToken.create({
+        data: {
+          userId: user.id,
+          token,
+          tokenType: 'EMAIL_VERIFICATION',
+          expiresAt: new Date(Date.now() + VERIFY_TTL_MS),
+        },
+      });
+    });
+
+    await this.redis.instance.del(this.draftKey(input.draftId));
+
+    const link = `${this.config.get('WEB_URL')}/verify?token=${token}`;
+    const { subject, html } = verificationEmail(link);
+    await this.email.send({ to: input.email, subject, html });
+
+    return {
+      email: input.email,
+      message: `We have sent you an activation email on ${input.email}`,
+    };
+  }
+
+  /** Verify the email token, mark verified, award the welcome bonus (idempotent). */
+  async verifyEmail(token: string): Promise<VerifyEmailResult> {
+    const record = await this.prisma.authToken.findUnique({ where: { token } });
+    if (!record || record.tokenType !== 'EMAIL_VERIFICATION') {
+      throw new UnprocessableException('Invalid verification link');
+    }
+    if (record.expiresAt.getTime() < Date.now()) {
+      throw new UnprocessableException('Verification link has expired');
+    }
+    if (record.usedAt) {
+      return { verified: true, pointsAwarded: 0 }; // idempotent — already verified
+    }
+
+    const bonus = this.config.get('REGISTRATION_BONUS_POINTS');
+    await this.prisma.$transaction(async (tx) => {
+      await tx.user.update({ where: { id: record.userId }, data: { isVerified: true } });
+      await tx.authToken.update({ where: { id: record.id }, data: { usedAt: new Date() } });
+      await this.points.award(tx, {
+        userId: record.userId,
+        points: bonus,
+        action: 'REGISTRATION_BONUS',
+        description: 'Welcome bonus',
+        idempotencyKey: `registration_bonus:${record.userId}`,
+      });
+    });
+
+    return { verified: true, pointsAwarded: bonus };
+  }
+
+  async login(input: LoginInput): Promise<LoginResult> {
+    const user = await this.prisma.user.findUnique({ where: { email: input.email.toLowerCase() } });
+    if (!user || !user.isActive) throw new UnauthenticatedException('Invalid email or password');
+
+    if (user.lockedUntil && user.lockedUntil.getTime() > Date.now()) {
+      throw new UnauthenticatedException('Account locked. Try again later.');
+    }
+
+    const ok = await bcrypt.compare(input.password, user.passwordHash);
+    if (!ok) {
+      const failed = user.failedLogins + 1;
+      const lock = failed >= MAX_FAILED_LOGINS;
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          failedLogins: lock ? 0 : failed,
+          lockedUntil: lock ? new Date(Date.now() + LOCKOUT_MS) : null,
+        },
+      });
+      throw new UnauthenticatedException('Invalid email or password');
+    }
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { failedLogins: 0, lockedUntil: null, lastLoginAt: new Date() },
+    });
+
+    const accessToken = this.tokens.signAccess({ sub: user.id, email: user.email, roles: [] });
+    const refreshToken = this.tokens.signRefresh(user.id);
+    return {
+      session: {
+        accessToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          isVerified: user.isVerified,
+        },
+      },
+      refreshToken,
+    };
+  }
+
+  async forgotPassword(input: ForgotPasswordInput): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { email: input.email.toLowerCase() } });
+    // Always succeed to avoid leaking whether the email exists.
+    if (!user) return;
+
+    const token = randomUUID();
+    await this.prisma.authToken.create({
+      data: {
+        userId: user.id,
+        token,
+        tokenType: 'PASSWORD_RESET',
+        expiresAt: new Date(Date.now() + RESET_TTL_MS),
+      },
+    });
+    const link = `${this.config.get('WEB_URL')}/reset-password?token=${token}`;
+    const { subject, html } = passwordResetEmail(link);
+    await this.email.send({ to: user.email, subject, html });
+  }
+
+  async resetPassword(input: ResetPasswordInput): Promise<void> {
+    const record = await this.prisma.authToken.findUnique({ where: { token: input.token } });
+    if (!record || record.tokenType !== 'PASSWORD_RESET' || record.usedAt) {
+      throw new UnprocessableException('Invalid or used reset link');
+    }
+    if (record.expiresAt.getTime() < Date.now()) {
+      throw new UnprocessableException('Reset link has expired');
+    }
+    const passwordHash = await bcrypt.hash(input.newPassword, BCRYPT_COST);
+    await this.prisma.$transaction(async (tx) => {
+      await tx.user.update({
+        where: { id: record.userId },
+        data: { passwordHash, failedLogins: 0, lockedUntil: null },
+      });
+      await tx.authToken.update({ where: { id: record.id }, data: { usedAt: new Date() } });
+    });
+  }
+
+  async refresh(refreshToken: string): Promise<AuthSession> {
+    const { sub } = this.tokens.verifyRefresh(refreshToken);
+    const user = await this.prisma.user.findUnique({ where: { id: sub } });
+    if (!user || !user.isActive) throw new UnauthenticatedException('Invalid refresh token');
+    const accessToken = this.tokens.signAccess({ sub: user.id, email: user.email, roles: [] });
+    return {
+      accessToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        isVerified: user.isVerified,
+      },
+    };
+  }
+
+  private draftKey(draftId: string): string {
+    return `reg:draft:${draftId}`;
+  }
+}

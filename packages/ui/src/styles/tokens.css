@@ -1,0 +1,90 @@
+/* Design tokens — primitive + semantic. See docs/design-system/11-color-system.md.
+   Components reference SEMANTIC tokens only (never raw hex). */
+
+:root {
+  /* ── Primitive: magenta (brand) ── */
+  --magenta-50: #fdf2f8;
+  --magenta-100: #fce7f3;
+  --magenta-200: #fbcfe8;
+  --magenta-300: #f9a8d4;
+  --magenta-400: #f472b6;
+  --magenta-500: #ec4899;
+  --magenta-600: #e91e8c;
+  --magenta-700: #c2186f;
+  --magenta-800: #9d1458;
+  --magenta-900: #6b0e3c;
+
+  /* ── Primitive: neutral ── */
+  --neutral-0: #ffffff;
+  --neutral-50: #f8fafc;
+  --neutral-100: #f1f5f9;
+  --neutral-200: #e2e8f0;
+  --neutral-300: #cbd5e1;
+  --neutral-400: #94a3b8;
+  --neutral-500: #64748b;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1e293b;
+  --neutral-900: #0f172a;
+  --neutral-950: #020617;
+
+  /* ── Primitive: semantic hues ── */
+  --success-500: #10b981;
+  --warning-500: #f59e0b;
+  --danger-500: #ef4444;
+  --info-500: #3b82f6;
+
+  /* ── Semantic: surfaces ── */
+  --color-bg: var(--neutral-50);
+  --color-surface: var(--neutral-0);
+  --color-surface-alt: var(--neutral-100);
+  --color-border: var(--neutral-200);
+  --color-border-strong: var(--neutral-300);
+
+  /* ── Semantic: text ── */
+  --color-text: var(--neutral-800);
+  --color-text-secondary: var(--neutral-600);
+  --color-text-muted: var(--neutral-500);
+  --color-text-inverse: var(--neutral-0);
+
+  /* ── Semantic: brand ── */
+  --color-primary: var(--magenta-600);
+  --color-primary-hover: var(--magenta-700);
+  --color-primary-active: var(--magenta-800);
+  --color-primary-tint: var(--magenta-50);
+  --color-on-primary: #ffffff;
+
+  /* ── Semantic: status ── */
+  --color-success: var(--success-500);
+  --color-warning: var(--warning-500);
+  --color-danger: var(--danger-500);
+  --color-info: var(--info-500);
+
+  /* ── Effects ── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.12);
+  --focus-ring: 0 0 0 3px rgba(233, 30, 140, 0.35);
+
+  /* ── Typography ── */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] {
+  --color-bg: var(--neutral-950);
+  --color-surface: var(--neutral-900);
+  --color-surface-alt: var(--neutral-800);
+  --color-border: var(--neutral-800);
+  --color-border-strong: var(--neutral-700);
+  --color-text: var(--neutral-100);
+  --color-text-secondary: var(--neutral-300);
+  --color-text-muted: var(--neutral-400);
+  --color-text-inverse: var(--neutral-900);
+  --color-primary: var(--magenta-500);
+  --color-primary-hover: var(--magenta-400);
+  --color-primary-tint: rgba(233, 30, 140, 0.12);
+}
