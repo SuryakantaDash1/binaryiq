@@ -1,4 +1,5 @@
 import type { Prisma, PointsAction } from '@influencer/db';
+import type { TransactionQuery } from '@influencer/types';
 import { Injectable } from '@nestjs/common';
 
 import { UnprocessableException } from '../../common/exceptions/domain.exception';
@@ -47,6 +48,74 @@ export class PointsService {
   /** Convenience: run a single movement in its own transaction. */
   awardStandalone(input: MovePointsInput): Promise<PointsMovementResult> {
     return this.prisma.$transaction((tx) => this.award(tx, input));
+  }
+
+  async getBalance(userId: string) {
+    const bal = await this.prisma.pointsBalance.findUnique({ where: { userId } });
+    return {
+      balance: bal?.balance ?? 0,
+      lifetimeEarned: bal?.lifetimeEarned ?? 0,
+      lifetimeSpent: bal?.lifetimeSpent ?? 0,
+      updatedAt: bal?.updatedAt.toISOString() ?? new Date().toISOString(),
+    };
+  }
+
+  async getTransactions(userId: string, query: TransactionQuery) {
+    const limit = query.limit ?? 20;
+
+    // Decode cursor (it's a base64-encoded createdAt timestamp)
+    let cursorDate: Date | undefined;
+    if (query.cursor) {
+      try {
+        cursorDate = new Date(Buffer.from(query.cursor, 'base64').toString('utf8'));
+      } catch {
+        // invalid cursor, ignore
+      }
+    }
+
+    const where = {
+      userId,
+      ...(query.direction ? { direction: query.direction } : {}),
+      ...(query.action ? { action: query.action as PointsAction } : {}),
+      ...(query.from || query.to || cursorDate
+        ? {
+            createdAt: {
+              ...(query.from ? { gte: new Date(query.from) } : {}),
+              ...(query.to ? { lte: new Date(query.to) } : {}),
+              ...(cursorDate ? { lt: cursorDate } : {}),
+            },
+          }
+        : {}),
+    };
+
+    const rows = await this.prisma.pointsTransaction.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      take: limit + 1,
+    });
+
+    const hasMore = rows.length > limit;
+    const items = hasMore ? rows.slice(0, limit) : rows;
+    const lastItem = items[items.length - 1];
+    const nextCursor =
+      hasMore && lastItem
+        ? Buffer.from(lastItem.createdAt.toISOString()).toString('base64')
+        : null;
+
+    return {
+      items: items.map((t) => ({
+        id: t.id,
+        direction: t.direction,
+        action: t.action,
+        points: t.points,
+        balanceAfter: t.balanceAfter,
+        description: t.description,
+        refType: t.refType,
+        refId: t.refId,
+        createdAt: t.createdAt.toISOString(),
+      })),
+      pagination: { nextCursor, hasMore, limit },
+    };
   }
 
   private async move(
