@@ -1,0 +1,35 @@
+{
+  "topic": "REWARDS",
+  "issueType": "REWARDS",
+  "title": "Rewards Delivery",
+  "icon": "gift",
+  "escalable": true,
+  "dpoRouted": false,
+  "entryNodeId": "root",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "message": "What is the issue with your reward?",
+      "options": [
+        { "label": "My redemption is pending for too long", "next": "pending_long" },
+        { "label": "I received the wrong reward", "next": "wrong_reward" },
+        { "label": "My PayPal payment did not arrive", "next": "paypal_missing" }
+      ]
+    },
+    "pending_long": {
+      "id": "pending_long",
+      "message": "Reward processing normally takes 3-5 business days. For charity and PayPal transfers, it can be up to 10 days. If your redemption has been pending for longer, raise a ticket.",
+      "escalate": true
+    },
+    "wrong_reward": {
+      "id": "wrong_reward",
+      "message": "If you received the wrong reward, please raise a ticket immediately and we will correct it. Please include your redemption reference number.",
+      "escalate": true
+    },
+    "paypal_missing": {
+      "id": "paypal_missing",
+      "message": "PayPal transfers can take 3-5 business days after we process the payout. Check that your PayPal account email matches what you registered. If it has been more than 7 days, raise a ticket.",
+      "escalate": true
+    }
+  }
+}

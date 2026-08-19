@@ -14,6 +14,7 @@ import { PointsModule } from './modules/points/points.module';
 import { PollsModule } from './modules/polls/polls.module';
 import { ProfileSurveysModule } from './modules/profile-surveys/profile-surveys.module';
 import { RewardsModule } from './modules/rewards/rewards.module';
+import { SupportModule } from './modules/support/support.module';
 import { SurveysModule } from './modules/surveys/surveys.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { QueueModule } from './queue/queue.module';
@@ -25,7 +26,7 @@ import { RedisModule } from './redis/redis.module';
     QueueModule,
     AuthModule, PointsModule, HealthModule,
     AccountModule, ProfileSurveysModule, RewardsModule, SurveysModule, PollsModule, GamesModule,
-    NotificationsModule,
+    NotificationsModule, SupportModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },

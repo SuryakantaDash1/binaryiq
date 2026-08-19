@@ -1,0 +1,35 @@
+{
+  "topic": "LOGIN",
+  "issueType": "LOGIN",
+  "title": "Login Problems",
+  "icon": "key",
+  "escalable": true,
+  "dpoRouted": false,
+  "entryNodeId": "root",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "message": "I can help with login issues. What's happening?",
+      "options": [
+        { "label": "I forgot my password", "next": "forgot_password" },
+        { "label": "My account is locked", "next": "account_locked" },
+        { "label": "I'm not receiving the verification email", "next": "no_verify_email" }
+      ]
+    },
+    "forgot_password": {
+      "id": "forgot_password",
+      "message": "You can reset your password by clicking 'Forgot Password' on the login page. A reset link will be sent to your registered email address within a few minutes.",
+      "resolution": true
+    },
+    "account_locked": {
+      "id": "account_locked",
+      "message": "Accounts are temporarily locked after 5 failed login attempts. The lock lifts automatically after 15 minutes. If you are still locked out after that, raise a ticket and our team will help.",
+      "escalate": true
+    },
+    "no_verify_email": {
+      "id": "no_verify_email",
+      "message": "Verification emails can take up to 5 minutes. Please check your spam/junk folder. You can also request a new one from the login page.",
+      "resolution": true
+    }
+  }
+}

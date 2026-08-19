@@ -8,3 +8,4 @@ export * from './surveys.js';
 export * from './polls.js';
 export * from './games.js';
 export * from './notifications.js';
+export * from './support.js';

@@ -1,0 +1,35 @@
+{
+  "topic": "SURVEY",
+  "issueType": "SURVEY",
+  "title": "Survey Problems",
+  "icon": "clipboard",
+  "escalable": true,
+  "dpoRouted": false,
+  "entryNodeId": "root",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "message": "What survey issue are you experiencing?",
+      "options": [
+        { "label": "Survey not loading", "next": "not_loading" },
+        { "label": "Survey terminated mid-way", "next": "terminated" },
+        { "label": "I am not matched to any surveys", "next": "no_match" }
+      ]
+    },
+    "not_loading": {
+      "id": "not_loading",
+      "message": "Survey loading issues are often caused by browser extensions or ad-blockers. Try disabling these and reloading. If the problem persists, please raise a ticket.",
+      "escalate": true
+    },
+    "terminated": {
+      "id": "terminated",
+      "message": "Surveys can terminate early if your profile does not match the target criteria mid-survey — this is normal and not an error. Points are not awarded for screened-out surveys. If you believe this was an error, raise a ticket.",
+      "escalate": true
+    },
+    "no_match": {
+      "id": "no_match",
+      "message": "Survey matching depends on your profile completion. Go to Profile → About You and fill in all sections to unlock more surveys. New surveys are added regularly.",
+      "resolution": true
+    }
+  }
+}

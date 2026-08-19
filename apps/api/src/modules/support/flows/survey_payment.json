@@ -1,0 +1,29 @@
+{
+  "topic": "SURVEY_PAYMENT",
+  "issueType": "SURVEY_PAYMENT",
+  "title": "Survey Payment",
+  "icon": "coins",
+  "escalable": true,
+  "dpoRouted": false,
+  "entryNodeId": "root",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "message": "What is the problem with your survey reward?",
+      "options": [
+        { "label": "Points not credited after completion", "next": "not_credited" },
+        { "label": "Wrong amount credited", "next": "wrong_amount" }
+      ]
+    },
+    "not_credited": {
+      "id": "not_credited",
+      "message": "Rewards can take up to 24 hours to post after a survey completes. If it has been longer than 24 hours, please raise a ticket and we will look into it.",
+      "escalate": true
+    },
+    "wrong_amount": {
+      "id": "wrong_amount",
+      "message": "The points shown before you start a survey are the guaranteed amount. If the credit differs, raise a ticket and we will reconcile it.",
+      "escalate": true
+    }
+  }
+}

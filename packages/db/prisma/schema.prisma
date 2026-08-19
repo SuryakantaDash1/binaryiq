@@ -77,6 +77,22 @@ enum GameType {
   QUIZ
 }
 
+enum TicketIssueType {
+  LOGIN
+  SURVEY
+  SURVEY_PAYMENT
+  REWARDS
+  UNSUBSCRIBE
+  OTHER
+}
+
+enum TicketStatus {
+  OPEN
+  PENDING
+  RESOLVED
+  CLOSED
+}
+
 enum NotificationChannel {
   EMAIL
   PUSH
@@ -149,6 +165,7 @@ model User {
   notifications            Notification[]
   notificationPreferences  NotificationPreference[]
   pushTokens               PushToken[]
+  supportTickets           SupportTicket[]
 
   @@index([email])
   @@index([username])
@@ -549,4 +566,37 @@ model PushToken {
 
   @@index([userId])
   @@map("push_tokens")
+}
+
+// ─────────────────────────────────────────────────────────────
+// SUPPORT / CHATBOT (Phase 8)
+// ─────────────────────────────────────────────────────────────
+model SupportTicket {
+  id              String           @id @default(uuid()) @db.Uuid
+  userId          String           @map("user_id") @db.Uuid
+  issueType       TicketIssueType  @map("issue_type")
+  subject         String?
+  status          TicketStatus     @default(OPEN)
+  assigneeAdminId String?          @map("assignee_admin_id") @db.Uuid
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages        SupportTicketMessage[]
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@map("support_tickets")
+}
+
+model SupportTicketMessage {
+  id         String         @id @default(uuid()) @db.Uuid
+  ticketId   String         @map("ticket_id") @db.Uuid
+  senderType String         @map("sender_type")
+  message    String
+  metadata   Json?          @db.JsonB
+  createdAt  DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  ticket     SupportTicket  @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId, createdAt])
+  @@map("support_ticket_messages")
 }

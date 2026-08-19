@@ -1,7 +1,13 @@
 import { AppShell, type NavItem } from '@influencer/ui';
 import { Home, Gift, Vote } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+
+const ChatWidget = dynamic(
+  () => import('../../features/support/ChatWidget.js').then((m) => ({ default: m.ChatWidget })),
+  { ssr: false },
+);
 
 const NAV: NavItem[] = [
   { label: 'Dashboard', href: '/sample', icon: <Home className="h-4 w-4" /> },
@@ -26,6 +32,7 @@ export default function AppGroupLayout({ children }: { children: ReactNode }): R
       )}
     >
       {children}
+      <ChatWidget />
     </AppShell>
   );
 }

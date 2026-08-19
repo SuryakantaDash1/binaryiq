@@ -1,0 +1,31 @@
+{
+  "topic": "UNSUBSCRIBE",
+  "issueType": "UNSUBSCRIBE",
+  "title": "Unsubscribe / Account",
+  "icon": "user-x",
+  "escalable": true,
+  "dpoRouted": true,
+  "entryNodeId": "root",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "message": "I can help with subscription and account options. What would you like to do?",
+      "options": [
+        { "label": "Manage notification preferences", "next": "manage_notifs" },
+        { "label": "Delete my account", "next": "delete_account" }
+      ]
+    },
+    "manage_notifs": {
+      "id": "manage_notifs",
+      "message": "You can manage all your notification preferences from your account settings.",
+      "action": { "type": "navigate", "href": "/account/notifications" },
+      "suppressEscalation": true
+    },
+    "delete_account": {
+      "id": "delete_account",
+      "message": "To request account deletion, go to Account Settings. Your data will be handled as per our Privacy Policy and applicable data protection law.",
+      "action": { "type": "navigate", "href": "/account/notifications" },
+      "suppressEscalation": true
+    }
+  }
+}
