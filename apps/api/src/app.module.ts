@@ -9,6 +9,7 @@ import { HealthModule } from './health/health.module';
 import { AccountModule } from './modules/account/account.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { PointsModule } from './modules/points/points.module';
+import { PollsModule } from './modules/polls/polls.module';
 import { ProfileSurveysModule } from './modules/profile-surveys/profile-surveys.module';
 import { RewardsModule } from './modules/rewards/rewards.module';
 import { SurveysModule } from './modules/surveys/surveys.module';
@@ -19,7 +20,7 @@ import { RedisModule } from './redis/redis.module';
   imports: [
     AppConfigModule, PrismaModule, RedisModule,
     AuthModule, PointsModule, HealthModule,
-    AccountModule, ProfileSurveysModule, RewardsModule, SurveysModule,
+    AccountModule, ProfileSurveysModule, RewardsModule, SurveysModule, PollsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },

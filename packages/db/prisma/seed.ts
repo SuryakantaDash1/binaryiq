@@ -371,6 +371,66 @@ async function seedSurveys(): Promise<void> {
   console.warn(`  ✓ ${surveys.length} brand surveys`);
 }
 
+async function seedPolls(prisma: PrismaClient): Promise<void> {
+  const count = await prisma.poll.count();
+  if (count > 0) {
+    console.warn('  ⚠ Polls already seeded, skipping');
+    return;
+  }
+
+  // Sample polls from the spec
+  await prisma.poll.create({
+    data: {
+      question: "Do you think Westside brand is a 'Made in India' brand?",
+      pollType: 'SINGLE_CHOICE',
+      sponsorName: 'Westside',
+      pointsReward: 15,
+      options: {
+        create: [
+          { optionText: 'Yes', sortOrder: 0 },
+          { optionText: 'No', sortOrder: 1 },
+        ],
+      },
+    },
+  });
+
+  await prisma.poll.create({
+    data: {
+      question: 'How frequently do you listen to FM Radio?',
+      pollType: 'MULTI_CHOICE',
+      sponsorName: 'RadioMirchi',
+      pointsReward: 15,
+      options: {
+        create: [
+          { optionText: 'Everyday', sortOrder: 0 },
+          { optionText: '2–3 days a week', sortOrder: 1 },
+          { optionText: '1 day a week', sortOrder: 2 },
+          { optionText: 'Less frequently', sortOrder: 3 },
+          { optionText: 'Do not listen', sortOrder: 4 },
+        ],
+      },
+    },
+  });
+
+  await prisma.poll.create({
+    data: {
+      question: 'Which payment method do you use most for online shopping?',
+      pollType: 'SINGLE_CHOICE',
+      pointsReward: 15,
+      options: {
+        create: [
+          { optionText: 'UPI', sortOrder: 0 },
+          { optionText: 'Credit / Debit Card', sortOrder: 1 },
+          { optionText: 'Net Banking', sortOrder: 2 },
+          { optionText: 'Cash on Delivery', sortOrder: 3 },
+        ],
+      },
+    },
+  });
+
+  console.warn('  ✓ 3 polls seeded');
+}
+
 async function main(): Promise<void> {
   console.warn('Seeding reference data…');
   await seedProfileCategories();
@@ -378,6 +438,7 @@ async function main(): Promise<void> {
   await seedRewards();
   await seedSuperAdmin();
   await seedSurveys();
+  await seedPolls(prisma);
   console.warn('Seed complete.');
 }
 

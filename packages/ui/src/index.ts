@@ -43,3 +43,7 @@ export { RangeFilter } from './range-filter.js';
 export type { RangeFilterProps, DateRange } from './range-filter.js';
 export { SurveyCard } from './survey-card.js';
 export type { SurveyCardProps, SurveyCardData } from './survey-card.js';
+export { PollCard } from './poll-card.js';
+export type { PollCardProps, PollCardData } from './poll-card.js';
+export { PollResultBars } from './poll-result-bars.js';
+export type { PollResultBarsProps } from './poll-result-bars.js';

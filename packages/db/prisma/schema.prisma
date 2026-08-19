@@ -67,6 +67,11 @@ enum SurveyType {
   PREMIUM
 }
 
+enum PollType {
+  SINGLE_CHOICE
+  MULTI_CHOICE
+}
+
 enum GameType {
   SPIN_WHEEL
   QUIZ
@@ -113,6 +118,7 @@ model User {
   redemptions     RewardRedemption[]
   surveyResponses    ProfileSurveyResponse[]
   brandSurveyResponses SurveyResponse[]
+  pollVotes            PollVote[]
 
   @@index([email])
   @@index([username])
@@ -262,6 +268,54 @@ model RewardRedemption {
   @@index([userId, createdAt])
   @@index([status])
   @@map("reward_redemptions")
+}
+
+// ─────────────────────────────────────────────────────────────
+// POLLS (Phase 5)
+// ─────────────────────────────────────────────────────────────
+model Poll {
+  id           String       @id @default(uuid()) @db.Uuid
+  question     String
+  pollType     PollType     @map("poll_type")
+  pointsReward Int          @default(15) @map("points_reward")
+  sponsorName  String?      @map("sponsor_name")
+  totalVotes   Int          @default(0) @map("total_votes")
+  isActive     Boolean      @default(true) @map("is_active")
+  expiresAt    DateTime?    @map("expires_at") @db.Timestamptz(6)
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
+  options      PollOption[]
+  votes        PollVote[]
+
+  @@index([isActive])
+  @@map("polls")
+}
+
+model PollOption {
+  id         String @id @default(uuid()) @db.Uuid
+  pollId     String @map("poll_id") @db.Uuid
+  optionText String @map("option_text")
+  voteCount  Int    @default(0) @map("vote_count")
+  sortOrder  Int    @default(0) @map("sort_order")
+  poll       Poll   @relation(fields: [pollId], references: [id], onDelete: Cascade)
+
+  @@index([pollId])
+  @@map("poll_options")
+}
+
+model PollVote {
+  id            String   @id @default(uuid()) @db.Uuid
+  pollId        String   @map("poll_id") @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  optionIds     String[] @map("option_ids")
+  pointsAwarded Int      @map("points_awarded")
+  votedAt       DateTime @default(now()) @map("voted_at") @db.Timestamptz(6)
+  poll          Poll     @relation(fields: [pollId], references: [id])
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, userId])
+  @@index([userId])
+  @@map("poll_votes")
 }
 
 // ─────────────────────────────────────────────────────────────
