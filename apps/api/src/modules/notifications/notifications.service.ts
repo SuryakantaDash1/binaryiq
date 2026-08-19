@@ -119,6 +119,14 @@ export class NotificationsService {
   private async resolveEnabledChannels(userId: string, type: NotificationType): Promise<NotificationChannel[]> {
     if (ALWAYS_ON.has(type)) return ['EMAIL'];
 
+    if (type === 'OFFERS_NEWS') {
+      const latestMarketing = await this.prisma.consentLog.findFirst({
+        where: { userId, consentType: 'MARKETING' },
+        orderBy: { createdAt: 'desc' },
+      });
+      if (latestMarketing && !latestMarketing.granted) return [];
+    }
+
     const pref = await this.prisma.notificationPreference.upsert({
       where: { userId_type: { userId, type } },
       create: { userId, type },

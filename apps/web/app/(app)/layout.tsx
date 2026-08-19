@@ -33,6 +33,13 @@ export default function AppGroupLayout({ children }: { children: ReactNode }): R
     >
       {children}
       <ChatWidget />
+      <div className="fixed bottom-0 left-0 right-0 z-10 flex items-center justify-center gap-3 bg-surface/80 py-1 text-[10px] text-text-secondary backdrop-blur-sm pointer-events-none">
+        <span>SSL Secured</span>
+        <span>·</span>
+        <span>DPDP 2023 Compliant</span>
+        <span>·</span>
+        <span>CERT-In Registered</span>
+      </div>
     </AppShell>
   );
 }

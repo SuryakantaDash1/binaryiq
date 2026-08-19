@@ -13,6 +13,18 @@ export default function AdminLayout({ children }: { children: ReactNode }): Reac
             >
               Support Tickets
             </a>
+            <a
+              href="/admin/audit-logs"
+              className="text-text/60 hover:text-text transition-colors"
+            >
+              Audit Logs
+            </a>
+            <a
+              href="/admin/consents"
+              className="text-text/60 hover:text-text transition-colors"
+            >
+              Consents
+            </a>
           </nav>
         </div>
       </header>

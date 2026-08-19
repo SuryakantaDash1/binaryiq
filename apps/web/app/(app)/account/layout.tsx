@@ -11,6 +11,7 @@ const TABS = [
   { key: 'paypal', label: 'PayPal' },
   { key: 'about-you', label: 'About You' },
   { key: 'notifications', label: 'Notifications' },
+  { key: 'privacy', label: 'Privacy' },
 ];
 
 export default function AccountLayout({ children }: { children: ReactNode }): React.JSX.Element {

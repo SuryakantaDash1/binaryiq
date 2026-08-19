@@ -77,6 +77,13 @@ enum GameType {
   QUIZ
 }
 
+enum ConsentType {
+  TERMS
+  PRIVACY
+  MARKETING
+  COOKIES
+}
+
 enum TicketIssueType {
   LOGIN
   SURVEY
@@ -166,6 +173,7 @@ model User {
   notificationPreferences  NotificationPreference[]
   pushTokens               PushToken[]
   supportTickets           SupportTicket[]
+  consentLogs              ConsentLog[]
 
   @@index([email])
   @@index([username])
@@ -566,6 +574,25 @@ model PushToken {
 
   @@index([userId])
   @@map("push_tokens")
+}
+
+// ─────────────────────────────────────────────────────────────
+// CONSENT (Phase 9)
+// ─────────────────────────────────────────────────────────────
+model ConsentLog {
+  id             String      @id @default(uuid()) @db.Uuid
+  userId         String?     @map("user_id") @db.Uuid
+  consentType    ConsentType @map("consent_type")
+  consentVersion String      @map("consent_version")
+  granted        Boolean
+  ipAddress      String?     @map("ip_address")
+  userAgent      String?     @map("user_agent")
+  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  user           User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, consentType])
+  @@index([createdAt])
+  @@map("consent_logs")
 }
 
 // ─────────────────────────────────────────────────────────────
