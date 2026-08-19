@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 // ─── Language list ────────────────────────────────────────────────────────────
 const LANGUAGES = [
@@ -17,6 +18,7 @@ const LANGUAGES = [
   { code: 'en-MY', label: 'english (malaysia)' },
   { code: 'en-PH', label: 'english (philippines)' },
   { code: 'en-ZA', label: 'english (south africa)' },
+  { code: 'en-PK', label: 'english (pakistan)' },
   { code: 'hi-IN', label: 'हिन्दी (भारत)' },
   { code: 'ar-AE', label: 'العربية (الإمارات العربية المتحدة)' },
   { code: 'ar-EG', label: 'العربية (مصر)' },
@@ -34,6 +36,7 @@ const LANGUAGES = [
   { code: 'pt-PT', label: 'português (portugal)' },
   { code: 'it-IT', label: 'italiano (italia)' },
   { code: 'nl-NL', label: 'nederlands (nederland)' },
+  { code: 'nl-BE', label: 'nederlands (belgië)' },
   { code: 'pl-PL', label: 'polski (polska)' },
   { code: 'ru-RU', label: 'русский (россия)' },
   { code: 'tr-TR', label: 'türkçe (türkiye)' },
@@ -49,13 +52,10 @@ const LANGUAGES = [
   { code: 'el-GR', label: 'ελληνικά' },
 ];
 
-// ─── Hero words cycling on right panel ───────────────────────────────────────
-const CYCLE_WORDS = ['INSPIRE', 'INFLUENCE', 'IMPACT', 'INNOVATE'];
-
 const BRAND_LOGOS = [
-  { name: 'amazon.in', color: '#FF9900', textColor: '#000', bg: '#fff' },
-  { name: 'Nykaa', color: '#FC2779', textColor: '#FC2779', bg: '#fff' },
-  { name: 'Swiggy', color: '#FC8019', textColor: '#FC8019', bg: '#fff' },
+  { name: 'amazon.in', color: '#FF9900' },
+  { name: 'Nykaa', color: '#FC2779' },
+  { name: 'Swiggy', color: '#FC8019' },
 ];
 
 const REVIEWS = [
@@ -64,11 +64,53 @@ const REVIEWS = [
   { name: 'Anita K.', text: 'Love the variety of surveys available every day.', rating: 5 },
 ];
 
+// Map full locale codes to base language codes (must match i18n/request.ts)
+const LOCALE_TO_LANG: Record<string, string> = {
+  'en-IN': 'en', 'en-GB': 'en', 'en-US': 'en', 'en-AU': 'en', 'en-CA': 'en',
+  'en-AE': 'en', 'en-IE': 'en', 'en-EG': 'en', 'en-SG': 'en', 'en-MY': 'en',
+  'en-PH': 'en', 'en-ZA': 'en', 'en-PK': 'en',
+  'hi-IN': 'hi',
+  'ar-AE': 'ar', 'ar-EG': 'ar', 'ar-MA': 'ar', 'ar-SA': 'ar',
+  'de-DE': 'de', 'de-AT': 'de', 'de-CH': 'de',
+  'fr-FR': 'fr', 'fr-BE': 'fr', 'fr-CA': 'fr',
+  'es-ES': 'es', 'es-MX': 'es',
+  'pt-BR': 'pt', 'pt-PT': 'pt',
+  'it-IT': 'it',
+  'nl-NL': 'nl', 'nl-BE': 'nl',
+  'pl-PL': 'pl',
+  'ru-RU': 'ru',
+  'tr-TR': 'tr',
+  'zh-CN': 'zh-CN',
+  'zh-TW': 'zh-TW',
+  'ja-JP': 'ja',
+  'ko-KR': 'ko',
+  'id-ID': 'id',
+  'ms-MY': 'ms',
+  'da-DK': 'da',
+  'sv-SE': 'sv',
+  'cs-CZ': 'cs',
+  'el-GR': 'el',
+};
+
+function getStoredLocale(): string {
+  if (typeof document === 'undefined') return 'en-IN';
+  const m = document.cookie.match(/NEXT_LOCALE=([^;]+)/);
+  return m?.[1] ?? 'en-IN';
+}
+
 export default function LandingPage(): React.JSX.Element {
+  const t = useTranslations('landing');
   const [lang, setLang] = useState('en-IN');
   const [wordIndex, setWordIndex] = useState(0);
   const [fade, setFade] = useState(true);
   const [reviewIndex, setReviewIndex] = useState(0);
+
+  const CYCLE_WORDS = [t('inspire'), t('influence'), t('impact'), t('innovate')];
+
+  // Sync dropdown with stored cookie on mount
+  useEffect(() => {
+    setLang(getStoredLocale());
+  }, []);
 
   // Cycle hero word every 2.5 s
   useEffect(() => {
@@ -80,6 +122,7 @@ export default function LandingPage(): React.JSX.Element {
       }, 300);
     }, 2500);
     return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Cycle review every 4 s
@@ -89,6 +132,17 @@ export default function LandingPage(): React.JSX.Element {
     }, 4000);
     return () => clearInterval(interval);
   }, []);
+
+  function handleLangChange(e: React.ChangeEvent<HTMLSelectElement>): void {
+    const fullLocale = e.target.value;
+    if (!fullLocale) return;
+    setLang(fullLocale);
+    const baseLang = LOCALE_TO_LANG[fullLocale] ?? 'en';
+    // Store full locale so dropdown shows correct selection after reload
+    document.cookie = `NEXT_LOCALE=${fullLocale}; path=/; max-age=31536000; SameSite=Lax`;
+    // Reload so server picks up new locale and serves correct messages
+    window.location.reload();
+  }
 
   const review = REVIEWS[reviewIndex]!;
 
@@ -111,24 +165,22 @@ export default function LandingPage(): React.JSX.Element {
 
         {/* Hero text */}
         <div className="mt-10">
-          <p className="text-2xl font-semibold text-gray-800">Influence</p>
-          <h1 className="text-5xl font-black leading-tight text-gray-900">Your World</h1>
+          <p className="text-2xl font-semibold text-gray-800">{t('tagline')}</p>
+          <h1 className="text-5xl font-black leading-tight text-gray-900">{t('title')}</h1>
           <p className="mt-5 max-w-sm text-sm leading-relaxed text-gray-600">
-            Join Toluna Influencers, a community of people just like you! Share your opinion on
-            products and services of brands you love and get rewarded for your participation in
-            online surveys!
+            {t('description')}
           </p>
 
           {/* CTA buttons */}
           <div className="mt-7 flex gap-3">
             <Link href="/register">
               <button className="rounded-full bg-pink-600 px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-pink-700 active:scale-95">
-                Register
+                {t('register')}
               </button>
             </Link>
             <Link href="/login">
               <button className="rounded-full border-2 border-blue-500 px-8 py-3 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 active:scale-95">
-                Sign In
+                {t('signIn')}
               </button>
             </Link>
           </div>
@@ -136,11 +188,7 @@ export default function LandingPage(): React.JSX.Element {
           {/* Brand logos */}
           <div className="mt-10 flex items-center gap-6">
             {BRAND_LOGOS.map((b) => (
-              <span
-                key={b.name}
-                className="text-sm font-bold"
-                style={{ color: b.color }}
-              >
+              <span key={b.name} className="text-sm font-bold" style={{ color: b.color }}>
                 {b.name}
               </span>
             ))}
@@ -152,7 +200,7 @@ export default function LandingPage(): React.JSX.Element {
           {/* Trustpilot-style rating */}
           <div className="flex items-center gap-4">
             <div>
-              <p className="text-base font-bold text-gray-900">Great</p>
+              <p className="text-base font-bold text-gray-900">{t('great')}</p>
               <StarRating rating={review.rating} />
             </div>
             <div className="flex-1">
@@ -171,10 +219,10 @@ export default function LandingPage(): React.JSX.Element {
         <div className="mt-10">
           <select
             value={lang}
-            onChange={(e) => setLang(e.target.value)}
+            onChange={handleLangChange}
             className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
           >
-            <option value="">Please select</option>
+            <option value="">{t('pleaseSelect')}</option>
             {LANGUAGES.map((l) => (
               <option key={l.code} value={l.code}>
                 {l.label}
@@ -186,7 +234,7 @@ export default function LandingPage(): React.JSX.Element {
 
       {/* ── Right Panel — animated "video" ─────────────────────────── */}
       <div className="relative hidden flex-1 overflow-hidden md:flex">
-        {/* Animated gradient background simulating video */}
+        {/* Animated gradient background */}
         <div className="animate-gradient-shift absolute inset-0 bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700" />
 
         {/* Noise texture overlay */}
@@ -198,7 +246,7 @@ export default function LandingPage(): React.JSX.Element {
           }}
         />
 
-        {/* Silhouette / person shape */}
+        {/* Silhouette shape */}
         <div className="absolute inset-0 flex items-center justify-end pr-16 opacity-25">
           <svg viewBox="0 0 200 400" fill="white" className="h-4/5 w-auto">
             <ellipse cx="100" cy="80" rx="55" ry="65" />
@@ -219,18 +267,18 @@ export default function LandingPage(): React.JSX.Element {
           >
             {CYCLE_WORDS[wordIndex]}
           </p>
-          <p className="mt-1 text-4xl font-semibold text-white/80">Change</p>
-          <p className="mt-4 text-7xl font-black uppercase tracking-tight text-white">GET</p>
-          <p className="mt-1 text-5xl font-bold text-white/90">Rewarded</p>
+          <p className="mt-1 text-4xl font-semibold text-white/80">{t('change')}</p>
+          <p className="mt-4 text-7xl font-black uppercase tracking-tight text-white">{t('get')}</p>
+          <p className="mt-1 text-5xl font-bold text-white/90">{t('rewarded')}</p>
         </div>
 
         {/* Bottom strip — stats */}
         <div className="absolute bottom-0 left-0 right-0 flex items-center justify-around bg-black/30 px-8 py-4 backdrop-blur-sm">
-          <Stat value="10M+" label="Members" />
+          <Stat value="10M+" label={t('members')} />
           <div className="h-8 w-px bg-white/20" />
-          <Stat value="50K+" label="Surveys monthly" />
+          <Stat value="50K+" label={t('surveysMonthly')} />
           <div className="h-8 w-px bg-white/20" />
-          <Stat value="₹500" label="Welcome bonus" />
+          <Stat value="₹500" label={t('welcomeBonus')} />
         </div>
       </div>
 

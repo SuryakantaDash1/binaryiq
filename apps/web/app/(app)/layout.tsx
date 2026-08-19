@@ -1,5 +1,6 @@
 import { AppShell, type NavItem } from '@influencer/ui';
-import { Home, Gift, Vote } from 'lucide-react';
+import { ClipboardList, Gift, User, Star } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
@@ -9,17 +10,20 @@ const ChatWidget = dynamic(
   { ssr: false },
 );
 
-const NAV: NavItem[] = [
-  { label: 'Dashboard', href: '/sample', icon: <Home className="h-4 w-4" /> },
-  { label: 'Polls', href: '/sample', icon: <Vote className="h-4 w-4" /> },
-  { label: 'Rewards', href: '/sample', icon: <Gift className="h-4 w-4" /> },
-];
+export default async function AppGroupLayout({ children }: { children: ReactNode }): Promise<React.JSX.Element> {
+  const t = await getTranslations('nav');
 
-export default function AppGroupLayout({ children }: { children: ReactNode }): React.JSX.Element {
+  const NAV: NavItem[] = [
+    { label: t('surveys'), href: '/surveys', icon: <ClipboardList className="h-4 w-4" /> },
+    { label: t('rewards'), href: '/rewards', icon: <Gift className="h-4 w-4" /> },
+    { label: t('profile'), href: '/profile', icon: <User className="h-4 w-4" /> },
+    { label: t('points'), href: '/points', icon: <Star className="h-4 w-4" /> },
+  ];
+
   return (
     <AppShell
       nav={NAV}
-      header={{ brand: 'Influencer' }}
+      header={{ brand: 'Influencers' }}
       renderLink={(item) => (
         <Link
           key={item.href}

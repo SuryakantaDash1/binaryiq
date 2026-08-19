@@ -11,6 +11,7 @@ import { Button, FormField, Heading, Input, Text } from '@influencer/ui';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 
 import { authApi } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/client';
@@ -18,6 +19,7 @@ import { ApiError } from '@/lib/api/client';
 type Step = 1 | 2 | 'done';
 
 export default function RegisterPage(): React.JSX.Element {
+  const t = useTranslations('auth');
   const [step, setStep] = useState<Step>(1);
   const [draftId, setDraftId] = useState<string>('');
   const [sentTo, setSentTo] = useState<string>('');
@@ -25,13 +27,13 @@ export default function RegisterPage(): React.JSX.Element {
   if (step === 'done') {
     return (
       <div className="flex flex-col gap-3 text-center">
-        <Heading level={3}>Check your inbox</Heading>
-        <Text color="secondary">We have sent you an activation email on {sentTo}.</Text>
+        <Heading level={3}>{t('checkInbox')}</Heading>
+        <Text color="secondary">{t('sentTo', { email: sentTo })}</Text>
         <Text color="muted" size="sm">
-          Click “Confirm your registration” in that email to claim your 500 welcome points.
+          {t('clickConfirm')}
         </Text>
         <Link href="/login" className="text-primary mt-2 text-sm">
-          Back to sign in
+          {t('backToSignIn')}
         </Link>
       </div>
     );
@@ -40,9 +42,9 @@ export default function RegisterPage(): React.JSX.Element {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <Heading level={3}>Create your account</Heading>
+        <Heading level={3}>{t('createAccount')}</Heading>
         <Text color="muted" size="sm">
-          Step {step} of 2
+          {t('stepOf', { step, total: 2 })}
         </Text>
       </div>
       {step === 1 ? (
@@ -62,9 +64,9 @@ export default function RegisterPage(): React.JSX.Element {
         />
       )}
       <Text color="muted" size="sm">
-        Already have an account?{' '}
+        {t('alreadyHaveAccount')}{' '}
         <Link href="/login" className="text-primary">
-          Sign in
+          {t('signIn')}
         </Link>
       </Text>
     </div>
@@ -72,6 +74,7 @@ export default function RegisterPage(): React.JSX.Element {
 }
 
 function Step1Form({ onNext }: { onNext: (draftId: string) => void }): React.JSX.Element {
+  const t = useTranslations('auth');
   const {
     register,
     handleSubmit,
@@ -90,7 +93,7 @@ function Step1Form({ onNext }: { onNext: (draftId: string) => void }): React.JSX
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
-      <FormField label="Country" error={errors.country?.message} required>
+      <FormField label={t('country')} error={errors.country?.message} required>
         {({ id, invalid }) => (
           <select
             id={id}
@@ -98,7 +101,7 @@ function Step1Form({ onNext }: { onNext: (draftId: string) => void }): React.JSX
             className="border-border bg-surface h-10 w-full rounded-md border px-3 text-sm"
             {...register('country')}
           >
-            <option value="">Select country…</option>
+            <option value="">{t('selectCountry')}</option>
             <option value="IN">India</option>
             <option value="US">United States</option>
             <option value="GB">United Kingdom</option>
@@ -119,21 +122,25 @@ function Step1Form({ onNext }: { onNext: (draftId: string) => void }): React.JSX
             <option value="DE">Germany</option>
             <option value="FR">France</option>
             <option value="NL">Netherlands</option>
+            <option value="BE">Belgium</option>
+            <option value="SA">Saudi Arabia</option>
+            <option value="EG">Egypt</option>
+            <option value="MA">Morocco</option>
           </select>
         )}
       </FormField>
       <div className="grid grid-cols-2 gap-3">
-        <FormField label="First name" error={errors.firstName?.message} required>
+        <FormField label={t('firstName')} error={errors.firstName?.message} required>
           {({ id, invalid }) => <Input id={id} invalid={invalid} {...register('firstName')} />}
         </FormField>
-        <FormField label="Surname" error={errors.surname?.message} required>
+        <FormField label={t('surname')} error={errors.surname?.message} required>
           {({ id, invalid }) => <Input id={id} invalid={invalid} {...register('surname')} />}
         </FormField>
       </div>
-      <FormField label="Date of birth" hint="YYYY-MM-DD" error={errors.dob?.message} required>
+      <FormField label={t('dateOfBirth')} hint="YYYY-MM-DD" error={errors.dob?.message} required>
         {({ id, invalid }) => <Input id={id} type="date" invalid={invalid} {...register('dob')} />}
       </FormField>
-      <FormField label="Gender" error={errors.gender?.message} required>
+      <FormField label={t('gender')} error={errors.gender?.message} required>
         {({ id, invalid }) => (
           <select
             id={id}
@@ -141,16 +148,16 @@ function Step1Form({ onNext }: { onNext: (draftId: string) => void }): React.JSX
             className="border-border bg-surface h-10 w-full rounded-md border px-3 text-sm"
             {...register('gender')}
           >
-            <option value="">Select…</option>
-            <option value="MALE">Male</option>
-            <option value="FEMALE">Female</option>
-            <option value="OTHER">Other</option>
-            <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+            <option value="">{t('selectGender')}</option>
+            <option value="MALE">{t('male')}</option>
+            <option value="FEMALE">{t('female')}</option>
+            <option value="OTHER">{t('other')}</option>
+            <option value="PREFER_NOT_TO_SAY">{t('preferNotToSay')}</option>
           </select>
         )}
       </FormField>
       <Button type="submit" loading={isSubmitting} fullWidth>
-        Continue
+        {t('continue')}
       </Button>
     </form>
   );
@@ -163,6 +170,7 @@ function Step2Form({
   draftId: string;
   onDone: (email: string) => void;
 }): React.JSX.Element {
+  const t = useTranslations('auth');
   const {
     register,
     handleSubmit,
@@ -184,35 +192,34 @@ function Step2Form({
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
-      <FormField label="Email" error={errors.email?.message} required>
+      <FormField label={t('email')} error={errors.email?.message} required>
         {({ id, invalid }) => (
           <Input id={id} type="email" invalid={invalid} {...register('email')} />
         )}
       </FormField>
-      <FormField label="Password" error={errors.password?.message} required>
+      <FormField label={t('password')} error={errors.password?.message} required>
         {({ id, invalid }) => (
           <Input id={id} type="password" invalid={invalid} {...register('password')} />
         )}
       </FormField>
       <div className="grid grid-cols-2 gap-3">
-        <FormField label="Username" error={errors.username?.message} required>
+        <FormField label={t('username')} error={errors.username?.message} required>
           {({ id, invalid }) => <Input id={id} invalid={invalid} {...register('username')} />}
         </FormField>
-        <FormField label="PIN / postal code" error={errors.pinCode?.message} required>
+        <FormField label={t('pinCode')} error={errors.pinCode?.message} required>
           {({ id, invalid }) => <Input id={id} invalid={invalid} {...register('pinCode')} />}
         </FormField>
       </div>
-      <FormField label="Mobile (optional)" error={errors.mobile?.message}>
+      <FormField label={t('mobile')} error={errors.mobile?.message}>
         {({ id, invalid }) => <Input id={id} invalid={invalid} {...register('mobile')} />}
       </FormField>
       <Button type="submit" loading={isSubmitting} fullWidth>
-        Register
+        {t('register')}
       </Button>
     </form>
   );
 }
 
-/** Map API VALIDATION_ERROR details back onto form fields; else a root error. */
 function applyApiError(
   err: unknown,
   setError: (name: never, e: { message: string }) => void,

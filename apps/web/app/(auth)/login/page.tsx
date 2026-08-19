@@ -6,11 +6,13 @@ import { Button, FormField, Heading, Input, Text } from '@influencer/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 
 import { authApi } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/client';
 
 export default function LoginPage(): React.JSX.Element {
+  const t = useTranslations('auth');
   const router = useRouter();
   const {
     register,
@@ -24,7 +26,7 @@ export default function LoginPage(): React.JSX.Element {
   const onSubmit = handleSubmit(async (values) => {
     try {
       await authApi.login(values);
-      router.push('/sample');
+      router.push('/surveys');
     } catch (err) {
       setError('root', {
         message: err instanceof ApiError ? err.message : 'Sign in failed',
@@ -34,14 +36,14 @@ export default function LoginPage(): React.JSX.Element {
 
   return (
     <div className="flex flex-col gap-5">
-      <Heading level={3}>Welcome back</Heading>
+      <Heading level={3}>{t('welcomeBack')}</Heading>
       <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
-        <FormField label="Email" error={errors.email?.message} required>
+        <FormField label={t('email')} error={errors.email?.message} required>
           {({ id, invalid }) => (
             <Input id={id} type="email" invalid={invalid} {...register('email')} />
           )}
         </FormField>
-        <FormField label="Password" error={errors.password?.message} required>
+        <FormField label={t('password')} error={errors.password?.message} required>
           {({ id, invalid }) => (
             <Input id={id} type="password" invalid={invalid} {...register('password')} />
           )}
@@ -52,15 +54,15 @@ export default function LoginPage(): React.JSX.Element {
           </Text>
         )}
         <Button type="submit" loading={isSubmitting} fullWidth>
-          Sign in
+          {t('signIn')}
         </Button>
       </form>
       <div className="flex justify-between text-sm">
         <Link href="/forgot-password" className="text-primary">
-          Forgot password?
+          {t('forgotPassword')}
         </Link>
         <Link href="/register" className="text-primary">
-          Create account
+          {t('createAccountLink')}
         </Link>
       </div>
     </div>
