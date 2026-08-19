@@ -16,7 +16,28 @@
     "inspire": "INSPIREZ",
     "influence": "INFLUENCEZ",
     "impact": "IMPACT",
-    "innovate": "INNOVEZ"
+    "innovate": "INNOVEZ",
+    "share": "PARTAGEZ",
+    "yourVoice": "Votre Voix",
+    "basedOnReviews": "Basé sur {count} avis",
+    "showingReviews": "Nos avis 5 étoiles"
+  },
+  "footer": {
+    "aboutUs": "À propos",
+    "cookies": "Politique de cookies",
+    "contact": "Contact",
+    "faqs": "FAQ",
+    "terms": "Conditions",
+    "privacy": "Confidentialité"
+  },
+  "chat": {
+    "hello": "Bonjour",
+    "howCanWeHelp": "Comment pouvons-nous vous aider ?",
+    "lunaIntro": "Je suis Luna, l'assistante virtuelle d'Influencers, et je suis ravie de vous aider avec toutes vos questions.",
+    "askQuestion": "Poser une question",
+    "writeMessage": "Écrire un message…",
+    "openChat": "Ouvrir le chat",
+    "closeChat": "Fermer le chat"
   },
   "auth": {
     "createAccount": "Créez votre compte",

@@ -16,7 +16,28 @@
     "inspire": "प्रेरित करें",
     "influence": "प्रभावित करें",
     "impact": "प्रभाव",
-    "innovate": "नवाचार करें"
+    "innovate": "नवाचार करें",
+    "share": "साझा करें",
+    "yourVoice": "अपनी आवाज़",
+    "basedOnReviews": "{count} समीक्षाओं पर आधारित",
+    "showingReviews": "हमारी 5 स्टार समीक्षाएं"
+  },
+  "footer": {
+    "aboutUs": "हमारे बारे में",
+    "cookies": "कुकी नीति",
+    "contact": "संपर्क करें",
+    "faqs": "अक्सर पूछे जाने वाले प्रश्न",
+    "terms": "नियम",
+    "privacy": "गोपनीयता"
+  },
+  "chat": {
+    "hello": "नमस्ते",
+    "howCanWeHelp": "हम आपकी कैसे मदद कर सकते हैं?",
+    "lunaIntro": "मैं लूना हूं, Influencers की वर्चुअल असिस्टेंट, और आपके सभी सवालों में आपकी मदद करके खुश हूं।",
+    "askQuestion": "एक प्रश्न पूछें",
+    "writeMessage": "एक संदेश लिखें…",
+    "openChat": "चैट खोलें",
+    "closeChat": "चैट बंद करें"
   },
   "auth": {
     "createAccount": "अपना खाता बनाएं",

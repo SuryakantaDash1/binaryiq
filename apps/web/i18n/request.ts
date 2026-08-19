@@ -1,6 +1,8 @@
 import { getRequestConfig } from 'next-intl/server';
 import { cookies } from 'next/headers';
 
+import enBase from '../messages/en.json';
+
 // Maps every locale code in the dropdown to a base language message file
 const LOCALE_MAP: Record<string, string> = {
   'en-IN': 'en', 'en-GB': 'en', 'en-US': 'en', 'en-AU': 'en', 'en-CA': 'en',
@@ -33,7 +35,7 @@ function getBaseLang(raw: string): string {
   return LOCALE_MAP[raw] ?? raw.split('-')[0] ?? 'en';
 }
 
-async function loadMessages(lang: string) {
+async function loadMessages(lang: string): Promise<Record<string, unknown>> {
   switch (lang) {
     case 'nl': return (await import('../messages/nl.json')).default;
     case 'hi': return (await import('../messages/hi.json')).default;
@@ -56,14 +58,38 @@ async function loadMessages(lang: string) {
     case 'sv': return (await import('../messages/sv.json')).default;
     case 'cs': return (await import('../messages/cs.json')).default;
     case 'el': return (await import('../messages/el.json')).default;
-    default: return (await import('../messages/en.json')).default;
+    default: return enBase as Record<string, unknown>;
   }
+}
+
+/** Deep-merge target over English base so any missing key falls back to English. */
+function deepMerge(
+  base: Record<string, unknown>,
+  target: Record<string, unknown>,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...base };
+  for (const key of Object.keys(target)) {
+    const b = base[key];
+    const t = target[key];
+    if (
+      b && t &&
+      typeof b === 'object' && typeof t === 'object' &&
+      !Array.isArray(b) && !Array.isArray(t)
+    ) {
+      out[key] = deepMerge(b as Record<string, unknown>, t as Record<string, unknown>);
+    } else {
+      out[key] = t;
+    }
+  }
+  return out;
 }
 
 export default getRequestConfig(async () => {
   const cookieStore = await cookies();
   const rawLocale = cookieStore.get('NEXT_LOCALE')?.value ?? 'en-IN';
   const lang = getBaseLang(rawLocale);
-  const messages = await loadMessages(lang);
+  const target = await loadMessages(lang);
+  // English is always the fallback base; the chosen language overrides on top.
+  const messages = deepMerge(enBase as Record<string, unknown>, target);
   return { locale: lang, messages };
 });

@@ -16,7 +16,28 @@
     "inspire": "ألهم",
     "influence": "أثّر",
     "impact": "تأثير",
-    "innovate": "ابتكر"
+    "innovate": "ابتكر",
+    "share": "شارك",
+    "yourVoice": "صوتك",
+    "basedOnReviews": "استنادًا إلى {count} تقييم",
+    "showingReviews": "تقييماتنا من 5 نجوم"
+  },
+  "footer": {
+    "aboutUs": "من نحن",
+    "cookies": "سياسة ملفات تعريف الارتباط",
+    "contact": "اتصل بنا",
+    "faqs": "الأسئلة الشائعة",
+    "terms": "الشروط",
+    "privacy": "الخصوصية"
+  },
+  "chat": {
+    "hello": "مرحبًا",
+    "howCanWeHelp": "كيف يمكننا مساعدتك؟",
+    "lunaIntro": "أنا لونا، المساعدة الافتراضية لـ Influencers، ويسعدني مساعدتك في جميع أسئلتك.",
+    "askQuestion": "اطرح سؤالاً",
+    "writeMessage": "اكتب رسالة…",
+    "openChat": "فتح الدردشة",
+    "closeChat": "إغلاق الدردشة"
   },
   "auth": {
     "createAccount": "أنشئ حسابك",

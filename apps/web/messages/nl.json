@@ -16,7 +16,28 @@
     "inspire": "INSPIREER",
     "influence": "BEÏNVLOED",
     "impact": "IMPACT",
-    "innovate": "INNOVEER"
+    "innovate": "INNOVEER",
+    "share": "DEEL",
+    "yourVoice": "Uw Stem",
+    "basedOnReviews": "Gebaseerd op {count} beoordelingen",
+    "showingReviews": "Onze 5-sterrenbeoordelingen"
+  },
+  "footer": {
+    "aboutUs": "Over Ons",
+    "cookies": "Cookiebeleid",
+    "contact": "Contact",
+    "faqs": "Veelgestelde vragen",
+    "terms": "Voorwaarden",
+    "privacy": "Privacy"
+  },
+  "chat": {
+    "hello": "Hallo",
+    "howCanWeHelp": "Hoe kunnen wij u helpen?",
+    "lunaIntro": "Ik ben Luna, de virtuele assistent van Influencers en ik help je graag verder met al je vragen.",
+    "askQuestion": "Een vraag stellen",
+    "writeMessage": "Schrijf een reactie…",
+    "openChat": "Chat openen",
+    "closeChat": "Chat sluiten"
   },
   "auth": {
     "createAccount": "Maak uw account aan",

@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { LunaBubble } from '@/features/landing/LunaBubble.js';
+
 // ─── Language list ────────────────────────────────────────────────────────────
 const LANGUAGES = [
   { code: 'en-IN', label: 'english (india)' },
@@ -53,15 +55,15 @@ const LANGUAGES = [
 ];
 
 const BRAND_LOGOS = [
-  { name: 'amazon.in', color: '#FF9900' },
-  { name: 'Nykaa', color: '#FC2779' },
+  { name: 'amazon.in', color: '#232F3E' },
+  { name: 'Nykaa', color: '#E80071' },
   { name: 'Swiggy', color: '#FC8019' },
 ];
 
 const REVIEWS = [
-  { name: 'Priya M.', text: 'Great platform to earn rewards by sharing opinions!', rating: 5 },
-  { name: 'Rahul S.', text: 'Easy to use and rewards are credited fast.', rating: 4 },
-  { name: 'Anita K.', text: 'Love the variety of surveys available every day.', rating: 5 },
+  { name: 'Priya M.', title: 'Genuinely rewarding', text: 'Great platform to earn rewards by sharing opinions!', rating: 5 },
+  { name: 'Rahul S.', title: 'Fast payouts', text: 'Easy to use and rewards are credited fast.', rating: 5 },
+  { name: 'Anita K.', title: 'Plenty of surveys', text: 'Love the variety of surveys available every day.', rating: 5 },
 ];
 
 // Map full locale codes to base language codes (must match i18n/request.ts)
@@ -98,29 +100,38 @@ function getStoredLocale(): string {
   return m?.[1] ?? 'en-IN';
 }
 
+const FOOTER_KEYS = ['aboutUs', 'cookies', 'contact', 'faqs', 'terms', 'privacy'] as const;
+
 export default function LandingPage(): React.JSX.Element {
   const t = useTranslations('landing');
+  const tf = useTranslations('footer');
   const [lang, setLang] = useState('en-IN');
-  const [wordIndex, setWordIndex] = useState(0);
+  const [phraseIndex, setPhraseIndex] = useState(0);
   const [fade, setFade] = useState(true);
   const [reviewIndex, setReviewIndex] = useState(0);
 
-  const CYCLE_WORDS = [t('inspire'), t('influence'), t('impact'), t('innovate')];
+  // Cycling hero phrases (big word + subtitle), built from translation keys
+  const PHRASES = [
+    { big: t('share'), small: t('yourVoice') },
+    { big: t('influence'), small: t('title') },
+    { big: t('inspire'), small: t('change') },
+    { big: t('get'), small: t('rewarded') },
+  ];
 
   // Sync dropdown with stored cookie on mount
   useEffect(() => {
     setLang(getStoredLocale());
   }, []);
 
-  // Cycle hero word every 2.5 s
+  // Cycle hero phrase every 3 s with a fade
   useEffect(() => {
     const interval = setInterval(() => {
       setFade(false);
       setTimeout(() => {
-        setWordIndex((i) => (i + 1) % CYCLE_WORDS.length);
+        setPhraseIndex((i) => (i + 1) % PHRASES.length);
         setFade(true);
-      }, 300);
-    }, 2500);
+      }, 400);
+    }, 3000);
     return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -137,19 +148,21 @@ export default function LandingPage(): React.JSX.Element {
     const fullLocale = e.target.value;
     if (!fullLocale) return;
     setLang(fullLocale);
-    const baseLang = LOCALE_TO_LANG[fullLocale] ?? 'en';
-    // Store full locale so dropdown shows correct selection after reload
     document.cookie = `NEXT_LOCALE=${fullLocale}; path=/; max-age=31536000; SameSite=Lax`;
-    // Reload so server picks up new locale and serves correct messages
     window.location.reload();
   }
 
+  function stepReview(dir: number): void {
+    setReviewIndex((i) => (i + dir + REVIEWS.length) % REVIEWS.length);
+  }
+
   const review = REVIEWS[reviewIndex]!;
+  const phrase = PHRASES[phraseIndex]!;
 
   return (
     <div className="flex min-h-screen">
-      {/* ── Left Panel ─────────────────────────────────────────────── */}
-      <div className="relative flex w-full flex-col justify-between overflow-y-auto bg-white px-8 py-8 md:w-[42%] lg:px-12">
+      {/* ── Left Panel (50%) ───────────────────────────────────────── */}
+      <div className="relative flex w-full flex-col justify-between overflow-y-auto bg-white px-8 py-8 md:w-1/2 lg:px-14">
         {/* Logo */}
         <div className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 text-white">
@@ -164,10 +177,10 @@ export default function LandingPage(): React.JSX.Element {
         </div>
 
         {/* Hero text */}
-        <div className="mt-10">
+        <div className="mt-8">
           <p className="text-2xl font-semibold text-gray-800">{t('tagline')}</p>
           <h1 className="text-5xl font-black leading-tight text-gray-900">{t('title')}</h1>
-          <p className="mt-5 max-w-sm text-sm leading-relaxed text-gray-600">
+          <p className="mt-5 max-w-md text-sm leading-relaxed text-gray-600">
             {t('description')}
           </p>
 
@@ -186,9 +199,9 @@ export default function LandingPage(): React.JSX.Element {
           </div>
 
           {/* Brand logos */}
-          <div className="mt-10 flex items-center gap-6">
+          <div className="mt-9 flex items-center gap-8">
             {BRAND_LOGOS.map((b) => (
-              <span key={b.name} className="text-sm font-bold" style={{ color: b.color }}>
+              <span key={b.name} className="text-lg font-bold tracking-tight" style={{ color: b.color }}>
                 {b.name}
               </span>
             ))}
@@ -197,30 +210,54 @@ export default function LandingPage(): React.JSX.Element {
           {/* Divider */}
           <div className="my-5 border-t border-gray-100" />
 
-          {/* Trustpilot-style rating */}
-          <div className="flex items-center gap-4">
-            <div>
-              <p className="text-base font-bold text-gray-900">{t('great')}</p>
-              <StarRating rating={review.rating} />
+          {/* Trustpilot-style rating + review carousel */}
+          <div className="flex items-start gap-5">
+            <div className="shrink-0">
+              <p className="text-lg font-bold text-gray-900">{t('great')}</p>
+              <TrustStars score={4.5} />
+              <p className="mt-1 text-[11px] text-gray-500">{t('basedOnReviews', { count: '2,46,968' })}</p>
+              <TrustpilotWordmark />
             </div>
-            <div className="flex-1">
-              <div className="mb-1 flex items-center gap-1.5">
+
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
                 <VerifiedBadge />
-                <span className="text-[10px] text-gray-500">{review.name}</span>
+                <span className="text-[11px] font-semibold text-gray-700">{review.name}</span>
               </div>
-              <p className="text-xs text-gray-600 transition-all duration-500">
-                {review.text}
-              </p>
+              <p className="mt-1 text-sm font-bold text-gray-900">{review.title}</p>
+              <p className="text-xs text-gray-600">{review.text}</p>
+            </div>
+
+            <div className="flex shrink-0 flex-col justify-center gap-2">
+              <button
+                onClick={() => stepReview(-1)}
+                aria-label="Previous review"
+                className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-50"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                onClick={() => stepReview(1)}
+                aria-label="Next review"
+                className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-50"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
             </div>
           </div>
+          <p className="mt-3 text-center text-[11px] text-gray-400">{t('showingReviews')}</p>
         </div>
 
         {/* Language selector — pinned to bottom */}
-        <div className="mt-10">
+        <div className="mt-8">
           <select
             value={lang}
             onChange={handleLangChange}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
+            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 shadow-sm focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
           >
             <option value="">{t('pleaseSelect')}</option>
             {LANGUAGES.map((l) => (
@@ -232,66 +269,92 @@ export default function LandingPage(): React.JSX.Element {
         </div>
       </div>
 
-      {/* ── Right Panel — animated "video" ─────────────────────────── */}
-      <div className="relative hidden flex-1 overflow-hidden md:flex">
-        {/* Animated gradient background */}
-        <div className="animate-gradient-shift absolute inset-0 bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700" />
+      {/* ── Right Panel (50%) — animated "video" ───────────────────── */}
+      <div className="relative hidden w-1/2 overflow-hidden md:flex">
+        {/* Cross-fading gradient "scenes" simulate a looping video */}
+        <div className="video-scene scene-1 absolute inset-0" />
+        <div className="video-scene scene-2 absolute inset-0" />
+        <div className="video-scene scene-3 absolute inset-0" />
 
-        {/* Noise texture overlay */}
+        {/* Grain overlay */}
         <div
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 opacity-15"
           style={{
             backgroundImage:
               'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'1\'/%3E%3C/svg%3E")',
           }}
         />
 
-        {/* Silhouette shape */}
-        <div className="absolute inset-0 flex items-center justify-end pr-16 opacity-25">
-          <svg viewBox="0 0 200 400" fill="white" className="h-4/5 w-auto">
-            <ellipse cx="100" cy="80" rx="55" ry="65" />
-            <path d="M20 400 Q30 220 100 200 Q170 220 180 400Z" />
+        {/* Person silhouette */}
+        <div className="absolute inset-0 flex items-end justify-end pr-10 opacity-20">
+          <svg viewBox="0 0 200 400" fill="white" className="h-[85%] w-auto">
+            <ellipse cx="110" cy="90" rx="52" ry="60" />
+            <path d="M25 400 Q35 230 110 210 Q185 230 195 400Z" />
           </svg>
         </div>
 
         {/* Moving light blobs */}
-        <div className="animate-blob absolute left-1/4 top-1/4 h-64 w-64 rounded-full bg-purple-500 opacity-30 mix-blend-screen blur-3xl" />
-        <div className="animate-blob animation-delay-2000 absolute bottom-1/4 right-1/4 h-72 w-72 rounded-full bg-pink-500 opacity-25 mix-blend-screen blur-3xl" />
-        <div className="animate-blob animation-delay-4000 absolute left-1/3 top-2/3 h-56 w-56 rounded-full bg-blue-400 opacity-20 mix-blend-screen blur-3xl" />
+        <div className="animate-blob absolute left-1/4 top-1/4 h-64 w-64 rounded-full bg-purple-400 opacity-30 mix-blend-screen blur-3xl" />
+        <div className="animate-blob animation-delay-2000 absolute bottom-1/3 right-1/4 h-72 w-72 rounded-full bg-pink-400 opacity-25 mix-blend-screen blur-3xl" />
+        <div className="animate-blob animation-delay-4000 absolute left-1/3 top-2/3 h-56 w-56 rounded-full bg-blue-300 opacity-20 mix-blend-screen blur-3xl" />
 
-        {/* Text overlay */}
-        <div className="relative z-10 flex flex-col justify-center px-16">
-          <p
-            className="text-7xl font-black uppercase tracking-tight text-white transition-opacity duration-300"
-            style={{ opacity: fade ? 1 : 0 }}
-          >
-            {CYCLE_WORDS[wordIndex]}
+        {/* Cycling hero phrase */}
+        <div
+          className="absolute left-14 top-1/2 z-10 -translate-y-1/2 transition-opacity duration-400"
+          style={{ opacity: fade ? 1 : 0 }}
+        >
+          <p className="text-7xl font-black uppercase leading-none tracking-tight text-white drop-shadow-lg">
+            {phrase.big}
           </p>
-          <p className="mt-1 text-4xl font-semibold text-white/80">{t('change')}</p>
-          <p className="mt-4 text-7xl font-black uppercase tracking-tight text-white">{t('get')}</p>
-          <p className="mt-1 text-5xl font-bold text-white/90">{t('rewarded')}</p>
+          <p className="mt-2 text-5xl font-semibold text-white/90 drop-shadow">{phrase.small}</p>
         </div>
 
-        {/* Bottom strip — stats */}
-        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-around bg-black/30 px-8 py-4 backdrop-blur-sm">
-          <Stat value="10M+" label={t('members')} />
-          <div className="h-8 w-px bg-white/20" />
-          <Stat value="50K+" label={t('surveysMonthly')} />
-          <div className="h-8 w-px bg-white/20" />
-          <Stat value="₹500" label={t('welcomeBonus')} />
+        {/* Bottom: store badges + footer links */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-black/50 to-transparent px-10 pb-6 pt-16">
+          <div className="flex items-center gap-3">
+            <AppStoreBadge />
+            <GooglePlayBadge />
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-white/85">
+            {FOOTER_KEYS.map((k) => (
+              <span key={k} className="cursor-pointer hover:text-white hover:underline">
+                {tf(k)}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
+      {/* Luna chat bubble — floats over everything, works with no backend */}
+      <LunaBubble />
+
       {/* Global styles for animations */}
       <style jsx global>{`
-        @keyframes gradient-shift {
+        .video-scene {
+          background-size: 300% 300%;
+          animation: sceneFade 18s ease-in-out infinite, gradientShift 10s ease infinite;
+        }
+        .scene-1 {
+          background-image: linear-gradient(135deg, #1e3a8a 0%, #6d28d9 50%, #db2777 100%);
+          animation-delay: 0s, 0s;
+        }
+        .scene-2 {
+          background-image: linear-gradient(135deg, #4c1d95 0%, #7c3aed 50%, #ec4899 100%);
+          animation-delay: -6s, -3s;
+        }
+        .scene-3 {
+          background-image: linear-gradient(135deg, #312e81 0%, #9333ea 45%, #f43f5e 100%);
+          animation-delay: -12s, -6s;
+        }
+        @keyframes sceneFade {
+          0%, 22% { opacity: 1; }
+          33%, 89% { opacity: 0; }
+          100% { opacity: 1; }
+        }
+        @keyframes gradientShift {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
-        }
-        .animate-gradient-shift {
-          background-size: 300% 300%;
-          animation: gradient-shift 8s ease infinite;
         }
         @keyframes blob {
           0%, 100% { transform: translate(0, 0) scale(1); }
@@ -301,26 +364,48 @@ export default function LandingPage(): React.JSX.Element {
         .animate-blob { animation: blob 7s infinite; }
         .animation-delay-2000 { animation-delay: 2s; }
         .animation-delay-4000 { animation-delay: 4s; }
+        .duration-400 { transition-duration: 400ms; }
       `}</style>
     </div>
   );
 }
 
-function StarRating({ rating }: { rating: number }): React.JSX.Element {
+/** Trustpilot-style green square stars, filled by score (0–5, halves supported). */
+function TrustStars({ score }: { score: number }): React.JSX.Element {
   return (
-    <div className="flex gap-0.5">
-      {[1, 2, 3, 4, 5].map((s) => (
-        <svg key={s} className={`h-4 w-4 ${s <= rating ? 'text-green-500' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-      ))}
+    <div className="mt-1 flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((i) => {
+        const fill = Math.max(0, Math.min(1, score - (i - 1)));
+        return (
+          <div key={i} className="relative h-6 w-6 overflow-hidden rounded-sm bg-gray-200">
+            <div
+              className="absolute inset-y-0 left-0 bg-[#00b67a]"
+              style={{ width: `${fill * 100}%` }}
+            />
+            <svg className="absolute inset-0 m-auto h-4 w-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function TrustpilotWordmark(): React.JSX.Element {
+  return (
+    <div className="mt-1.5 flex items-center gap-1">
+      <svg className="h-3.5 w-3.5 text-[#00b67a]" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+      </svg>
+      <span className="text-xs font-bold text-gray-700">Trustpilot</span>
     </div>
   );
 }
 
 function VerifiedBadge(): React.JSX.Element {
   return (
-    <div className="flex items-center gap-1 rounded bg-green-600 px-1.5 py-0.5">
+    <div className="flex items-center gap-1 rounded bg-[#00b67a] px-1.5 py-0.5">
       <svg className="h-2.5 w-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
       </svg>
@@ -329,11 +414,33 @@ function VerifiedBadge(): React.JSX.Element {
   );
 }
 
-function Stat({ value, label }: { value: string; label: string }): React.JSX.Element {
+function AppStoreBadge(): React.JSX.Element {
   return (
-    <div className="text-center">
-      <p className="text-xl font-black text-white">{value}</p>
-      <p className="text-xs text-white/70">{label}</p>
+    <div className="flex items-center gap-2 rounded-lg bg-black px-3 py-1.5 text-white">
+      <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M17.05 12.04c-.03-2.6 2.12-3.85 2.22-3.91-1.21-1.77-3.09-2.01-3.76-2.04-1.6-.16-3.12.94-3.93.94-.81 0-2.06-.92-3.39-.9-1.74.03-3.35 1.01-4.25 2.57-1.81 3.14-.46 7.79 1.3 10.34.86 1.25 1.89 2.65 3.24 2.6 1.3-.05 1.79-.84 3.36-.84 1.57 0 2.01.84 3.39.81 1.4-.02 2.29-1.27 3.15-2.53.99-1.45 1.4-2.85 1.42-2.92-.03-.01-2.73-1.05-2.76-4.16zM14.53 4.4c.72-.87 1.2-2.08 1.07-3.28-1.03.04-2.28.69-3.02 1.55-.66.77-1.24 2-1.08 3.18 1.15.09 2.33-.58 3.03-1.45z" />
+      </svg>
+      <div className="leading-none">
+        <p className="text-[8px]">Download on the</p>
+        <p className="text-sm font-semibold">App Store</p>
+      </div>
+    </div>
+  );
+}
+
+function GooglePlayBadge(): React.JSX.Element {
+  return (
+    <div className="flex items-center gap-2 rounded-lg bg-black px-3 py-1.5 text-white">
+      <svg className="h-6 w-6" viewBox="0 0 24 24">
+        <path fill="#00d2ff" d="M3.6 2.4c-.3.3-.5.8-.5 1.4v16.4c0 .6.2 1.1.5 1.4l.1.1L12 13.1v-.2L3.7 2.3l-.1.1z" />
+        <path fill="#ffce00" d="M15.5 15.9 12 12.9v-.2l3.5-3 .1.1 4.1 2.3c1.2.7 1.2 1.8 0 2.5l-4.2 2.3z" />
+        <path fill="#00f076" d="M15.6 15.8 12 12.8 3.6 21.2c.4.4 1 .5 1.8.1l10.2-5.5z" />
+        <path fill="#ff3a44" d="M15.6 9.9 5.4 4.3c-.8-.4-1.4-.4-1.8.1L12 12.8l3.6-2.9z" />
+      </svg>
+      <div className="leading-none">
+        <p className="text-[8px]">GET IT ON</p>
+        <p className="text-sm font-semibold">Google Play</p>
+      </div>
     </div>
   );
 }

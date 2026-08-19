@@ -16,7 +16,28 @@
     "inspire": "INSPIRIERE",
     "influence": "BEEINFLUSSE",
     "impact": "WIRKUNG",
-    "innovate": "INNOVIERE"
+    "innovate": "INNOVIERE",
+    "share": "TEILE",
+    "yourVoice": "Deine Stimme",
+    "basedOnReviews": "Basierend auf {count} Bewertungen",
+    "showingReviews": "Unsere 5-Sterne-Bewertungen"
+  },
+  "footer": {
+    "aboutUs": "Über uns",
+    "cookies": "Cookie-Richtlinie",
+    "contact": "Kontakt",
+    "faqs": "FAQ",
+    "terms": "Bedingungen",
+    "privacy": "Datenschutz"
+  },
+  "chat": {
+    "hello": "Hallo",
+    "howCanWeHelp": "Wie können wir Ihnen helfen?",
+    "lunaIntro": "Ich bin Luna, die virtuelle Assistentin von Influencers, und helfe Ihnen gerne bei all Ihren Fragen.",
+    "askQuestion": "Eine Frage stellen",
+    "writeMessage": "Nachricht schreiben…",
+    "openChat": "Chat öffnen",
+    "closeChat": "Chat schließen"
   },
   "auth": {
     "createAccount": "Konto erstellen",
