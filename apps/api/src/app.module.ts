@@ -8,6 +8,7 @@ import { AppConfigModule } from './config/config.module';
 import { HealthModule } from './health/health.module';
 import { AccountModule } from './modules/account/account.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { GamesModule } from './modules/games/games.module';
 import { PointsModule } from './modules/points/points.module';
 import { PollsModule } from './modules/polls/polls.module';
 import { ProfileSurveysModule } from './modules/profile-surveys/profile-surveys.module';
@@ -20,7 +21,7 @@ import { RedisModule } from './redis/redis.module';
   imports: [
     AppConfigModule, PrismaModule, RedisModule,
     AuthModule, PointsModule, HealthModule,
-    AccountModule, ProfileSurveysModule, RewardsModule, SurveysModule, PollsModule,
+    AccountModule, ProfileSurveysModule, RewardsModule, SurveysModule, PollsModule, GamesModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },

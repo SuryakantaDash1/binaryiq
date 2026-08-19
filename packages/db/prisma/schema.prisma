@@ -116,9 +116,10 @@ model User {
   pointsTxns      PointsTransaction[]
   pointsBalance   PointsBalance?
   redemptions     RewardRedemption[]
-  surveyResponses    ProfileSurveyResponse[]
+  surveyResponses      ProfileSurveyResponse[]
   brandSurveyResponses SurveyResponse[]
   pollVotes            PollVote[]
+  gamePlays            GamePlay[]
 
   @@index([email])
   @@index([username])
@@ -385,22 +386,41 @@ model Game {
   isActive  Boolean       @default(true) @map("is_active")
   createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   segments  GameSegment[]
+  plays     GamePlay[]
 
   @@map("games")
 }
 
 model GameSegment {
-  id          String   @id @default(uuid()) @db.Uuid
-  gameId      String   @map("game_id") @db.Uuid
+  id          String     @id @default(uuid()) @db.Uuid
+  gameId      String     @map("game_id") @db.Uuid
   label       String
-  pointsValue Int      @map("points_value")
-  probability Decimal  @db.Decimal(5, 4)
-  color       String   @db.VarChar(7)
-  sortOrder   Int      @default(0) @map("sort_order")
-  game        Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  pointsValue Int        @map("points_value")
+  probability Decimal    @db.Decimal(5, 4)
+  color       String     @db.VarChar(7)
+  sortOrder   Int        @default(0) @map("sort_order")
+  game        Game       @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  plays       GamePlay[]
 
   @@index([gameId])
   @@map("game_segments")
+}
+
+model GamePlay {
+  id         String      @id @default(uuid()) @db.Uuid
+  userId     String      @map("user_id") @db.Uuid
+  gameId     String      @map("game_id") @db.Uuid
+  segmentId  String      @map("segment_id") @db.Uuid
+  pointsWon  Int         @map("points_won")
+  playDate   DateTime    @map("play_date") @db.Date
+  playedAt   DateTime    @default(now()) @map("played_at") @db.Timestamptz(6)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game       Game        @relation(fields: [gameId], references: [id])
+  segment    GameSegment @relation(fields: [segmentId], references: [id])
+
+  @@unique([userId, gameId, playDate])
+  @@index([userId, playedAt])
+  @@map("game_plays")
 }
 
 // ─────────────────────────────────────────────────────────────

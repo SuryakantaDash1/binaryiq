@@ -47,3 +47,5 @@ export { PollCard } from './poll-card.js';
 export type { PollCardProps, PollCardData } from './poll-card.js';
 export { PollResultBars } from './poll-result-bars.js';
 export type { PollResultBarsProps } from './poll-result-bars.js';
+export { SpinWheel } from './spin-wheel.js';
+export type { SpinWheelProps, SpinWheelSegment } from './spin-wheel.js';

@@ -6,3 +6,4 @@ export * from './account.js';
 export * from './rewards.js';
 export * from './surveys.js';
 export * from './polls.js';
+export * from './games.js';

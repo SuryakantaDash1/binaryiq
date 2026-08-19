@@ -431,6 +431,36 @@ async function seedPolls(prisma: PrismaClient): Promise<void> {
   console.warn('  ✓ 3 polls seeded');
 }
 
+async function seedGames(prismaClient: PrismaClient): Promise<void> {
+  const count = await prismaClient.game.count();
+  if (count > 0) {
+    console.warn('  ⚠ Games already seeded, skipping');
+    return;
+  }
+
+  await prismaClient.game.create({
+    data: {
+      gameName: 'Spin the Daily Wheel',
+      gameType: 'SPIN_WHEEL',
+      isFree: true,
+      segments: {
+        create: [
+          { label: 'Better luck next time!', pointsValue: 0,    probability: 0.1500, color: '#9E9E9E', sortOrder: 0 },
+          { label: '40 Points',              pointsValue: 40,   probability: 0.2000, color: '#FF7043', sortOrder: 1 },
+          { label: '80 Points',              pointsValue: 80,   probability: 0.2000, color: '#FFA726', sortOrder: 2 },
+          { label: '100 Points',             pointsValue: 100,  probability: 0.1800, color: '#FFCA28', sortOrder: 3 },
+          { label: '200 Points',             pointsValue: 200,  probability: 0.1200, color: '#66BB6A', sortOrder: 4 },
+          { label: '300 Points',             pointsValue: 300,  probability: 0.0800, color: '#26C6DA', sortOrder: 5 },
+          { label: '500 Points',             pointsValue: 500,  probability: 0.0500, color: '#42A5F5', sortOrder: 6 },
+          { label: '1000 Points',            pointsValue: 1000, probability: 0.0200, color: '#E91E8C', sortOrder: 7 },
+        ],
+      },
+    },
+  });
+
+  console.warn('  ✓ Seeded 1 game with 8 segments (Σprobability = 1.0000)');
+}
+
 async function main(): Promise<void> {
   console.warn('Seeding reference data…');
   await seedProfileCategories();
@@ -439,6 +469,7 @@ async function main(): Promise<void> {
   await seedSuperAdmin();
   await seedSurveys();
   await seedPolls(prisma);
+  await seedGames(prisma);
   console.warn('Seed complete.');
 }
 
