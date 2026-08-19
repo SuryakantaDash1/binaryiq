@@ -1,4 +1,6 @@
+import type { CompleteSurveyResult } from '@influencer/types';
 import { Injectable, Logger } from '@nestjs/common';
+
 import {
   ConflictException,
   NotFoundException,
@@ -6,7 +8,6 @@ import {
 } from '../../common/exceptions/domain.exception';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PointsService } from '../points/points.service';
-import type { CompleteSurveyResult } from '@influencer/types';
 
 @Injectable()
 export class SurveyCompletionService {

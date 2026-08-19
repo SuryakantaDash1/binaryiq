@@ -1,7 +1,9 @@
 import { createHmac } from 'node:crypto';
-import { Injectable } from '@nestjs/common';
+
 import { type SurveyType, Prisma } from '@influencer/db';
 import type { TargetingCriteria } from '@influencer/types';
+import { Injectable } from '@nestjs/common';
+
 import { EncryptionService } from '../../common/services/encryption.service';
 import { PrismaService } from '../../prisma/prisma.service';
 

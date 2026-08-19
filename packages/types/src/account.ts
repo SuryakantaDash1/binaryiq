@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { passwordSchema } from './auth.js';
 
 export const updateProfileSchema = z.object({
