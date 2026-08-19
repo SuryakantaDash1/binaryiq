@@ -8,13 +8,17 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist", "prisma"],
+  "files": [
+    "dist",
+    "prisma"
+  ],
   "scripts": {
     "generate": "prisma generate",
-    "build": "prisma generate && tsc -p tsconfig.json",
+    "build": "prisma generate && tsup src/index.ts --format cjs,esm --dts --out-dir dist",
     "migrate:dev": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
     "seed": "prisma db seed",
@@ -34,6 +38,7 @@
     "@types/node": "^20.16.10",
     "bcryptjs": "^2.4.3",
     "prisma": "^5.20.0",
+    "tsup": "^8.5.1",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2"
   }

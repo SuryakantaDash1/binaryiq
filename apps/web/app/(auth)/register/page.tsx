@@ -91,7 +91,36 @@ function Step1Form({ onNext }: { onNext: (draftId: string) => void }): React.JSX
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
       <FormField label="Country" error={errors.country?.message} required>
-        {({ id, invalid }) => <Input id={id} invalid={invalid} {...register('country')} />}
+        {({ id, invalid }) => (
+          <select
+            id={id}
+            aria-invalid={invalid}
+            className="border-border bg-surface h-10 w-full rounded-md border px-3 text-sm"
+            {...register('country')}
+          >
+            <option value="">Select country…</option>
+            <option value="IN">India</option>
+            <option value="US">United States</option>
+            <option value="GB">United Kingdom</option>
+            <option value="AU">Australia</option>
+            <option value="CA">Canada</option>
+            <option value="SG">Singapore</option>
+            <option value="AE">United Arab Emirates</option>
+            <option value="NZ">New Zealand</option>
+            <option value="ZA">South Africa</option>
+            <option value="NG">Nigeria</option>
+            <option value="PK">Pakistan</option>
+            <option value="BD">Bangladesh</option>
+            <option value="LK">Sri Lanka</option>
+            <option value="NP">Nepal</option>
+            <option value="MY">Malaysia</option>
+            <option value="PH">Philippines</option>
+            <option value="ID">Indonesia</option>
+            <option value="DE">Germany</option>
+            <option value="FR">France</option>
+            <option value="NL">Netherlands</option>
+          </select>
+        )}
       </FormField>
       <div className="grid grid-cols-2 gap-3">
         <FormField label="First name" error={errors.firstName?.message} required>
