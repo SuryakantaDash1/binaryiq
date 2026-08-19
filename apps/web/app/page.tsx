@@ -60,6 +60,14 @@ const BRAND_LOGOS = [
   { name: 'Swiggy', color: '#FC8019' },
 ];
 
+// Real lifestyle/community photos (Unsplash CDN) that cross-fade like a video.
+// If offline, the panel's base gradient shows instead — no broken images.
+const HERO_IMAGES = [
+  'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1400&q=80',
+  'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1400&q=80',
+  'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1400&q=80',
+];
+
 const REVIEWS = [
   { name: 'Priya M.', title: 'Genuinely rewarding', text: 'Great platform to earn rewards by sharing opinions!', rating: 5 },
   { name: 'Rahul S.', title: 'Fast payouts', text: 'Easy to use and rewards are credited fast.', rating: 5 },
@@ -172,7 +180,7 @@ export default function LandingPage(): React.JSX.Element {
           </div>
           <div className="leading-tight">
             <p className="text-base font-bold text-gray-900">Influencers</p>
-            <p className="text-[10px] text-gray-500">by toluna</p>
+            <p className="text-[10px] text-gray-500">surveys &amp; rewards</p>
           </div>
         </div>
 
@@ -269,29 +277,15 @@ export default function LandingPage(): React.JSX.Element {
         </div>
       </div>
 
-      {/* ── Right Panel (50%) — animated "video" ───────────────────── */}
-      <div className="relative hidden w-1/2 overflow-hidden md:flex">
-        {/* Cross-fading gradient "scenes" simulate a looping video */}
-        <div className="video-scene scene-1 absolute inset-0" />
-        <div className="video-scene scene-2 absolute inset-0" />
-        <div className="video-scene scene-3 absolute inset-0" />
+      {/* ── Right Panel (50%) — cross-fading real photos ───────────── */}
+      <div className="relative hidden w-1/2 overflow-hidden bg-gradient-to-br from-indigo-900 to-purple-800 md:flex">
+        {/* Real lifestyle photos cross-fade to feel like a looping video */}
+        <div className="photo-scene ps-1 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMAGES[0]})` }} />
+        <div className="photo-scene ps-2 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMAGES[1]})` }} />
+        <div className="photo-scene ps-3 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMAGES[2]})` }} />
 
-        {/* Grain overlay */}
-        <div
-          className="absolute inset-0 opacity-15"
-          style={{
-            backgroundImage:
-              'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'1\'/%3E%3C/svg%3E")',
-          }}
-        />
-
-        {/* Person silhouette */}
-        <div className="absolute inset-0 flex items-end justify-end pr-10 opacity-20">
-          <svg viewBox="0 0 200 400" fill="white" className="h-[85%] w-auto">
-            <ellipse cx="110" cy="90" rx="52" ry="60" />
-            <path d="M25 400 Q35 230 110 210 Q185 230 195 400Z" />
-          </svg>
-        </div>
+        {/* Brand tint overlay (blue → purple → pink) over the photos */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-800/75 via-purple-700/65 to-pink-600/70" />
 
         {/* Moving light blobs */}
         <div className="animate-blob absolute left-1/4 top-1/4 h-64 w-64 rounded-full bg-purple-400 opacity-30 mix-blend-screen blur-3xl" />
@@ -330,31 +324,19 @@ export default function LandingPage(): React.JSX.Element {
 
       {/* Global styles for animations */}
       <style jsx global>{`
-        .video-scene {
-          background-size: 300% 300%;
-          animation: sceneFade 18s ease-in-out infinite, gradientShift 10s ease infinite;
+        .photo-scene {
+          opacity: 0;
+          animation: sceneFade 21s ease-in-out infinite;
+          transform: scale(1.05);
         }
-        .scene-1 {
-          background-image: linear-gradient(135deg, #1e3a8a 0%, #6d28d9 50%, #db2777 100%);
-          animation-delay: 0s, 0s;
-        }
-        .scene-2 {
-          background-image: linear-gradient(135deg, #4c1d95 0%, #7c3aed 50%, #ec4899 100%);
-          animation-delay: -6s, -3s;
-        }
-        .scene-3 {
-          background-image: linear-gradient(135deg, #312e81 0%, #9333ea 45%, #f43f5e 100%);
-          animation-delay: -12s, -6s;
-        }
+        .ps-1 { animation-delay: 0s; }
+        .ps-2 { animation-delay: -7s; }
+        .ps-3 { animation-delay: -14s; }
         @keyframes sceneFade {
-          0%, 22% { opacity: 1; }
-          33%, 89% { opacity: 0; }
-          100% { opacity: 1; }
-        }
-        @keyframes gradientShift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+          0% { opacity: 0; transform: scale(1.05); }
+          5%, 28% { opacity: 1; transform: scale(1.12); }
+          38%, 95% { opacity: 0; }
+          100% { opacity: 0; }
         }
         @keyframes blob {
           0%, 100% { transform: translate(0, 0) scale(1); }
