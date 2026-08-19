@@ -49,3 +49,5 @@ export { PollResultBars } from './poll-result-bars.js';
 export type { PollResultBarsProps } from './poll-result-bars.js';
 export { SpinWheel } from './spin-wheel.js';
 export type { SpinWheelProps, SpinWheelSegment } from './spin-wheel.js';
+export { Switch } from './switch.js';
+export type { SwitchProps } from './switch.js';

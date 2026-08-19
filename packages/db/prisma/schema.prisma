@@ -77,6 +77,32 @@ enum GameType {
   QUIZ
 }
 
+enum NotificationChannel {
+  EMAIL
+  PUSH
+  SMS
+  WHATSAPP
+}
+
+enum NotificationType {
+  REGISTRATION
+  SURVEY_INVITE
+  SURVEY_REMINDER
+  POINTS_UPDATE
+  GAME_REMINDER
+  REWARD_UPDATE
+  PASSWORD_RESET
+  OFFERS_NEWS
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  FAILED
+  READ
+}
+
 enum AdminRole {
   SUPER_ADMIN
   ADMIN
@@ -116,10 +142,13 @@ model User {
   pointsTxns      PointsTransaction[]
   pointsBalance   PointsBalance?
   redemptions     RewardRedemption[]
-  surveyResponses      ProfileSurveyResponse[]
-  brandSurveyResponses SurveyResponse[]
-  pollVotes            PollVote[]
-  gamePlays            GamePlay[]
+  surveyResponses          ProfileSurveyResponse[]
+  brandSurveyResponses     SurveyResponse[]
+  pollVotes                PollVote[]
+  gamePlays                GamePlay[]
+  notifications            Notification[]
+  notificationPreferences  NotificationPreference[]
+  pushTokens               PushToken[]
 
   @@index([email])
   @@index([username])
@@ -469,4 +498,55 @@ model ProfileSurveyResponse {
   @@unique([userId, categoryId])
   @@index([userId, createdAt])
   @@map("profile_survey_responses")
+}
+
+// ─────────────────────────────────────────────────────────────
+// NOTIFICATIONS (Phase 7)
+// ─────────────────────────────────────────────────────────────
+model Notification {
+  id        String             @id @default(uuid()) @db.Uuid
+  userId    String             @map("user_id") @db.Uuid
+  channel   NotificationChannel
+  type      NotificationType
+  title     String?
+  message   String
+  status    NotificationStatus @default(QUEUED)
+  sentAt    DateTime?          @map("sent_at") @db.Timestamptz(6)
+  readAt    DateTime?          @map("read_at") @db.Timestamptz(6)
+  metadata  Json?              @db.JsonB
+  createdAt DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @map("user_id") @db.Uuid
+  type      NotificationType
+  email     Boolean          @default(true)
+  push      Boolean          @default(true)
+  sms       Boolean          @default(false)
+  whatsapp  Boolean          @default(false)
+  updatedAt DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type])
+  @@index([userId])
+  @@map("notification_preferences")
+}
+
+model PushToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  token     String   @unique
+  platform  String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("push_tokens")
 }
