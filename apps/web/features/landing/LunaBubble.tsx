@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 /**
@@ -11,9 +11,19 @@ import { useTranslations } from 'next-intl';
 export function LunaBubble(): React.JSX.Element {
   const t = useTranslations('chat');
   const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Speech-bubble shape: rounded on 3 corners, tail on the bottom-left.
   const bubbleShape = { borderRadius: '50% 50% 50% 14%' };
+  const canSend = message.trim().length > 0;
+
+  function handleSend(): void {
+    if (!canSend) return;
+    // Landing chat is decorative — echo the message into the field being cleared.
+    setMessage('');
+    inputRef.current?.focus();
+  }
 
   return (
     <div
@@ -24,46 +34,58 @@ export function LunaBubble(): React.JSX.Element {
       {open && (
         <div className="flex h-[560px] max-h-[calc(100vh-7rem)] w-[380px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5">
           {/* Gradient header (blue → purple → pink) */}
-          <div className="relative shrink-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 px-6 pb-16 pt-6 text-white">
+          <div className="shrink-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 px-6 pb-14 pt-6 text-white">
             <p className="text-xl font-medium">
               {t('hello')} <span className="inline-block">👋</span>
             </p>
             <p className="mt-1 text-2xl font-bold leading-snug">{t('howCanWeHelp')}</p>
           </div>
 
-          {/* Chat body */}
-          <div className="flex flex-1 flex-col overflow-y-auto bg-gray-50 px-5">
-            {/* Intro card overlapping the header */}
-            <div className="-mt-12 rounded-2xl bg-white p-5 shadow-lg ring-1 ring-black/5">
+          {/* Intro card — overlaps the header, OUTSIDE the scroll area so it never clips */}
+          <div className="relative z-10 -mt-10 shrink-0 px-5">
+            <div className="rounded-2xl bg-white p-5 shadow-lg ring-1 ring-black/5">
               <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-amber-300 text-xl">
-                  😌
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-amber-300 text-xl">
+                  😊
                 </div>
                 <p className="text-sm leading-relaxed text-gray-700">{t('lunaIntro')}</p>
               </div>
               <button
                 type="button"
-                className="mt-5 w-full rounded-full bg-blue-600 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-95"
+                onClick={() => inputRef.current?.focus()}
+                className="mt-4 w-full rounded-full bg-blue-600 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-95"
               >
                 {t('askQuestion')}
               </button>
             </div>
-
-            {/* Empty conversation space */}
-            <div className="flex-1" />
           </div>
+
+          {/* Conversation space (scrollable) */}
+          <div className="flex-1 overflow-y-auto bg-gray-50" />
 
           {/* Message input, pinned to the bottom */}
           <div className="flex shrink-0 items-center gap-2 border-t border-gray-100 bg-white px-5 py-3">
             <input
+              ref={inputRef}
               type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSend();
+              }}
               placeholder={t('writeMessage')}
               className="flex-1 bg-transparent text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none"
             />
             <button
               type="button"
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition hover:bg-blue-600 hover:text-white"
+              onClick={handleSend}
+              disabled={!canSend}
               aria-label={t('askQuestion')}
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition ${
+                canSend
+                  ? 'bg-pink-600 text-white shadow-md hover:bg-pink-700 active:scale-90'
+                  : 'cursor-not-allowed bg-gray-100 text-gray-300'
+              }`}
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -87,7 +109,7 @@ export function LunaBubble(): React.JSX.Element {
           </svg>
         </button>
       ) : (
-        // When closed: royal-blue speech bubble with a content face
+        // When closed: royal-blue speech bubble with a big smiling face
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -97,7 +119,7 @@ export function LunaBubble(): React.JSX.Element {
         >
           <span style={bubbleShape} className="absolute inset-0 animate-ping bg-blue-500/20" />
           <span className="relative flex h-[58px] w-[58px] items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-amber-200 text-[38px] leading-none shadow-inner">
-            😌
+            😊
           </span>
         </button>
       )}
