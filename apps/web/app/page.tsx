@@ -54,11 +54,15 @@ const LANGUAGES = [
   { code: 'el-GR', label: 'ελληνικά' },
 ];
 
-const BRAND_LOGOS = [
-  { name: 'amazon.in', color: '#232F3E' },
-  { name: 'Nykaa', color: '#E80071' },
-  { name: 'Swiggy', color: '#FC8019' },
-];
+// Benefits shown as interactive cards (icon + translated line)
+const BENEFITS = [
+  { key: 'benefit1', icon: '🎁' },
+  { key: 'benefit2', icon: '🎯' },
+  { key: 'benefit3', icon: '💳' },
+] as const;
+
+// "How it works" quick steps
+const STEPS = ['step1', 'step2', 'step3'] as const;
 
 // Real lifestyle/community photos (Unsplash CDN) that cross-fade like a video.
 // If offline, the panel's base gradient shows instead — no broken images.
@@ -193,35 +197,44 @@ export default function LandingPage(): React.JSX.Element {
             </Link>
           </div>
 
-          {/* Brand logos */}
-          <div className="mt-9 flex items-center gap-8">
-            {BRAND_LOGOS.map((b) => (
-              <span key={b.name} className="text-lg font-bold tracking-tight" style={{ color: b.color }}>
-                {b.name}
-              </span>
-            ))}
-          </div>
-
           {/* Divider */}
-          <div className="my-6 border-t border-gray-100" />
+          <div className="mt-8 border-t border-gray-100" />
 
-          {/* Why join — clean benefit checklist */}
-          <div>
+          {/* Why join — interactive benefit cards */}
+          <div className="mt-6">
             <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">
               {t('benefitsTitle')}
             </p>
-            <ul className="space-y-2.5">
-              {[t('benefit1'), t('benefit2'), t('benefit3')].map((b, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-pink-100 text-pink-600">
-                    <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </span>
-                  <span className="text-sm text-gray-700">{b}</span>
-                </li>
+            <div className="space-y-2.5">
+              {BENEFITS.map((b) => (
+                <div
+                  key={b.key}
+                  className="group flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-pink-200 hover:shadow-md"
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-pink-50 text-xl transition-transform duration-200 group-hover:scale-110">
+                    {b.icon}
+                  </div>
+                  <p className="text-sm font-medium text-gray-700">{t(b.key)}</p>
+                </div>
               ))}
-            </ul>
+            </div>
+          </div>
+
+          {/* How it works — 3 quick steps */}
+          <div className="mt-7">
+            <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">
+              {t('howItWorks')}
+            </p>
+            <div className="flex items-start justify-between gap-2">
+              {STEPS.map((s, i) => (
+                <div key={s} className="group flex flex-1 flex-col items-center text-center">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-500 text-sm font-bold text-white shadow-sm transition-transform duration-200 group-hover:scale-110">
+                    {i + 1}
+                  </div>
+                  <p className="mt-2 text-xs font-medium leading-tight text-gray-600">{t(s)}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
