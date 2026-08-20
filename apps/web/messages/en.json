@@ -37,7 +37,13 @@
     "askQuestion": "Ask a question",
     "writeMessage": "Write a reply…",
     "openChat": "Open chat",
-    "closeChat": "Minimize chat"
+    "closeChat": "Minimize chat",
+    "qaGreeting": "Hello, I am Luna, your helpful Q&A bot.\nHow may I assist you today?",
+    "resolvedOption": "You have answered my query, thank you",
+    "escalateOption": "I didn't get a response. Let's raise a support ticket.",
+    "thankYouMsg": "Happy to help! You're welcome 😊",
+    "backToTopics": "Back to topics",
+    "chooseTopic": "Please choose a topic below."
   },
   "auth": {
     "createAccount": "Create your account",
