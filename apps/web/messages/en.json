@@ -31,13 +31,13 @@
     "privacy": "Privacy"
   },
   "chat": {
-    "hello": "Hello",
-    "howCanWeHelp": "How can we help you?",
-    "lunaIntro": "I'm Luna, the virtual assistant of Influencers, and I'm happy to help you with all your questions.",
+    "hello": "Hi",
+    "howCanWeHelp": "How can we assist you?",
+    "lunaIntro": "I am Luna, the Influencer's virtual assistant and I will be happy to help you with any questions you may have.",
     "askQuestion": "Ask a question",
-    "writeMessage": "Write a message…",
+    "writeMessage": "Write a reply…",
     "openChat": "Open chat",
-    "closeChat": "Close chat"
+    "closeChat": "Minimize chat"
   },
   "auth": {
     "createAccount": "Create your account",
