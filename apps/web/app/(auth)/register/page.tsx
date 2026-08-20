@@ -41,12 +41,21 @@ export default function RegisterPage(): React.JSX.Element {
 
   return (
     <div className="flex flex-col gap-5">
+      {/* Progress bar */}
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-300"
+          style={{ width: step === 1 ? '50%' : '100%' }}
+        />
+      </div>
+
       <div>
-        <Heading level={3}>{t('createAccount')}</Heading>
+        <Heading level={3}>{t('joinBonus')}</Heading>
         <Text color="muted" size="sm">
           {t('stepOf', { step, total: 2 })}
         </Text>
       </div>
+
       {step === 1 ? (
         <Step1Form
           onNext={(id) => {
@@ -63,6 +72,19 @@ export default function RegisterPage(): React.JSX.Element {
           }}
         />
       )}
+
+      <Text color="muted" size="sm">
+        {t('acceptPrefix')}{' '}
+        <Link href="/terms" className="text-primary">
+          {t('termsAndConditions')}
+        </Link>{' '}
+        {t('and')}{' '}
+        <Link href="/privacy" className="text-primary">
+          {t('privacyPolicy')}
+        </Link>{' '}
+        {t('acceptSuffix')}
+      </Text>
+
       <Text color="muted" size="sm">
         {t('alreadyHaveAccount')}{' '}
         <Link href="/login" className="text-primary">

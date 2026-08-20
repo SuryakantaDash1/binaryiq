@@ -55,6 +55,12 @@
   },
   "auth": {
     "createAccount": "Create your account",
+    "joinBonus": "Join Influencers and get 500 points as a welcome bonus!",
+    "acceptPrefix": "By registering to our community, you accept the",
+    "termsAndConditions": "Terms and Conditions",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy",
+    "acceptSuffix": "of the Influencers Community. Please take a moment to review them.",
     "stepOf": "Step {step} of {total}",
     "checkInbox": "Check your inbox",
     "sentTo": "We have sent you an activation email on {email}.",
