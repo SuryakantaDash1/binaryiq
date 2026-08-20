@@ -68,12 +68,6 @@ const HERO_IMAGES = [
   'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1400&q=80',
 ];
 
-const REVIEWS = [
-  { name: 'Priya M.', title: 'Genuinely rewarding', text: 'Great platform to earn rewards by sharing opinions!', rating: 5 },
-  { name: 'Rahul S.', title: 'Fast payouts', text: 'Easy to use and rewards are credited fast.', rating: 5 },
-  { name: 'Anita K.', title: 'Plenty of surveys', text: 'Love the variety of surveys available every day.', rating: 5 },
-];
-
 // Map full locale codes to base language codes (must match i18n/request.ts)
 const LOCALE_TO_LANG: Record<string, string> = {
   'en-IN': 'en', 'en-GB': 'en', 'en-US': 'en', 'en-AU': 'en', 'en-CA': 'en',
@@ -123,7 +117,6 @@ export default function LandingPage(): React.JSX.Element {
   const [lang, setLang] = useState('en-IN');
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [fade, setFade] = useState(true);
-  const [reviewIndex, setReviewIndex] = useState(0);
 
   // Cycling hero phrases (big word + subtitle), built from translation keys
   const PHRASES = [
@@ -151,14 +144,6 @@ export default function LandingPage(): React.JSX.Element {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Cycle review every 4 s
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setReviewIndex((i) => (i + 1) % REVIEWS.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
   function handleLangChange(e: React.ChangeEvent<HTMLSelectElement>): void {
     const fullLocale = e.target.value;
     if (!fullLocale) return;
@@ -167,11 +152,6 @@ export default function LandingPage(): React.JSX.Element {
     window.location.reload();
   }
 
-  function stepReview(dir: number): void {
-    setReviewIndex((i) => (i + dir + REVIEWS.length) % REVIEWS.length);
-  }
-
-  const review = REVIEWS[reviewIndex]!;
   const phrase = PHRASES[phraseIndex]!;
 
   return (
@@ -223,48 +203,26 @@ export default function LandingPage(): React.JSX.Element {
           </div>
 
           {/* Divider */}
-          <div className="my-5 border-t border-gray-100" />
+          <div className="my-6 border-t border-gray-100" />
 
-          {/* Trustpilot-style rating + review carousel */}
-          <div className="flex items-start gap-5">
-            <div className="shrink-0">
-              <p className="text-lg font-bold text-gray-900">{t('great')}</p>
-              <TrustStars score={4.5} />
-              <p className="mt-1 text-[11px] text-gray-500">{t('basedOnReviews', { count: '2,46,968' })}</p>
-              <TrustpilotWordmark />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <VerifiedBadge />
-                <span className="text-[11px] font-semibold text-gray-700">{review.name}</span>
-              </div>
-              <p className="mt-1 text-sm font-bold text-gray-900">{review.title}</p>
-              <p className="text-xs text-gray-600">{review.text}</p>
-            </div>
-
-            <div className="flex shrink-0 flex-col justify-center gap-2">
-              <button
-                onClick={() => stepReview(-1)}
-                aria-label="Previous review"
-                className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-50"
-              >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                onClick={() => stepReview(1)}
-                aria-label="Next review"
-                className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-50"
-              >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
+          {/* Why join — clean benefit checklist */}
+          <div>
+            <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">
+              {t('benefitsTitle')}
+            </p>
+            <ul className="space-y-2.5">
+              {[t('benefit1'), t('benefit2'), t('benefit3')].map((b, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-pink-100 text-pink-600">
+                    <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </span>
+                  <span className="text-sm text-gray-700">{b}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-          <p className="mt-3 text-center text-[11px] text-gray-400">{t('showingReviews')}</p>
         </div>
 
         {/* Language selector — pinned to bottom */}
@@ -355,50 +313,6 @@ export default function LandingPage(): React.JSX.Element {
         .animation-delay-4000 { animation-delay: 4s; }
         .duration-400 { transition-duration: 400ms; }
       `}</style>
-    </div>
-  );
-}
-
-/** Trustpilot-style green square stars, filled by score (0–5, halves supported). */
-function TrustStars({ score }: { score: number }): React.JSX.Element {
-  return (
-    <div className="mt-1 flex gap-0.5">
-      {[1, 2, 3, 4, 5].map((i) => {
-        const fill = Math.max(0, Math.min(1, score - (i - 1)));
-        return (
-          <div key={i} className="relative h-6 w-6 overflow-hidden rounded-sm bg-gray-200">
-            <div
-              className="absolute inset-y-0 left-0 bg-[#00b67a]"
-              style={{ width: `${fill * 100}%` }}
-            />
-            <svg className="absolute inset-0 m-auto h-4 w-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function TrustpilotWordmark(): React.JSX.Element {
-  return (
-    <div className="mt-1.5 flex items-center gap-1">
-      <svg className="h-3.5 w-3.5 text-[#00b67a]" fill="currentColor" viewBox="0 0 20 20">
-        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-      </svg>
-      <span className="text-xs font-bold text-gray-700">Trustpilot</span>
-    </div>
-  );
-}
-
-function VerifiedBadge(): React.JSX.Element {
-  return (
-    <div className="flex items-center gap-1 rounded bg-[#00b67a] px-1.5 py-0.5">
-      <svg className="h-2.5 w-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-      </svg>
-      <span className="text-[9px] font-bold text-white">Verified</span>
     </div>
   );
 }
