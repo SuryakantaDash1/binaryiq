@@ -93,10 +93,10 @@ export function LunaBubble(): React.JSX.Element {
           onClick={() => setOpen(true)}
           aria-label={t('openChat')}
           style={bubbleShape}
-          className="relative flex h-[72px] w-[72px] items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700 shadow-xl transition hover:scale-105 active:scale-95"
+          className="relative flex h-[84px] w-[84px] items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700 shadow-xl transition hover:scale-105 active:scale-95"
         >
-          <span style={bubbleShape} className="absolute inset-0 animate-ping bg-blue-500/25" />
-          <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-amber-200 text-2xl shadow-inner">
+          <span style={bubbleShape} className="absolute inset-0 animate-ping bg-blue-500/20" />
+          <span className="relative flex h-[58px] w-[58px] items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-amber-200 text-[38px] leading-none shadow-inner">
             😌
           </span>
         </button>

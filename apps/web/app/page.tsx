@@ -108,7 +108,14 @@ function getStoredLocale(): string {
   return m?.[1] ?? 'en-IN';
 }
 
-const FOOTER_KEYS = ['aboutUs', 'cookies', 'contact', 'faqs', 'terms', 'privacy'] as const;
+const FOOTER_LINKS = [
+  { key: 'aboutUs', href: '/about' },
+  { key: 'cookies', href: '/cookies' },
+  { key: 'contact', href: '/contact' },
+  { key: 'faqs', href: '/faqs' },
+  { key: 'terms', href: '/terms' },
+  { key: 'privacy', href: '/privacy' },
+] as const;
 
 export default function LandingPage(): React.JSX.Element {
   const t = useTranslations('landing');
@@ -310,10 +317,10 @@ export default function LandingPage(): React.JSX.Element {
             <GooglePlayBadge />
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-white/85">
-            {FOOTER_KEYS.map((k) => (
-              <span key={k} className="cursor-pointer hover:text-white hover:underline">
-                {tf(k)}
-              </span>
+            {FOOTER_LINKS.map((l) => (
+              <Link key={l.key} href={l.href} className="hover:text-white hover:underline">
+                {tf(l.key)}
+              </Link>
             ))}
           </div>
         </div>
