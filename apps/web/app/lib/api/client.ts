@@ -33,15 +33,35 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
       ? JSON.stringify(rest.body)
       : (rest.body as BodyInit | null | undefined);
 
-  const res = await fetch(`${BASE_URL}${path}`, {
-    ...rest,
-    body: serializedBody,
-    headers: {
-      'content-type': 'application/json',
-      ...(token ? { authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
-  });
+  // Guard against a stalled request (server restarting, DB cold start, etc.)
+  // hanging the UI forever — surface it as an error after 25s instead.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25_000);
+
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, {
+      ...rest,
+      body: serializedBody,
+      signal: rest.signal ?? controller.signal,
+      headers: {
+        'content-type': 'application/json',
+        ...(token ? { authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
+    });
+  } catch (err) {
+    const aborted = err instanceof DOMException && err.name === 'AbortError';
+    throw new ApiError(
+      'INTERNAL_ERROR',
+      aborted
+        ? 'The request timed out. Please try again.'
+        : 'Unable to reach the server. Please check your connection and try again.',
+      0,
+    );
+  } finally {
+    clearTimeout(timeout);
+  }
 
   let body: ApiResponse<T>;
   try {

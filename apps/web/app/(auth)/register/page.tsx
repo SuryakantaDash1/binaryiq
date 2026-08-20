@@ -7,22 +7,51 @@ import {
   type RegisterStep1Input,
   type RegisterStep2Input,
 } from '@influencer/types';
-import { Button, FormField, Heading, Input, Text } from '@influencer/ui';
+import { Heading, Text } from '@influencer/ui';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 
 import { authApi } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/client';
+import { useAuthPanel } from '@/features/auth/AuthPanel.js';
 
 type Step = 1 | 2 | 'done';
+
+const INPUT =
+  'h-12 w-full rounded-lg border border-gray-300 px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300';
+const PINK_BTN =
+  'rounded-full bg-pink-600 px-9 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-pink-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60';
+const BLUE_BTN =
+  'rounded-full bg-blue-500 px-9 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-600 active:scale-95';
+
+const COUNTRIES = [
+  ['IN', 'India'], ['US', 'United States'], ['GB', 'United Kingdom'], ['AU', 'Australia'],
+  ['CA', 'Canada'], ['SG', 'Singapore'], ['AE', 'United Arab Emirates'], ['NZ', 'New Zealand'],
+  ['ZA', 'South Africa'], ['NG', 'Nigeria'], ['PK', 'Pakistan'], ['BD', 'Bangladesh'],
+  ['LK', 'Sri Lanka'], ['NP', 'Nepal'], ['MY', 'Malaysia'], ['PH', 'Philippines'],
+  ['ID', 'Indonesia'], ['DE', 'Germany'], ['FR', 'France'], ['NL', 'Netherlands'],
+];
+
+const GENDERS = [
+  { value: 'MALE', symbol: '♂', color: 'text-blue-500', labelKey: 'male' },
+  { value: 'FEMALE', symbol: '♀', color: 'text-pink-500', labelKey: 'female' },
+  { value: 'OTHER', symbol: '⚧', color: 'text-purple-500', labelKey: 'other' },
+  { value: 'PREFER_NOT_TO_SAY', symbol: '?', color: 'text-gray-400', labelKey: 'preferNotToSay' },
+] as const;
 
 export default function RegisterPage(): React.JSX.Element {
   const t = useTranslations('auth');
   const [step, setStep] = useState<Step>(1);
-  const [draftId, setDraftId] = useState<string>('');
-  const [sentTo, setSentTo] = useState<string>('');
+  const [draftId, setDraftId] = useState('');
+  const [sentTo, setSentTo] = useState('');
+  const [banners, setBanners] = useState<string[]>([]);
+  const [step1Data, setStep1Data] = useState<Partial<RegisterStep1Input>>({});
+  const { setVariant } = useAuthPanel();
+
+  // Reset the right-panel headline when leaving the page.
+  useEffect(() => () => setVariant('default'), [setVariant]);
 
   if (step === 'done') {
     return (
@@ -41,7 +70,8 @@ export default function RegisterPage(): React.JSX.Element {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Progress bar */}
+      {/* Step label + progress bar */}
+      {step === 2 && <Heading level={3}>{t('accountStep')}</Heading>}
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
         <div
           className="h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-300"
@@ -56,9 +86,34 @@ export default function RegisterPage(): React.JSX.Element {
         </Text>
       </div>
 
+      {/* Error banners */}
+      {banners.map((b, i) => (
+        <div
+          key={i}
+          className="flex items-center justify-between gap-3 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-200"
+        >
+          <span className="flex items-center gap-2">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs text-white">!</span>
+            Error: {b}
+          </span>
+          <button
+            type="button"
+            onClick={() => setBanners((bs) => bs.filter((_, j) => j !== i))}
+            className="text-red-400 hover:text-red-600"
+            aria-label="Dismiss"
+          >
+            ✕
+          </button>
+        </div>
+      ))}
+
       {step === 1 ? (
         <Step1Form
-          onNext={(id) => {
+          defaults={step1Data}
+          onBanners={setBanners}
+          onNext={(id, values) => {
+            setBanners([]);
+            setStep1Data(values);
             setDraftId(id);
             setStep(2);
           }}
@@ -66,6 +121,8 @@ export default function RegisterPage(): React.JSX.Element {
       ) : (
         <Step2Form
           draftId={draftId}
+          onBack={() => setStep(1)}
+          onBanners={setBanners}
           onDone={(email) => {
             setSentTo(email);
             setStep('done');
@@ -95,161 +152,409 @@ export default function RegisterPage(): React.JSX.Element {
   );
 }
 
-function Step1Form({ onNext }: { onNext: (draftId: string) => void }): React.JSX.Element {
+/* ── Step 1 ─────────────────────────────────────────────────────────────── */
+function Step1Form({
+  onNext,
+  onBanners,
+  defaults,
+}: {
+  onNext: (draftId: string, values: RegisterStep1Input) => void;
+  onBanners: (msgs: string[]) => void;
+  defaults: Partial<RegisterStep1Input>;
+}): React.JSX.Element {
   const t = useTranslations('auth');
+  const { setVariant } = useAuthPanel();
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterStep1Input>({ resolver: zodResolver(registerStep1Schema) });
+  } = useForm<RegisterStep1Input>({
+    resolver: zodResolver(registerStep1Schema),
+    defaultValues: defaults,
+  });
+
+  const gender = watch('gender');
+
+  // Restore the right-panel headline when returning to step 1 with a gender set.
+  useEffect(() => {
+    if (defaults.gender === 'MALE') setVariant('male');
+    else if (defaults.gender === 'FEMALE') setVariant('female');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function isAtLeast18(dob: string): boolean {
+    const birth = new Date(dob);
+    if (Number.isNaN(birth.getTime())) return false;
+    const now = new Date();
+    let age = now.getFullYear() - birth.getFullYear();
+    const m = now.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
+    return age >= 18;
+  }
+
+  function pickGender(g: RegisterStep1Input['gender']): void {
+    setValue('gender', g, { shouldValidate: true });
+    setVariant(g === 'MALE' ? 'male' : g === 'FEMALE' ? 'female' : 'default');
+  }
 
   const onSubmit = handleSubmit(async (values) => {
+    onBanners([]);
+    if (!isAtLeast18(values.dob)) {
+      setError('dob', { message: t('ageError') });
+      return;
+    }
     try {
       const { draftId } = await authApi.registerStep1(values);
-      onNext(draftId);
+      onNext(draftId, values);
     } catch (err) {
       applyApiError(err, setError);
+      onBanners(buildBanners(t('registrationFailed'), t('somethingWrong'), err));
     }
   });
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
-      <FormField label={t('country')} error={errors.country?.message} required>
-        {({ id, invalid }) => (
-          <select
-            id={id}
-            aria-invalid={invalid}
-            className="border-border bg-surface h-10 w-full rounded-md border px-3 text-sm"
-            {...register('country')}
-          >
-            <option value="">{t('selectCountry')}</option>
-            <option value="IN">India</option>
-            <option value="US">United States</option>
-            <option value="GB">United Kingdom</option>
-            <option value="AU">Australia</option>
-            <option value="CA">Canada</option>
-            <option value="SG">Singapore</option>
-            <option value="AE">United Arab Emirates</option>
-            <option value="NZ">New Zealand</option>
-            <option value="ZA">South Africa</option>
-            <option value="NG">Nigeria</option>
-            <option value="PK">Pakistan</option>
-            <option value="BD">Bangladesh</option>
-            <option value="LK">Sri Lanka</option>
-            <option value="NP">Nepal</option>
-            <option value="MY">Malaysia</option>
-            <option value="PH">Philippines</option>
-            <option value="ID">Indonesia</option>
-            <option value="DE">Germany</option>
-            <option value="FR">France</option>
-            <option value="NL">Netherlands</option>
-            <option value="BE">Belgium</option>
-            <option value="SA">Saudi Arabia</option>
-            <option value="EG">Egypt</option>
-            <option value="MA">Morocco</option>
-          </select>
-        )}
-      </FormField>
+    <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
+      <Field label={t('country')} required error={errors.country?.message}>
+        <select className={INPUT} {...register('country')}>
+          <option value="">{t('selectCountry')}</option>
+          {COUNTRIES.map(([code, name]) => (
+            <option key={code} value={code}>
+              {name}
+            </option>
+          ))}
+        </select>
+      </Field>
+
       <div className="grid grid-cols-2 gap-3">
-        <FormField label={t('firstName')} error={errors.firstName?.message} required>
-          {({ id, invalid }) => <Input id={id} invalid={invalid} {...register('firstName')} />}
-        </FormField>
-        <FormField label={t('surname')} error={errors.surname?.message} required>
-          {({ id, invalid }) => <Input id={id} invalid={invalid} {...register('surname')} />}
-        </FormField>
+        <Field label={t('firstName')} required error={errors.firstName?.message}>
+          <input className={INPUT} placeholder={t('firstName')} {...register('firstName')} />
+        </Field>
+        <Field label={t('surname')} required error={errors.surname?.message}>
+          <input className={INPUT} placeholder={t('surname')} {...register('surname')} />
+        </Field>
       </div>
-      <FormField label={t('dateOfBirth')} hint="YYYY-MM-DD" error={errors.dob?.message} required>
-        {({ id, invalid }) => <Input id={id} type="date" invalid={invalid} {...register('dob')} />}
-      </FormField>
-      <FormField label={t('gender')} error={errors.gender?.message} required>
-        {({ id, invalid }) => (
-          <select
-            id={id}
-            aria-invalid={invalid}
-            className="border-border bg-surface h-10 w-full rounded-md border px-3 text-sm"
-            {...register('gender')}
-          >
-            <option value="">{t('selectGender')}</option>
-            <option value="MALE">{t('male')}</option>
-            <option value="FEMALE">{t('female')}</option>
-            <option value="OTHER">{t('other')}</option>
-            <option value="PREFER_NOT_TO_SAY">{t('preferNotToSay')}</option>
-          </select>
-        )}
-      </FormField>
-      <Button type="submit" loading={isSubmitting} fullWidth>
-        {t('continue')}
-      </Button>
+
+      <Field label={t('dateOfBirth')} required error={errors.dob?.message}>
+        <input type="date" className={INPUT} {...register('dob')} />
+      </Field>
+
+      <Field label={t('gender')} required error={errors.gender?.message}>
+        <input type="hidden" {...register('gender')} />
+        <div className="grid grid-cols-4 gap-2">
+          {GENDERS.map((g) => (
+            <GenderCard
+              key={g.value}
+              active={gender === g.value}
+              onClick={() => pickGender(g.value)}
+              symbol={g.symbol}
+              color={g.color}
+              label={t(g.labelKey)}
+            />
+          ))}
+        </div>
+      </Field>
+
+      <button type="submit" disabled={isSubmitting} className={`${PINK_BTN} self-start`}>
+        {isSubmitting ? '…' : t('next')}
+      </button>
     </form>
   );
 }
 
+/* ── Step 2 ─────────────────────────────────────────────────────────────── */
 function Step2Form({
   draftId,
+  onBack,
   onDone,
+  onBanners,
 }: {
   draftId: string;
+  onBack: () => void;
   onDone: (email: string) => void;
+  onBanners: (msgs: string[]) => void;
 }): React.JSX.Element {
   const t = useTranslations('auth');
   const {
     register,
     handleSubmit,
     setError,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<RegisterStep2Input>({
     resolver: zodResolver(registerStep2Schema),
     defaultValues: { draftId },
   });
 
+  const [showPw, setShowPw] = useState(false);
+  const [sms, setSms] = useState(true);
+  const [pinDisplay, setPinDisplay] = useState('');
+  const [pinOptions, setPinOptions] = useState<Array<{ pin: string; name: string }>>([]);
+  const [pinOpen, setPinOpen] = useState(false);
+
+  // The 6-digit PIN typed so far (used for the API lookup + submitted value).
+  const pinDigits = pinDisplay.replace(/\D/g, '').slice(0, 6);
+
+  // Register pinCode so RHF validates/submits it while we control the input.
+  useEffect(() => {
+    register('pinCode');
+  }, [register]);
+
+  // Suggest a friendly unique username on mount (editable).
+  useEffect(() => {
+    setValue('username', genUsername());
+  }, [setValue]);
+
+  // Look up Indian post offices for a 6-digit PIN code (free public API).
+  useEffect(() => {
+    if (pinDigits.length !== 6) {
+      setPinOptions([]);
+      setPinOpen(false);
+      return;
+    }
+    let cancelled = false;
+    fetch(`https://api.postalpincode.in/pincode/${pinDigits}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled) return;
+        const offices: Array<{ Name: string }> = data?.[0]?.PostOffice ?? [];
+        setPinOptions(offices.slice(0, 12).map((o) => ({ pin: pinDigits, name: o.Name })));
+        setPinOpen(offices.length > 0);
+      })
+      .catch(() => void 0);
+    return () => {
+      cancelled = true;
+    };
+  }, [pinDigits]);
+
+  function onPinChange(e: React.ChangeEvent<HTMLInputElement>): void {
+    const v = e.target.value;
+    setPinDisplay(v);
+    setValue('pinCode', v.replace(/\D/g, '').slice(0, 6), { shouldValidate: false });
+  }
+
+  function selectArea(pin: string, name: string): void {
+    setPinDisplay(`${pin}, ${name}`);
+    setValue('pinCode', pin, { shouldValidate: true });
+    setPinOpen(false);
+  }
+
   const onSubmit = handleSubmit(async (values) => {
+    onBanners([]);
     try {
       const res = await authApi.registerStep2({ ...values, draftId });
+      await new Promise((r) => setTimeout(r, 1200)); // brief "getting ready" moment
       onDone(res.email);
     } catch (err) {
       applyApiError(err, setError);
+      onBanners(buildBanners(t('registrationFailed'), t('somethingWrong'), err));
     }
   });
 
-  return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
-      <FormField label={t('email')} error={errors.email?.message} required>
-        {({ id, invalid }) => (
-          <Input id={id} type="email" invalid={invalid} {...register('email')} />
-        )}
-      </FormField>
-      <FormField label={t('password')} error={errors.password?.message} required>
-        {({ id, invalid }) => (
-          <Input id={id} type="password" invalid={invalid} {...register('password')} />
-        )}
-      </FormField>
-      <div className="grid grid-cols-2 gap-3">
-        <FormField label={t('username')} error={errors.username?.message} required>
-          {({ id, invalid }) => <Input id={id} invalid={invalid} {...register('username')} />}
-        </FormField>
-        <FormField label={t('pinCode')} error={errors.pinCode?.message} required>
-          {({ id, invalid }) => <Input id={id} invalid={invalid} {...register('pinCode')} />}
-        </FormField>
+  if (isSubmitting) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-6 py-16">
+        <div className="flex gap-2">
+          {[0, 1, 2, 3].map((i) => (
+            <span
+              key={i}
+              className="h-3.5 w-3.5 animate-bounce rounded-full bg-blue-600"
+              style={{ animationDelay: `${i * 0.15}s` }}
+            />
+          ))}
+        </div>
+        <p className="text-lg font-medium text-gray-700">{t('gettingReady')}</p>
       </div>
-      <FormField label={t('mobile')} error={errors.mobile?.message}>
-        {({ id, invalid }) => <Input id={id} invalid={invalid} {...register('mobile')} />}
-      </FormField>
-      <Button type="submit" loading={isSubmitting} fullWidth>
-        {t('register')}
-      </Button>
+    );
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
+      <Field label={t('emailLabel')} required error={errors.email?.message}>
+        <input type="email" className={INPUT} placeholder={t('emailPlaceholder')} {...register('email')} />
+      </Field>
+
+      <Field label={t('password')} required error={errors.password?.message}>
+        <div className="relative">
+          <input
+            type={showPw ? 'text' : 'password'}
+            className={`${INPUT} pr-11`}
+            placeholder={t('passwordHint')}
+            {...register('password')}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPw((v) => !v)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            aria-label={showPw ? 'Hide password' : 'Show password'}
+          >
+            {showPw ? (
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+              </svg>
+            ) : (
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            )}
+          </button>
+        </div>
+      </Field>
+
+      <Field label={t('pinLabel')} required error={errors.pinCode?.message}>
+        <div className="relative">
+          <input
+            className={INPUT}
+            placeholder={t('pinHint')}
+            autoComplete="off"
+            value={pinDisplay}
+            onChange={onPinChange}
+            onFocus={() => pinOptions.length > 0 && setPinOpen(true)}
+          />
+          {pinOpen && pinOptions.length > 0 && (
+            <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+              {pinOptions.map((o, i) => (
+                <li key={i}>
+                  <button
+                    type="button"
+                    onClick={() => selectArea(o.pin, o.name)}
+                    className="block w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    {o.pin}, {o.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </Field>
+
+      <Field label={t('username')} required error={errors.username?.message}>
+        <input className={INPUT} placeholder={t('usernamePlaceholder')} {...register('username')} />
+      </Field>
+
+      <Field label={t('mobileLabel')} error={errors.mobile?.message}>
+        <div className="flex h-12 items-center rounded-lg border border-gray-300 focus-within:border-pink-400 focus-within:ring-1 focus-within:ring-pink-300">
+          <span className="pl-4 pr-2 text-sm font-semibold text-gray-700">+91</span>
+          <input
+            className="h-full flex-1 rounded-r-lg bg-transparent pr-4 text-sm placeholder:text-gray-400 focus:outline-none"
+            placeholder={t('mobilePlaceholder')}
+            {...register('mobile', {
+              setValueAs: (v) => (typeof v === 'string' && v.trim() ? v.trim() : undefined),
+            })}
+          />
+        </div>
+      </Field>
+
+      <label className="flex items-center gap-2 text-sm text-gray-600">
+        <input
+          type="checkbox"
+          checked={sms}
+          onChange={(e) => setSms(e.target.checked)}
+          className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-400"
+        />
+        {t('smsConsent')}
+      </label>
+
+      <div className="flex gap-3">
+        <button type="button" onClick={onBack} className={BLUE_BTN}>
+          {t('previous')}
+        </button>
+        <button type="submit" disabled={isSubmitting} className={PINK_BTN}>
+          {t('register')}
+        </button>
+      </div>
     </form>
   );
 }
 
+/* ── Small building blocks ──────────────────────────────────────────────── */
+function Field({
+  label,
+  required,
+  error,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  error?: string;
+  children: React.ReactNode;
+}): React.JSX.Element {
+  return (
+    <div>
+      <label className="mb-1.5 block text-sm font-medium text-blue-500">
+        {label}
+        {required && <span className="text-pink-600"> *</span>}
+      </label>
+      {children}
+      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+    </div>
+  );
+}
+
+function GenderCard({
+  active,
+  onClick,
+  symbol,
+  color,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  symbol: string;
+  color: string;
+  label: string;
+}): React.JSX.Element {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex min-h-[84px] flex-col items-center justify-center gap-1.5 rounded-xl border-2 px-1 py-3 text-center transition ${
+        active ? 'border-pink-500 bg-pink-50 shadow-sm' : 'border-gray-200 hover:border-gray-300'
+      }`}
+    >
+      <span className={`text-2xl leading-none ${color}`}>{symbol}</span>
+      <span className="text-[11px] font-medium leading-tight text-gray-700">{label}</span>
+    </button>
+  );
+}
+
+/** Map API VALIDATION_ERROR details back onto form fields. */
 function applyApiError(
   err: unknown,
   setError: (name: never, e: { message: string }) => void,
 ): void {
   if (err instanceof ApiError && err.details?.length) {
     for (const d of err.details) setError(d.field as never, { message: d.issue });
-    return;
   }
-  const message = err instanceof ApiError ? err.message : 'Something went wrong';
-  setError('root' as never, { message });
+}
+
+/** Build the top-of-form error banners from any thrown error. */
+function buildBanners(failedMsg: string, networkMsg: string, err: unknown): string[] {
+  if (err instanceof ApiError) {
+    const msgs = [failedMsg];
+    if (err.details?.length) {
+      for (const d of err.details) msgs.push(d.issue);
+    } else if (err.message) {
+      msgs.push(err.message);
+    }
+    return msgs;
+  }
+  // Network / connection error (e.g. API not running)
+  return [networkMsg];
+}
+
+const NAME_WORDS = [
+  'tomato', 'cool', 'white', 'blue', 'swift', 'happy', 'lunar', 'sunny', 'clever', 'mango',
+  'ocean', 'tiger', 'maple', 'brave', 'quick', 'lucky', 'jolly', 'noble', 'amber', 'coral',
+];
+
+/** Generate a friendly unique-ish username like "tomato33cool5". */
+function genUsername(): string {
+  const w = () => NAME_WORDS[Math.floor(Math.random() * NAME_WORDS.length)];
+  const n = () => Math.floor(Math.random() * 90) + 1;
+  return `${w()}${n()}${w()}${Math.floor(Math.random() * 10)}`;
 }
