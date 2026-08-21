@@ -115,8 +115,23 @@ export class AuthService {
     await this.redis.instance.del(this.draftKey(input.draftId));
 
     const link = `${this.config.get('WEB_URL')}/verify?token=${token}`;
-    const { subject, html } = verificationEmail(link);
+    const { subject, html } = verificationEmail({
+      link,
+      firstName: step1.firstName,
+      webUrl: this.config.get('WEB_URL'),
+    });
     await this.email.send({ to: input.email, subject, html });
+
+    // Testing convenience: instantly verify + award points so accounts can log
+    // in without clicking the emailed link. Disable in production (env flag).
+    if (this.config.get('AUTO_VERIFY_EMAIL') === 'true') {
+      try {
+        await this.verifyEmail(token);
+        this.logger.log(`Auto-verified ${input.email}`);
+      } catch (e) {
+        this.logger.error(`Auto-verify failed for ${input.email}`, e as Error);
+      }
+    }
 
     return {
       email: input.email,
@@ -197,7 +212,10 @@ export class AuthService {
   }
 
   async forgotPassword(input: ForgotPasswordInput): Promise<void> {
-    const user = await this.prisma.user.findUnique({ where: { email: input.email.toLowerCase() } });
+    const user = await this.prisma.user.findUnique({
+      where: { email: input.email.toLowerCase() },
+      include: { profile: true },
+    });
     // Always succeed to avoid leaking whether the email exists.
     if (!user) return;
 
@@ -211,7 +229,11 @@ export class AuthService {
       },
     });
     const link = `${this.config.get('WEB_URL')}/reset-password?token=${token}`;
-    const { subject, html } = passwordResetEmail(link);
+    const { subject, html } = passwordResetEmail({
+      link,
+      firstName: user.profile?.firstName ?? user.username,
+      webUrl: this.config.get('WEB_URL'),
+    });
     await this.email.send({ to: user.email, subject, html });
   }
 

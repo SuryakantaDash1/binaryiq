@@ -26,6 +26,10 @@ export const envSchema = z.object({
   WEB_URL: z.string().url().default('http://localhost:3000'),
   REGISTRATION_BONUS_POINTS: z.coerce.number().default(500),
 
+  // Testing only: instantly verify accounts on registration so they can log in
+  // without clicking the emailed link. Must be 'false' in production.
+  AUTO_VERIFY_EMAIL: z.enum(['true', 'false']).default('false'),
+
   SEED_SUPERADMIN_EMAIL: z.string().email().optional(),
   SEED_SUPERADMIN_PASSWORD: z.string().min(12).optional(),
 });

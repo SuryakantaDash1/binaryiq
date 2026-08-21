@@ -13,7 +13,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     // Serverless Postgres (e.g. Neon free tier) auto-suspends when idle; the
     // first connection wakes it but can time out. Retry with backoff so a cold
     // start doesn't crash the whole API on boot.
-    const maxAttempts = 6;
+    const maxAttempts = 15;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         await this.$connect();
