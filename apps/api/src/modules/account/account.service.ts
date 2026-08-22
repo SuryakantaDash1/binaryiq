@@ -203,6 +203,7 @@ export class AccountService {
             householdSize: input.demographics.householdSize,
             childrenCount: input.demographics.childrenCount,
             chiefWageEarner: input.demographics.chiefWageEarner,
+            assets: input.demographics.assets ?? undefined,
           },
           update: {
             educationLevel: input.demographics.educationLevel ?? undefined,
@@ -211,6 +212,7 @@ export class AccountService {
             householdSize: input.demographics.householdSize ?? undefined,
             childrenCount: input.demographics.childrenCount ?? undefined,
             chiefWageEarner: input.demographics.chiefWageEarner ?? undefined,
+            assets: input.demographics.assets ?? undefined,
           },
         });
       }

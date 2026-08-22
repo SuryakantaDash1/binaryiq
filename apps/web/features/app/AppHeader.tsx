@@ -22,7 +22,7 @@ import { authApi } from '@/lib/api/auth';
 
 const LINKS = [
   { label: 'Home', href: '/home', icon: Home },
-  { label: 'Account', href: '/account', icon: User },
+  { label: 'Account', href: '/account/profile', icon: User },
   { label: 'Surveys', href: '/surveys', icon: ClipboardList },
   { label: 'Profile Surveys', href: '/profile-surveys', icon: User },
   { label: 'Rewards', href: '/rewards', icon: Gift },
@@ -85,7 +85,7 @@ export function AppHeader(): React.JSX.Element {
           <button type="button" aria-label="Notifications" className="text-gray-400 transition hover:text-gray-700">
             <Bell className="h-5 w-5" />
           </button>
-          <Link href="/account" aria-label="Account" className="text-gray-400 transition hover:text-gray-700">
+          <Link href="/account/profile" aria-label="Account" className="text-gray-400 transition hover:text-gray-700">
             <UserCircle2 className="h-6 w-6" />
           </Link>
         </div>
