@@ -1,5 +1,7 @@
 import type { ApiResponse, ApiErrorCode } from '@influencer/types';
 
+import { clearToken, getToken, setToken } from './session.js';
+
 /** Typed error thrown by the API client; callers never see the raw envelope. */
 export class ApiError extends Error {
   constructor(
@@ -16,7 +18,7 @@ export class ApiError extends Error {
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/v1';
 
 export interface ApiFetchOptions extends Omit<RequestInit, 'body'> {
-  /** Bearer token for authenticated calls (from the session on the server). */
+  /** Bearer token override; falls back to the stored access token. */
   token?: string;
   /** Request body — plain objects are JSON-stringified automatically. */
   body?: BodyInit | Record<string, unknown> | null;
@@ -24,10 +26,21 @@ export interface ApiFetchOptions extends Omit<RequestInit, 'body'> {
 
 /**
  * Envelope-aware fetch. On success returns `data`; on error throws `ApiError`.
- * See architecture/06-frontend-architecture §3.3.
+ * Auto-attaches the stored access token and, on a 401, tries to refresh it once
+ * (via the httpOnly refresh cookie) before giving up.
  */
 export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promise<T> {
+  return doFetch<T>(path, options, true);
+}
+
+async function doFetch<T>(
+  path: string,
+  options: ApiFetchOptions,
+  allowRefresh: boolean,
+): Promise<T> {
   const { token, headers, ...rest } = options;
+  const authToken = token ?? getToken() ?? undefined;
+
   const serializedBody =
     rest.body !== undefined && rest.body !== null && typeof rest.body === 'object' && !(rest.body instanceof FormData) && !(rest.body instanceof URLSearchParams) && !(rest.body instanceof ReadableStream) && !(rest.body instanceof ArrayBuffer)
       ? JSON.stringify(rest.body)
@@ -46,7 +59,7 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
       signal: rest.signal ?? controller.signal,
       headers: {
         'content-type': 'application/json',
-        ...(token ? { authorization: `Bearer ${token}` } : {}),
+        ...(authToken ? { authorization: `Bearer ${authToken}` } : {}),
         ...headers,
       },
     });
@@ -61,6 +74,12 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
     );
   } finally {
     clearTimeout(timeout);
+  }
+
+  // Access token likely expired — refresh once, then retry the request.
+  if (res.status === 401 && allowRefresh && !path.startsWith('/auth/')) {
+    const refreshed = await tryRefresh();
+    if (refreshed) return doFetch<T>(path, options, false);
   }
 
   let body: ApiResponse<T>;
@@ -81,4 +100,27 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
   }
 
   return body.data;
+}
+
+/** Exchange the httpOnly refresh cookie for a fresh access token. */
+async function tryRefresh(): Promise<boolean> {
+  try {
+    const res = await fetch(`${BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    if (!res.ok) {
+      clearToken();
+      return false;
+    }
+    const body = (await res.json()) as ApiResponse<{ accessToken: string }>;
+    const newToken = body.data?.accessToken;
+    if (newToken) {
+      setToken(newToken);
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
 }

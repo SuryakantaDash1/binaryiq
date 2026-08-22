@@ -26,7 +26,7 @@ export default function LoginPage(): React.JSX.Element {
   const onSubmit = handleSubmit(async (values) => {
     try {
       await authApi.login(values);
-      router.push('/surveys');
+      router.push('/home');
     } catch (err) {
       setError('root', {
         message: err instanceof ApiError ? err.message : 'Sign in failed',

@@ -11,6 +11,7 @@ import type {
 } from '@influencer/types';
 
 import { apiFetch } from './client';
+import { clearToken, setToken } from './session.js';
 
 export const authApi = {
   registerStep1: (body: RegisterStep1Input) =>
@@ -28,12 +29,23 @@ export const authApi = {
   verifyEmail: (token: string) =>
     apiFetch<VerifyEmailResult>(`/auth/verify-email?token=${encodeURIComponent(token)}`),
 
-  login: (body: LoginInput) =>
-    apiFetch<AuthSession>('/auth/login', {
+  login: async (body: LoginInput): Promise<AuthSession> => {
+    const session = await apiFetch<AuthSession>('/auth/login', {
       method: 'POST',
       credentials: 'include',
       body: JSON.stringify(body),
-    }),
+    });
+    setToken(session.accessToken);
+    return session;
+  },
+
+  logout: async (): Promise<void> => {
+    try {
+      await apiFetch('/auth/logout', { method: 'POST', credentials: 'include' });
+    } finally {
+      clearToken();
+    }
+  },
 
   forgotPassword: (body: ForgotPasswordInput) =>
     apiFetch<{ success: true }>('/auth/forgot-password', {
