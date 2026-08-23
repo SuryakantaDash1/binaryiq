@@ -7,7 +7,7 @@ import { type ReactNode } from 'react';
 const TOP_TABS = [
   { key: 'details', label: 'Details', href: '/account/profile', match: ['profile', 'email', 'password', 'paypal', 'about-you'] },
   { key: 'points', label: 'Points', href: '/account/points', match: ['points'] },
-  { key: 'profile-surveys', label: 'Profile Surveys', href: '/profile-surveys', match: [] },
+  { key: 'profile-surveys', label: 'Profile Surveys', href: '/account/profile-surveys', match: ['profile-surveys'] },
   { key: 'notifications', label: 'Notifications', href: '/account/notifications', match: ['notifications'] },
   { key: 'unsubscribe', label: 'Unsubscribe', href: '/account/unsubscribe', match: ['unsubscribe', 'privacy'] },
 ];

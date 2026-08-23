@@ -9,11 +9,19 @@ export interface CategoryQuestion {
   min?: number;
   max?: number;
   maxSelections?: number;
-  options?: Array<{ value: string; label: string }>;
+  /** Placeholder for select-type questions (defaults to "please select an answer …"). */
+  placeholder?: string;
+  /**
+   * `exclusive: true` marks an option (e.g. "None of the above") that, when picked in a
+   * multiselect, clears every other selection — and vice-versa.
+   */
+  options?: Array<{ value: string; label: string; exclusive?: boolean }>;
 }
 
 export interface CategorySchema {
   version: number;
+  /** Optional introductory paragraph shown above the questions. */
+  intro?: string;
   questions: CategoryQuestion[];
 }
 

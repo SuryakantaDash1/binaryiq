@@ -24,7 +24,7 @@ const LINKS = [
   { label: 'Home', href: '/home', icon: Home },
   { label: 'Account', href: '/account/profile', icon: User },
   { label: 'Surveys', href: '/surveys', icon: ClipboardList },
-  { label: 'Profile Surveys', href: '/profile-surveys', icon: User },
+  { label: 'Profile Surveys', href: '/account/profile-surveys', icon: User },
   { label: 'Rewards', href: '/rewards', icon: Gift },
   { label: 'Sponsored Polls', href: '/polls', icon: BarChart3 },
   { label: 'Games', href: '/games', icon: Gamepad2 },

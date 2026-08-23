@@ -12,6 +12,29 @@ const prisma = new PrismaClient();
 
 interface CategoryDef { key: string; name: string; points: number; sort: number; schema: object }
 
+// Shared country list for "born in" style questions. value === label to keep responses readable.
+const COUNTRY_NAMES = [
+  'India', 'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda',
+  'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain',
+  'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia',
+  'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria', 'Burkina Faso',
+  'Burundi', 'Cambodia', 'Cameroon', 'Canada', 'Chile', 'China', 'Colombia', 'Costa Rica',
+  'Croatia', 'Cuba', 'Cyprus', 'Czech Republic', 'Denmark', 'Ecuador', 'Egypt', 'El Salvador',
+  'Estonia', 'Ethiopia', 'Fiji', 'Finland', 'France', 'Georgia', 'Germany', 'Ghana', 'Greece',
+  'Guatemala', 'Honduras', 'Hong Kong', 'Hungary', 'Iceland', 'Indonesia', 'Iran', 'Iraq',
+  'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kuwait',
+  'Latvia', 'Lebanon', 'Lithuania', 'Luxembourg', 'Malaysia', 'Maldives', 'Malta', 'Mauritius',
+  'Mexico', 'Monaco', 'Mongolia', 'Morocco', 'Myanmar', 'Nepal', 'Netherlands', 'New Zealand',
+  'Nigeria', 'North Korea', 'Norway', 'Oman', 'Pakistan', 'Panama', 'Peru', 'Philippines',
+  'Poland', 'Portugal', 'Qatar', 'Romania', 'Russia', 'Saudi Arabia', 'Serbia', 'Singapore',
+  'Slovakia', 'Slovenia', 'South Africa', 'South Korea', 'Spain', 'Sri Lanka', 'Sweden',
+  'Switzerland', 'Syria', 'Taiwan', 'Tanzania', 'Thailand', 'Tunisia', 'Turkey', 'Uganda',
+  'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Uzbekistan',
+  'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe', 'Other',
+];
+const countryOptions = (): Array<{ value: string; label: string }> =>
+  COUNTRY_NAMES.map((c) => ({ value: c, label: c }));
+
 const PROFILE_CATEGORIES: CategoryDef[] = [
   {
     key: 'about_you', name: 'About You', points: 100, sort: 1,
@@ -26,11 +49,70 @@ const PROFILE_CATEGORIES: CategoryDef[] = [
   },
   {
     key: 'home_and_family', name: 'Home and Family', points: 100, sort: 2,
-    schema: { version: 1, questions: [
-      { key: 'household_size', type: 'number', label: 'People in household', required: true, min: 1, max: 20 },
-      { key: 'children_count', type: 'number', label: 'Number of children', required: true, min: 0, max: 15 },
-      { key: 'marital_status', type: 'radio', label: 'Marital status', required: true, options: [{ value: 'single', label: 'Single' }, { value: 'married', label: 'Married / partnered' }, { value: 'divorced', label: 'Divorced / separated' }, { value: 'widowed', label: 'Widowed' }] },
-      { key: 'living_situation', type: 'radio', label: 'Living situation', required: true, options: [{ value: 'own', label: 'Own home' }, { value: 'rent', label: 'Renting' }, { value: 'family', label: 'With family' }, { value: 'other', label: 'Other' }] },
+    schema: { version: 1,
+      intro: 'Home is where the heart is! Please take 2-3 minutes to complete this brief survey about your home and family. Your responses will help us find surveys that are relevant to your interests and increase your chances of qualifying.',
+      questions: [
+      { key: 'country_born', type: 'select', label: 'What country were you born in?', required: true, options: countryOptions() },
+      { key: 'mother_born', type: 'select', label: 'Where was your mother born?', required: true, options: countryOptions() },
+      { key: 'father_born', type: 'select', label: 'Where was your father born?', required: true, options: countryOptions() },
+      { key: 'marital_status', type: 'radio', label: 'What is your marital status?', required: true, options: [{ value: 'single', label: 'Single' }, { value: 'married_partner', label: 'Married / Live with partner' }, { value: 'divorced_widowed', label: 'Divorced/Widowed' }] },
+      { key: 'main_earner', type: 'radio', label: 'Are you the main salary-earner in your household?', required: true, options: [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }] },
+      { key: 'monthly_income', type: 'select', label: 'What is your individual monthly net income? (after tax)', required: true, options: [
+        { value: 'lt_5000', label: 'Less than Rs 5,000' }, { value: '5000_9999', label: 'Rs 5,000 to Rs 9,999' },
+        { value: '10000_14999', label: 'Rs 10,000 to Rs 14,999' }, { value: '15000_19999', label: 'Rs 15,000 to Rs 19,999' },
+        { value: '20000_24999', label: 'Rs 20,000 to Rs 24,999' }, { value: '25000_29999', label: 'Rs 25,000 to Rs 29,999' },
+        { value: '30000_34999', label: 'Rs 30,000 to Rs 34,999' }, { value: '35000_49999', label: 'Rs 35,000 to Rs 49,999' },
+        { value: '50000_74999', label: 'Rs 50,000 to Rs 74,999' }, { value: '75000_99999', label: 'Rs 75,000 to Rs 99,999' },
+        { value: 'gte_100000', label: 'Rs 100,000 or more' }, { value: 'prefer_not', label: 'Prefer not to answer' },
+      ] },
+      { key: 'pregnant', type: 'radio', label: 'Are you or your partner currently pregnant?', required: true, options: [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }] },
+      { key: 'population', type: 'radio', label: 'What is the population of the city/town/village you live in?', required: true, options: [
+        { value: 'lt_2000', label: 'Less than 2.000 inhabitants' }, { value: '2000_4999', label: '2.000 to 4.999 inhabitants' },
+        { value: '5000_19999', label: '5.000 to 19.999 inhabitants' }, { value: '20000_49999', label: '20.000 to 49.999 inhabitants' },
+        { value: '50000_99999', label: '50.000 to 99.999 inhabitants' }, { value: '100000_499999', label: '100.000 to 499.999 inhabitants' },
+        { value: 'over_500000', label: 'Over 500000 inhabitants' }, { value: 'dont_know', label: "Don't know" },
+      ] },
+      { key: 'home_ownership', type: 'radio', label: 'Do you rent or own your home?', required: true, options: [
+        { value: 'own_apartment', label: 'Own an apartment/condominium' }, { value: 'own_home', label: 'Own my own home' },
+        { value: 'rent_apartment', label: 'Rent an apartment/condominium' }, { value: 'rent_house', label: 'Rent a house' },
+        { value: 'neither', label: 'Neither own nor rent' },
+      ] },
+      { key: 'ride_sharing', type: 'multiselect', label: 'Which of the following ride sharing companies have you used in the last 12 months?', required: true, options: [
+        { value: 'blablacar', label: 'BlaBlaCar' }, { value: 'blacklane', label: 'Blacklane' }, { value: 'ola', label: 'Ola' },
+        { value: 'talixo', label: 'Talixo' }, { value: 'uber', label: 'Uber' }, { value: 'other', label: 'Other' },
+        { value: 'none', label: 'I do not use ride sharing services', exclusive: true },
+      ] },
+      { key: 'survey_languages', type: 'multiselect', label: 'What languages do you feel comfortable taking surveys in?', required: true, options: [
+        { value: 'bengali', label: 'Bengali' }, { value: 'gujarati', label: 'Gujarati' }, { value: 'hindi', label: 'Hindi' },
+        { value: 'kannada', label: 'Kannada' }, { value: 'marathi', label: 'Marathi' }, { value: 'tamil', label: 'Tamil' },
+        { value: 'none', label: 'None of these', exclusive: true },
+      ] },
+      { key: 'gender_identity', type: 'radio', label: 'When thinking about your gender, which of the following terms do you use to self-identify?', required: true, options: [
+        { value: 'female', label: 'Female' }, { value: 'male', label: 'Male' }, { value: 'non_binary', label: 'Non-binary' },
+        { value: 'transgender', label: 'Transgender' }, { value: 'other', label: 'Others not listed here' }, { value: 'prefer_not', label: 'Prefer not to say' },
+      ] },
+      { key: 'pets', type: 'multiselect', label: 'Which of the following pets do you have in your household?', required: true, options: [
+        { value: 'birds', label: 'Bird(s)' }, { value: 'cats', label: 'Cat(s)' }, { value: 'dogs', label: 'Dog(s)' },
+        { value: 'fish', label: 'Fish' }, { value: 'reptiles', label: 'Reptile(s)' }, { value: 'other', label: 'Other pet(s)' },
+        { value: 'none', label: 'None of the above', exclusive: true },
+      ] },
+      { key: 'appliances', type: 'multiselect', label: 'Which of the following household appliances do you currently have in your household?', required: true, options: [
+        { value: 'refrigerator', label: 'Refrigerator' }, { value: 'freezer', label: 'Freezer (separate unit)' },
+        { value: 'oven', label: 'Oven (electric or gas)' }, { value: 'microwave', label: 'Microwave oven' },
+        { value: 'electric_grill', label: 'Electric grill/griddle' }, { value: 'cooker', label: 'Cooker/hob/stove (electric,gas,induction)' },
+        { value: 'toaster_oven', label: 'Toaster Oven' }, { value: 'pizza_oven', label: 'Pizza oven (indoor)' },
+        { value: 'coffee_machine', label: 'Coffee machine (capsule/espresso/filter)' }, { value: 'soda_maker', label: 'Home soda maker' },
+        { value: 'electric_kettle', label: 'Electric kettle' }, { value: 'toaster', label: 'Toaster' },
+        { value: 'blender', label: 'Blender/food processor' }, { value: 'mixer', label: 'Mixer (hand or stand)' },
+        { value: 'air_fryer', label: 'Air fryer' }, { value: 'dishwasher', label: 'Dishwasher' },
+        { value: 'washing_machine', label: 'Washing machine' }, { value: 'tumble_dryer', label: 'Tumble dryer' },
+        { value: 'washer_dryer', label: 'Washer-dryer (combined)' }, { value: 'vacuum_cordless', label: 'Vacuum cleaner (cordless)' },
+        { value: 'vacuum_corded', label: 'Vacuum cleaner (corded)' }, { value: 'robot_vacuum', label: 'Robot vacuum cleaner' },
+        { value: 'steam_cleaner', label: 'Steam cleaner' }, { value: 'air_conditioner', label: 'Air conditioner' },
+        { value: 'electric_fan', label: 'Electric fan' }, { value: 'dehumidifier', label: 'Dehumidifier' },
+        { value: 'humidifier', label: 'Humidifier' }, { value: 'portable_heater', label: 'Portable heater' },
+        { value: 'other', label: 'Other' }, { value: 'prefer_not', label: 'Prefer not to answer', exclusive: true },
+      ] },
     ]},
   },
   {
@@ -129,10 +211,16 @@ const PROFILE_CATEGORIES: CategoryDef[] = [
   {
     key: 'social_activities', name: 'Social Activities', points: 200, sort: 14,
     schema: { version: 1, questions: [
-      { key: 'platforms', type: 'multiselect', label: 'Social media platforms you use', required: true, maxSelections: 8, options: [{ value: 'instagram', label: 'Instagram' }, { value: 'facebook', label: 'Facebook' }, { value: 'twitter', label: 'X (Twitter)' }, { value: 'linkedin', label: 'LinkedIn' }, { value: 'youtube', label: 'YouTube' }, { value: 'whatsapp', label: 'WhatsApp' }, { value: 'snapchat', label: 'Snapchat' }, { value: 'tiktok', label: 'TikTok' }] },
-      { key: 'daily_time', type: 'select', label: 'Daily social media time', required: true, options: [{ value: 'under_30m', label: 'Under 30 min' }, { value: '30m_1h', label: '30 min–1 hour' }, { value: '1h_3h', label: '1–3 hours' }, { value: 'above_3h', label: 'Above 3 hours' }] },
-      { key: 'content_type', type: 'multiselect', label: 'Content you create or share', required: false, maxSelections: 5, options: [{ value: 'photos', label: 'Photos / stories' }, { value: 'videos', label: 'Videos / reels' }, { value: 'opinions', label: 'Opinions / reviews' }, { value: 'memes', label: 'Memes / humour' }, { value: 'news', label: 'News / current events' }, { value: 'nothing', label: 'I mostly consume' }] },
-      { key: 'community', type: 'radio', label: 'Member of any online community / group?', required: true, options: [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }] },
+      { key: 'activities', type: 'multiselect', label: 'Which of the following activities are you interested in?', required: true, options: [
+        { value: 'discussion_boards', label: 'Online discussion boards' }, { value: 'one_to_one', label: '1 to 1 online interviews' },
+        { value: 'video_focus', label: 'Online video focus groups' }, { value: 'live_interaction', label: 'Live online interaction' },
+        { value: 'concept_ad', label: 'Concept and Ad testing' }, { value: 'in_home', label: 'In-home product tests' },
+        { value: 'website_feedback', label: 'Website feedback' }, { value: 'diaries', label: 'Diaries' },
+        { value: 'ai_chats', label: 'Conversational AI chats' }, { value: 'none', label: 'None of the above', exclusive: true },
+      ] },
+      { key: 'participate', type: 'radio', label: 'Do you wish to participate in Social Activities?', required: true, options: [
+        { value: 'no', label: 'No' }, { value: 'yes', label: 'Yes, please include me' },
+      ] },
     ]},
   },
 ];
