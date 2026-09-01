@@ -243,6 +243,8 @@ const SPIN_SEGMENTS: Array<{
   { label: '1000 Points', points: 1000, prob: '0.0200', color: '#6B0E3C', sort: 8 },
 ];
 
+const SIMPLE_ICON = (slug: string): string => `https://cdn.simpleicons.org/${slug}`;
+
 const REWARDS: Array<{
   key: string;
   name: string;
@@ -250,11 +252,12 @@ const REWARDS: Array<{
   type: 'CHARITY' | 'PAYPAL' | 'VOUCHER' | 'MERCHANDISE';
   points: number;
   sort: number;
+  imageUrl?: string;
 }> = [
   {
     key: 'meals-africa',
     name: 'Offer 4 meals to kids (Africa)',
-    description: 'Donate to fight malnutrition in Africa.',
+    description: 'Fight malnutrition in Africa — provide a healthy meal to children in need.',
     type: 'CHARITY',
     points: 4500,
     sort: 1,
@@ -262,26 +265,140 @@ const REWARDS: Array<{
   {
     key: 'tree-madagascar',
     name: 'Plant 1 tree in Madagascar',
-    description: 'Reforestation charity contribution.',
+    description: 'Act for reforestation. Help rebuild biodiversity and restore natural habitats.',
     type: 'CHARITY',
     points: 4500,
     sort: 2,
   },
   {
     key: 'plastic-ocean',
-    name: 'Remove 100g plastic from ocean',
-    description: 'Fight plastic pollution charity.',
+    name: 'Remove 100 g of plastic from the ocean',
+    description: "Fight plastic pollution. It's time to act against ocean waste.",
     type: 'CHARITY',
     points: 4500,
     sort: 3,
   },
   {
     key: 'paypal-usd',
-    name: 'PayPal Payout (USD)',
-    description: 'Cash payout via PayPal to your linked account.',
+    name: 'PayPal Payout (USD) — United States',
+    description: 'Fast, Secure, and Global: PayPal Payouts straight to your linked account.',
     type: 'PAYPAL',
     points: 90000,
     sort: 4,
+  },
+  // ── Gift-card catalogue (VOUCHER) ──
+  {
+    key: 'gc-amazon',
+    name: 'Amazon.in Gift Card INR | 90-Day validity',
+    description: 'Amazon gift cards can be seamlessly converted to Amazon Pay balance and used across millions of products.',
+    type: 'VOUCHER',
+    points: 20000,
+    sort: 5,
+    imageUrl: SIMPLE_ICON('amazon'),
+  },
+  {
+    key: 'gc-flipkart',
+    name: 'Flipkart eGift Card INR | 90-Day Link',
+    description: "Flipkart is India's most popular online shopping destination for electronics, fashion and more.",
+    type: 'VOUCHER',
+    points: 20000,
+    sort: 6,
+    imageUrl: SIMPLE_ICON('flipkart'),
+  },
+  {
+    key: 'gc-pizzahut',
+    name: 'Pizza Hut eGift Card 500 INR',
+    description: 'Treat yourself to hot, cheesy, delicious pizzas from Pizza Hut.',
+    type: 'VOUCHER',
+    points: 50000,
+    sort: 7,
+    imageUrl: SIMPLE_ICON('pizzahut'),
+  },
+  {
+    key: 'gc-croma',
+    name: 'Croma eGift Card INR | 90-Day Link',
+    description: 'Croma has always been dedicated towards giving its customers the best electronics experience.',
+    type: 'VOUCHER',
+    points: 25000,
+    sort: 8,
+  },
+  {
+    key: 'gc-dominos',
+    name: "Domino's Pizza eGift Card 500 INR",
+    description: "Domino's Pizza India has remained focused on delivering great-tasting pizzas to your door.",
+    type: 'VOUCHER',
+    points: 50000,
+    sort: 9,
+    imageUrl: SIMPLE_ICON('dominos'),
+  },
+  {
+    key: 'gc-nykaa',
+    name: 'Nykaa eGift Card 250 INR',
+    description: 'Nykaa, a premier online beauty destination in India for cosmetics, skincare and wellness.',
+    type: 'VOUCHER',
+    points: 25000,
+    sort: 10,
+  },
+  {
+    key: 'gc-myntra',
+    name: 'Myntra eGift Card 500 INR',
+    description: "Myntra is India's most trendiest fashion hub with the widest range of styles.",
+    type: 'VOUCHER',
+    points: 50000,
+    sort: 11,
+    imageUrl: SIMPLE_ICON('myntra'),
+  },
+  {
+    key: 'gc-makemytrip',
+    name: 'Makemytrip eGift Card 500 INR',
+    description: "MakeMyTrip.com, India's leading online travel company for flights, hotels and holidays.",
+    type: 'VOUCHER',
+    points: 50400,
+    sort: 12,
+  },
+  {
+    key: 'gc-amazon-prime',
+    name: 'Amazon Prime Membership eGift Card',
+    description: 'Access rapid delivery and digital entertainment with an Amazon Prime membership.',
+    type: 'VOUCHER',
+    points: 40000,
+    sort: 13,
+    imageUrl: SIMPLE_ICON('amazonprime'),
+  },
+  {
+    key: 'gc-zomato',
+    name: 'Zomato eGift Card 500 INR',
+    description: 'Satisfy your food requirements instantly with Zomato food delivery.',
+    type: 'VOUCHER',
+    points: 50000,
+    sort: 14,
+    imageUrl: SIMPLE_ICON('zomato'),
+  },
+  {
+    key: 'gc-swiggy',
+    name: 'Swiggy Money Voucher eGift Card',
+    description: 'Swiggy is an on-demand food delivery platform that brings your favourite meals home.',
+    type: 'VOUCHER',
+    points: 25000,
+    sort: 15,
+    imageUrl: SIMPLE_ICON('swiggy'),
+  },
+  {
+    key: 'gc-uber',
+    name: 'Uber eGift Card 250 INR',
+    description: 'Plan your daily transit with UBER, providing a dependable ride at your fingertips.',
+    type: 'VOUCHER',
+    points: 25000,
+    sort: 16,
+    imageUrl: SIMPLE_ICON('uber'),
+  },
+  {
+    key: 'gc-jio',
+    name: 'Reliance My Jio Store eGift Card',
+    description: 'Manage your telecom and electronic needs with Reliance My Jio Store.',
+    type: 'VOUCHER',
+    points: 25000,
+    sort: 17,
   },
 ];
 
@@ -338,6 +455,7 @@ async function seedRewards(): Promise<void> {
         description: r.description,
         pointsRequired: r.points,
         sortOrder: r.sort,
+        imageUrl: r.imageUrl ?? null,
       },
       create: {
         id: rewardId(r.key),
@@ -346,6 +464,7 @@ async function seedRewards(): Promise<void> {
         rewardType: r.type,
         pointsRequired: r.points,
         sortOrder: r.sort,
+        imageUrl: r.imageUrl ?? null,
         metadata: { key: r.key },
       },
     });
@@ -378,6 +497,19 @@ function rewardId(key: string): string {
     'tree-madagascar': '00000000-0000-4000-8000-000000000102',
     'plastic-ocean': '00000000-0000-4000-8000-000000000103',
     'paypal-usd': '00000000-0000-4000-8000-000000000104',
+    'gc-amazon': '00000000-0000-4000-8000-000000000105',
+    'gc-flipkart': '00000000-0000-4000-8000-000000000106',
+    'gc-pizzahut': '00000000-0000-4000-8000-000000000107',
+    'gc-croma': '00000000-0000-4000-8000-000000000108',
+    'gc-dominos': '00000000-0000-4000-8000-000000000109',
+    'gc-nykaa': '00000000-0000-4000-8000-000000000110',
+    'gc-myntra': '00000000-0000-4000-8000-000000000111',
+    'gc-makemytrip': '00000000-0000-4000-8000-000000000112',
+    'gc-amazon-prime': '00000000-0000-4000-8000-000000000113',
+    'gc-zomato': '00000000-0000-4000-8000-000000000114',
+    'gc-swiggy': '00000000-0000-4000-8000-000000000115',
+    'gc-uber': '00000000-0000-4000-8000-000000000116',
+    'gc-jio': '00000000-0000-4000-8000-000000000117',
   };
   const id = map[key];
   if (!id) throw new Error(`No fixed reward id for key ${key}`);
