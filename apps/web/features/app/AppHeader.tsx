@@ -9,6 +9,7 @@ import {
   Home,
   LogOut,
   Menu,
+  MessagesSquare,
   User,
   UserCircle2,
   X,
@@ -27,6 +28,7 @@ const LINKS = [
   { label: 'Profile Surveys', href: '/account/profile-surveys', icon: User },
   { label: 'Rewards', href: '/rewards', icon: Gift },
   { label: 'Sponsored Polls', href: '/polls', icon: BarChart3 },
+  { label: 'Community', href: '/community', icon: MessagesSquare },
   { label: 'Games', href: '/games', icon: Gamepad2 },
 ];
 
