@@ -68,7 +68,7 @@ export function AppHeader(): React.JSX.Element {
         </button>
 
         <Link href="/home" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 text-white">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-teal-700 to-teal-900 text-white">
             <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
@@ -78,7 +78,7 @@ export function AppHeader(): React.JSX.Element {
 
         <div className="flex items-center gap-3">
           {points !== null && (
-            <span className="hidden rounded-full bg-pink-50 px-3 py-1 text-sm font-semibold text-pink-600 sm:inline">
+            <span className="hidden rounded-full bg-teal-50 px-3 py-1 text-sm font-semibold text-teal-800 sm:inline">
               🪙 {points.toLocaleString()}
             </span>
           )}
@@ -112,7 +112,7 @@ export function AppHeader(): React.JSX.Element {
                 <div className="min-w-0">
                   <p className="truncate text-base font-bold text-gray-900">{name || 'Member'}</p>
                   {points !== null && (
-                    <p className="text-sm font-semibold text-pink-600">
+                    <p className="text-sm font-semibold text-teal-800">
                       🪙 Points: {points.toLocaleString()}
                     </p>
                   )}

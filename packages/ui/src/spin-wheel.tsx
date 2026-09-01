@@ -110,7 +110,7 @@ export function SpinWheel({ segments, targetIndex, spinning = false, onAnimation
               </text>
             </g>
           ))}
-          <circle cx={CX} cy={CY} r={20} fill="white" stroke="#E91E8C" strokeWidth={3} />
+          <circle cx={CX} cy={CY} r={20} fill="white" stroke="#0d9488" strokeWidth={3} />
         </g>
       </svg>
     </div>

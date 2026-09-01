@@ -107,7 +107,7 @@ export function LunaBubble(): React.JSX.Element {
       {open && (
         <div className="flex h-[560px] max-h-[calc(100vh-7rem)] w-[380px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5">
           {/* Gradient header */}
-          <div className="shrink-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 px-6 pb-14 pt-6 text-white">
+          <div className="shrink-0 bg-gradient-to-r from-teal-700 via-teal-800 to-teal-900 px-6 pb-14 pt-6 text-white">
             <p className="text-xl font-medium">
               {t('hello')} <span className="inline-block">👋</span>
             </p>
@@ -127,7 +127,7 @@ export function LunaBubble(): React.JSX.Element {
                 <button
                   type="button"
                   onClick={startQA}
-                  className="mt-4 w-full rounded-full bg-blue-600 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-95"
+                  className="mt-4 w-full rounded-full bg-teal-800 py-3 text-sm font-semibold text-white transition hover:bg-teal-900 active:scale-95"
                 >
                   {t('askQuestion')}
                 </button>
@@ -151,7 +151,7 @@ export function LunaBubble(): React.JSX.Element {
                   </div>
                 ) : (
                   <div key={i} className="flex flex-col items-end">
-                    <div className="max-w-[78%] rounded-2xl rounded-br-sm bg-blue-600 px-3 py-2 text-sm text-white shadow-sm">
+                    <div className="max-w-[78%] rounded-2xl rounded-br-sm bg-teal-800 px-3 py-2 text-sm text-white shadow-sm">
                       {line.text}
                     </div>
                     {line.time && <p className="mt-0.5 pr-1 text-[10px] text-gray-400">{line.time}</p>}
@@ -167,7 +167,7 @@ export function LunaBubble(): React.JSX.Element {
                       key={f.topic}
                       type="button"
                       onClick={() => pickTopic(f)}
-                      className="w-full rounded-full border border-blue-400 bg-white px-4 py-2.5 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 active:scale-95"
+                      className="w-full rounded-full border border-teal-600 bg-white px-4 py-2.5 text-sm font-semibold text-teal-800 transition hover:bg-teal-50 active:scale-95"
                     >
                       {f.title}
                     </button>
@@ -183,7 +183,7 @@ export function LunaBubble(): React.JSX.Element {
                       key={o.next}
                       type="button"
                       onClick={() => pickOption(o)}
-                      className="w-full rounded-full border border-blue-400 bg-white px-4 py-2.5 text-left text-sm font-medium text-blue-600 transition hover:bg-blue-50 active:scale-95"
+                      className="w-full rounded-full border border-teal-600 bg-white px-4 py-2.5 text-left text-sm font-medium text-teal-800 transition hover:bg-teal-50 active:scale-95"
                     >
                       {o.label}
                     </button>
@@ -197,14 +197,14 @@ export function LunaBubble(): React.JSX.Element {
                   <button
                     type="button"
                     onClick={resolveThanks}
-                    className="w-full rounded-full border border-blue-400 bg-white px-4 py-2.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50 active:scale-95"
+                    className="w-full rounded-full border border-teal-600 bg-white px-4 py-2.5 text-sm font-medium text-teal-800 transition hover:bg-teal-50 active:scale-95"
                   >
                     {t('resolvedOption')}
                   </button>
                   <button
                     type="button"
                     onClick={raiseTicket}
-                    className="w-full rounded-full border border-blue-400 bg-white px-4 py-2.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50 active:scale-95"
+                    className="w-full rounded-full border border-teal-600 bg-white px-4 py-2.5 text-sm font-medium text-teal-800 transition hover:bg-teal-50 active:scale-95"
                   >
                     {t('escalateOption')}
                   </button>
@@ -217,7 +217,7 @@ export function LunaBubble(): React.JSX.Element {
                   <button
                     type="button"
                     onClick={startQA}
-                    className="text-xs font-medium text-blue-600 hover:underline"
+                    className="text-xs font-medium text-teal-800 hover:underline"
                   >
                     ← {t('backToTopics')}
                   </button>
@@ -246,7 +246,7 @@ export function LunaBubble(): React.JSX.Element {
               aria-label={t('askQuestion')}
               className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition ${
                 canSend
-                  ? 'bg-pink-600 text-white shadow-md hover:bg-pink-700 active:scale-90'
+                  ? 'bg-teal-800 text-white shadow-md hover:bg-teal-900 active:scale-90'
                   : 'cursor-not-allowed bg-gray-100 text-gray-300'
               }`}
             >
@@ -264,7 +264,7 @@ export function LunaBubble(): React.JSX.Element {
           type="button"
           onClick={() => setOpen(false)}
           aria-label={t('closeChat')}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-xl transition hover:scale-105 hover:bg-blue-700 active:scale-95"
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-teal-800 text-white shadow-xl transition hover:scale-105 hover:bg-teal-900 active:scale-95"
         >
           <svg className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -276,9 +276,9 @@ export function LunaBubble(): React.JSX.Element {
           onClick={() => setOpen(true)}
           aria-label={t('openChat')}
           style={bubbleShape}
-          className="relative flex h-[84px] w-[84px] items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700 shadow-xl transition hover:scale-105 active:scale-95"
+          className="relative flex h-[84px] w-[84px] items-center justify-center bg-gradient-to-br from-teal-700 to-teal-900 shadow-xl transition hover:scale-105 active:scale-95"
         >
-          <span style={bubbleShape} className="absolute inset-0 animate-ping bg-blue-500/20" />
+          <span style={bubbleShape} className="absolute inset-0 animate-ping bg-teal-500/20" />
           <span className="relative flex h-[58px] w-[58px] items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-amber-200 text-[38px] leading-none shadow-inner">
             😊
           </span>

@@ -32,7 +32,7 @@ export default function ContactPage(): React.JSX.Element {
           Your request has been received. Our Customer Support Team will respond to your email
           shortly.
         </p>
-        <a href="/" className="mt-6 inline-block rounded-full bg-pink-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-pink-700">
+        <a href="/" className="mt-6 inline-block rounded-full bg-teal-800 px-8 py-3 text-sm font-semibold text-white transition hover:bg-teal-900">
           Back to home
         </a>
       </div>
@@ -60,7 +60,7 @@ export default function ContactPage(): React.JSX.Element {
             <select
               value={issueType}
               onChange={(e) => setIssueType(e.target.value)}
-              className="h-12 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
+              className="h-12 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-teal-400 focus:outline-none focus:ring-1 focus:ring-teal-300"
             >
               {ISSUE_TYPES.map((i) => (
                 <option key={i.value} value={i.value}>
@@ -74,13 +74,13 @@ export default function ContactPage(): React.JSX.Element {
             type="text"
             required
             placeholder="Name"
-            className="h-12 w-full rounded-lg border border-gray-300 px-4 text-sm focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
+            className="h-12 w-full rounded-lg border border-gray-300 px-4 text-sm focus:border-teal-400 focus:outline-none focus:ring-1 focus:ring-teal-300"
           />
           <input
             type="email"
             required
             placeholder="Email"
-            className="h-12 w-full rounded-lg border border-gray-300 px-4 text-sm focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
+            className="h-12 w-full rounded-lg border border-gray-300 px-4 text-sm focus:border-teal-400 focus:outline-none focus:ring-1 focus:ring-teal-300"
           />
         </div>
 
@@ -90,14 +90,14 @@ export default function ContactPage(): React.JSX.Element {
             <input
               type="text"
               required
-              className="h-12 w-full rounded-lg border border-gray-300 px-4 text-sm focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
+              className="h-12 w-full rounded-lg border border-gray-300 px-4 text-sm focus:border-teal-400 focus:outline-none focus:ring-1 focus:ring-teal-300"
             />
           </Field>
           <textarea
             rows={5}
             required
             placeholder="Problem description"
-            className="w-full resize-y rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
+            className="w-full resize-y rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-teal-400 focus:outline-none focus:ring-1 focus:ring-teal-300"
           />
           <div>
             <p className="mb-2 text-lg font-semibold text-blue-500">Attached files</p>
@@ -107,7 +107,7 @@ export default function ContactPage(): React.JSX.Element {
 
         <button
           type="submit"
-          className="mt-8 rounded-full bg-pink-600 px-10 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-pink-700 active:scale-95"
+          className="mt-8 rounded-full bg-teal-800 px-10 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-teal-900 active:scale-95"
         >
           Send
         </button>

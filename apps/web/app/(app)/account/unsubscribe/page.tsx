@@ -8,11 +8,11 @@ export default function UnsubscribePage(): React.JSX.Element {
       <h2 className="text-xl font-bold text-gray-900">Unsubscribe / Account</h2>
       <p className="mt-2 text-sm text-gray-600">
         We&apos;d be sad to see you go. You can pause survey invitations from your{' '}
-        <Link href="/account/notifications" className="text-pink-600 underline">
+        <Link href="/account/notifications" className="text-teal-800 underline">
           notification preferences
         </Link>
         , or request account deletion below in line with our{' '}
-        <Link href="/privacy" className="text-pink-600 underline">
+        <Link href="/privacy" className="text-teal-800 underline">
           Privacy Policy
         </Link>
         .

@@ -94,7 +94,7 @@ export function TolunaSurvey({
     <div>
       {/* Category header with gradient underline */}
       <h2 className="text-center text-2xl font-semibold text-indigo-800 md:text-3xl">{name}</h2>
-      <div className="mx-auto mt-3 h-[3px] w-full max-w-3xl rounded-full bg-gradient-to-r from-indigo-700 via-purple-500 to-pink-500" />
+      <div className="mx-auto mt-3 h-[3px] w-full max-w-3xl rounded-full bg-gradient-to-r from-teal-800 via-cyan-500 to-teal-900" />
 
       <div className="mx-auto mt-6 flex max-w-3xl flex-col gap-4">
         {schema.intro && (
@@ -124,7 +124,7 @@ export function TolunaSurvey({
       {/* Sticky footer bar */}
       <div className="sticky bottom-0 z-10 -mx-5 mt-8 flex items-center justify-between gap-4 border-t border-gray-100 bg-white px-5 py-4 md:-mx-8 md:px-8">
         <div className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 text-white">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-teal-700 to-teal-900 text-white">
             <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>

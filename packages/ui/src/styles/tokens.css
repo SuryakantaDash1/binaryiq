@@ -2,17 +2,17 @@
    Components reference SEMANTIC tokens only (never raw hex). */
 
 :root {
-  /* ── Primitive: magenta (brand) ── */
-  --magenta-50: #fdf2f8;
-  --magenta-100: #fce7f3;
-  --magenta-200: #fbcfe8;
-  --magenta-300: #f9a8d4;
-  --magenta-400: #f472b6;
-  --magenta-500: #ec4899;
-  --magenta-600: #e91e8c;
-  --magenta-700: #c2186f;
-  --magenta-800: #9d1458;
-  --magenta-900: #6b0e3c;
+  /* ── Primitive: teal (brand) ── */
+  --teal-50: #f0fdfa;
+  --teal-100: #ccfbf1;
+  --teal-200: #99f6e4;
+  --teal-300: #5eead4;
+  --teal-400: #2dd4bf;
+  --teal-500: #14b8a6;
+  --teal-600: #0d9488;
+  --teal-700: #0f766e;
+  --teal-800: #115e59;
+  --teal-900: #134e4a;
 
   /* ── Primitive: neutral ── */
   --neutral-0: #ffffff;
@@ -48,10 +48,10 @@
   --color-text-inverse: var(--neutral-0);
 
   /* ── Semantic: brand ── */
-  --color-primary: var(--magenta-600);
-  --color-primary-hover: var(--magenta-700);
-  --color-primary-active: var(--magenta-800);
-  --color-primary-tint: var(--magenta-50);
+  --color-primary: var(--teal-800);
+  --color-primary-hover: var(--teal-900);
+  --color-primary-active: var(--teal-900);
+  --color-primary-tint: var(--teal-50);
   --color-on-primary: #ffffff;
 
   /* ── Semantic: status ── */
@@ -68,7 +68,7 @@
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
   --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
   --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.12);
-  --focus-ring: 0 0 0 3px rgba(233, 30, 140, 0.35);
+  --focus-ring: 0 0 0 3px rgba(17, 94, 89, 0.35);
 
   /* ── Typography ── */
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -84,7 +84,7 @@
   --color-text-secondary: var(--neutral-300);
   --color-text-muted: var(--neutral-400);
   --color-text-inverse: var(--neutral-900);
-  --color-primary: var(--magenta-500);
-  --color-primary-hover: var(--magenta-400);
-  --color-primary-tint: rgba(233, 30, 140, 0.12);
+  --color-primary: var(--teal-600);
+  --color-primary-hover: var(--teal-500);
+  --color-primary-tint: rgba(20, 184, 166, 0.12);
 }

@@ -51,7 +51,7 @@ export default function HomePage(): React.JSX.Element {
       count: `0 of ${surveyCount} attempted`,
       desc: `You have ${surveyCount} survey${surveyCount === 1 ? '' : 's'} available today. Complete them before they get filled!`,
       href: '/surveys',
-      grad: 'from-pink-500 to-rose-600',
+      grad: 'from-teal-500 to-cyan-600',
       icon: ICONS.surveys,
     },
     {
@@ -106,7 +106,7 @@ export default function HomePage(): React.JSX.Element {
       {/* Hero */}
       <div className="relative overflow-hidden rounded-2xl shadow-md">
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMG})` }} />
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-800 via-indigo-800/80 to-indigo-900/5" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-teal-900/85 to-teal-800/20" />
         <div className="relative px-8 py-14 md:py-20">
           <h1 className="text-3xl font-black text-white md:text-4xl">
             Hi, {name || 'there'}! <span className="inline-block">👋</span>
@@ -158,8 +158,8 @@ export default function HomePage(): React.JSX.Element {
 
         {/* Right: About you + notifications */}
         <aside className="space-y-6">
-          <div className="overflow-hidden rounded-2xl border-2 border-pink-300 bg-white shadow-sm">
-            <div className="flex items-center gap-2 bg-gradient-to-r from-pink-600 to-fuchsia-600 px-5 py-4 text-white">
+          <div className="overflow-hidden rounded-2xl border-2 border-teal-300 bg-white shadow-sm">
+            <div className="flex items-center gap-2 bg-gradient-to-r from-teal-800 to-cyan-600 px-5 py-4 text-white">
               <Icon d={ICONS.profile} />
               <span className="text-lg font-bold">About you</span>
             </div>
@@ -168,7 +168,7 @@ export default function HomePage(): React.JSX.Element {
                 Let us recommend surveys just for you — complete your About You profile.
               </p>
               <Link href="/profile-surveys">
-                <button className="mt-4 w-full rounded-full bg-pink-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-pink-700 active:scale-95">
+                <button className="mt-4 w-full rounded-full bg-teal-800 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-900 active:scale-95">
                   Complete Your Profile
                 </button>
               </Link>

@@ -10,7 +10,7 @@ export default function InfoLayout({
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 text-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-teal-700 to-teal-900 text-white">
               <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
@@ -20,7 +20,7 @@ export default function InfoLayout({
               <p className="text-[10px] text-gray-500">surveys &amp; rewards</p>
             </div>
           </Link>
-          <Link href="/" className="text-sm font-medium text-pink-600 hover:underline">
+          <Link href="/" className="text-sm font-medium text-teal-800 hover:underline">
             ← Home
           </Link>
         </div>

@@ -35,7 +35,7 @@ export function AuthRightPanel(): React.JSX.Element {
   return (
     <div className="relative hidden h-screen overflow-hidden md:block md:w-1/2">
       <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${AUTH_IMAGE})` }} />
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-700/75 via-purple-700/65 to-pink-600/70" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/15 to-black/5" />
       <div className="absolute inset-0 flex flex-col items-center justify-center px-10 text-center">
         <p className="text-5xl font-semibold text-white/90 drop-shadow transition-all duration-300">
           {text.top}

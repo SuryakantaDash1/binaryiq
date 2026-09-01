@@ -53,7 +53,7 @@ const preset: Omit<Config, 'content'> = {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
       },
       ringColor: {
-        focus: 'rgba(233, 30, 140, 0.35)',
+        focus: 'rgba(17, 94, 89, 0.35)',
       },
     },
   },

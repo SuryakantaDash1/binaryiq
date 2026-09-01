@@ -164,7 +164,7 @@ export default function LandingPage(): React.JSX.Element {
       <div className="relative flex w-full flex-col justify-between overflow-y-auto bg-white px-8 py-8 md:w-1/2 lg:px-14">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 text-white">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-teal-700 to-teal-900 text-white">
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
@@ -186,7 +186,7 @@ export default function LandingPage(): React.JSX.Element {
           {/* CTA buttons */}
           <div className="mt-7 flex gap-3">
             <Link href="/register">
-              <button className="rounded-full bg-pink-600 px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-pink-700 active:scale-95">
+              <button className="rounded-full bg-teal-800 px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-teal-900 active:scale-95">
                 {t('register')}
               </button>
             </Link>
@@ -209,9 +209,9 @@ export default function LandingPage(): React.JSX.Element {
               {BENEFITS.map((b) => (
                 <div
                   key={b.key}
-                  className="group flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-pink-200 hover:shadow-md"
+                  className="group flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-md"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-pink-50 text-xl transition-transform duration-200 group-hover:scale-110">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-xl transition-transform duration-200 group-hover:scale-110">
                     {b.icon}
                   </div>
                   <p className="text-sm font-medium text-gray-700">{t(b.key)}</p>
@@ -228,7 +228,7 @@ export default function LandingPage(): React.JSX.Element {
             <div className="flex items-start justify-between gap-2">
               {STEPS.map((s, i) => (
                 <div key={s} className="group flex flex-1 flex-col items-center text-center">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-500 text-sm font-bold text-white shadow-sm transition-transform duration-200 group-hover:scale-110">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-cyan-500 text-sm font-bold text-white shadow-sm transition-transform duration-200 group-hover:scale-110">
                     {i + 1}
                   </div>
                   <p className="mt-2 text-xs font-medium leading-tight text-gray-600">{t(s)}</p>
@@ -243,7 +243,7 @@ export default function LandingPage(): React.JSX.Element {
           <select
             value={lang}
             onChange={handleLangChange}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 shadow-sm focus:border-pink-400 focus:outline-none focus:ring-1 focus:ring-pink-300"
+            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 shadow-sm focus:border-teal-400 focus:outline-none focus:ring-1 focus:ring-teal-300"
           >
             <option value="">{t('pleaseSelect')}</option>
             {LANGUAGES.map((l) => (
@@ -256,18 +256,18 @@ export default function LandingPage(): React.JSX.Element {
       </div>
 
       {/* ── Right Panel (50%) — cross-fading real photos ───────────── */}
-      <div className="relative hidden w-1/2 overflow-hidden bg-gradient-to-br from-indigo-900 to-purple-800 md:flex">
+      <div className="relative hidden w-1/2 overflow-hidden bg-gradient-to-br from-teal-900 to-cyan-900 md:flex">
         {/* Real lifestyle photos cross-fade to feel like a looping video */}
         <div className="photo-scene ps-1 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMAGES[0]})` }} />
         <div className="photo-scene ps-2 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMAGES[1]})` }} />
         <div className="photo-scene ps-3 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMAGES[2]})` }} />
 
         {/* Brand tint overlay (blue → purple → pink) over the photos */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-800/75 via-purple-700/65 to-pink-600/70" />
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-800/80 via-cyan-700/65 to-emerald-600/70" />
 
         {/* Moving light blobs */}
-        <div className="animate-blob absolute left-1/4 top-1/4 h-64 w-64 rounded-full bg-purple-400 opacity-30 mix-blend-screen blur-3xl" />
-        <div className="animate-blob animation-delay-2000 absolute bottom-1/3 right-1/4 h-72 w-72 rounded-full bg-pink-400 opacity-25 mix-blend-screen blur-3xl" />
+        <div className="animate-blob absolute left-1/4 top-1/4 h-64 w-64 rounded-full bg-teal-400 opacity-30 mix-blend-screen blur-3xl" />
+        <div className="animate-blob animation-delay-2000 absolute bottom-1/3 right-1/4 h-72 w-72 rounded-full bg-teal-400 opacity-25 mix-blend-screen blur-3xl" />
         <div className="animate-blob animation-delay-4000 absolute left-1/3 top-2/3 h-56 w-56 rounded-full bg-blue-300 opacity-20 mix-blend-screen blur-3xl" />
 
         {/* Cycling hero phrase */}

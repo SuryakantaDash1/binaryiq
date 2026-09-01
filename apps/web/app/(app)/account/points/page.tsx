@@ -65,7 +65,7 @@ export default function PointsPage(): React.JSX.Element {
           type="button"
           onClick={() => setTab('points')}
           className={`-mb-px border-b-2 pb-2 text-sm font-semibold transition ${
-            tab === 'points' ? 'border-pink-600 text-pink-600' : 'border-transparent text-gray-500 hover:text-gray-800'
+            tab === 'points' ? 'border-teal-800 text-teal-800' : 'border-transparent text-gray-500 hover:text-gray-800'
           }`}
         >
           Points History
@@ -74,7 +74,7 @@ export default function PointsPage(): React.JSX.Element {
           type="button"
           onClick={() => setTab('rewards')}
           className={`-mb-px border-b-2 pb-2 text-sm font-semibold transition ${
-            tab === 'rewards' ? 'border-pink-600 text-pink-600' : 'border-transparent text-gray-500 hover:text-gray-800'
+            tab === 'rewards' ? 'border-teal-800 text-teal-800' : 'border-transparent text-gray-500 hover:text-gray-800'
           }`}
         >
           Rewards History
@@ -122,7 +122,7 @@ export default function PointsPage(): React.JSX.Element {
 function Stat({ icon, label, value, sign }: { icon: string; label: string; value: number; sign?: string }): React.JSX.Element {
   return (
     <div className="flex items-center gap-3">
-      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-pink-100 text-lg text-pink-600">{icon}</div>
+      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-teal-100 text-lg text-teal-800">{icon}</div>
       <div>
         <p className="text-xs text-gray-500">{label}</p>
         <p className={`text-lg font-bold ${sign ?? 'text-gray-900'}`}>{value.toLocaleString()} points</p>
