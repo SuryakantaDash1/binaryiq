@@ -1,3 +1,4 @@
+import { adminFetch } from './admin.js';
 import { apiFetch } from './client.js';
 
 export type ConsentType = 'TERMS' | 'PRIVACY' | 'MARKETING' | 'COOKIES';
@@ -66,7 +67,7 @@ export const dataRightsApi = {
     if (params?.limit) qs.set('limit', String(params.limit));
     if (params?.cursor) qs.set('cursor', params.cursor);
     const q = qs.toString();
-    return apiFetch(`/admin/audit-logs${q ? `?${q}` : ''}`);
+    return adminFetch(`/admin/audit-logs${q ? `?${q}` : ''}`, { raw: true });
   },
 
   adminGetConsents(params?: {
@@ -84,6 +85,6 @@ export const dataRightsApi = {
     if (params?.limit) qs.set('limit', String(params.limit));
     if (params?.cursor) qs.set('cursor', params.cursor);
     const q = qs.toString();
-    return apiFetch(`/admin/consents${q ? `?${q}` : ''}`);
+    return adminFetch(`/admin/consents${q ? `?${q}` : ''}`, { raw: true });
   },
 };

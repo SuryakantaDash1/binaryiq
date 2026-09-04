@@ -10,3 +10,4 @@ export * from './games.js';
 export * from './notifications.js';
 export * from './support.js';
 export * from './data-rights.js';
+export * from './admin.js';

@@ -1,3 +1,4 @@
+import { adminFetch } from './admin.js';
 import { apiFetch } from './client.js';
 
 export type TicketIssueType = 'LOGIN' | 'SURVEY' | 'SURVEY_PAYMENT' | 'REWARDS' | 'UNSUBSCRIBE' | 'OTHER';
@@ -124,18 +125,18 @@ export const supportApi = {
     if (params?.page) qs.set('page', String(params.page));
     if (params?.pageSize) qs.set('pageSize', String(params.pageSize));
     const q = qs.toString();
-    return apiFetch(`/admin/support/tickets${q ? `?${q}` : ''}`);
+    return adminFetch(`/admin/support/tickets${q ? `?${q}` : ''}`);
   },
 
   adminGetTicket(id: string): Promise<AdminTicketDetail> {
-    return apiFetch(`/admin/support/tickets/${id}`);
+    return adminFetch(`/admin/support/tickets/${id}`);
   },
 
   adminUpdateTicket(id: string, body: { status?: string; assigneeAdminId?: string }): Promise<AdminTicketRow> {
-    return apiFetch(`/admin/support/tickets/${id}`, { method: 'PUT', body });
+    return adminFetch(`/admin/support/tickets/${id}`, { method: 'PUT', body });
   },
 
   adminAddMessage(ticketId: string, message: string): Promise<TicketMessage> {
-    return apiFetch(`/admin/support/tickets/${ticketId}/messages`, { method: 'POST', body: { message } });
+    return adminFetch(`/admin/support/tickets/${ticketId}/messages`, { method: 'POST', body: { message } });
   },
 };

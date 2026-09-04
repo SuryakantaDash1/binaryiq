@@ -9,6 +9,7 @@ import { SecurityHeadersMiddleware } from './common/middleware/security-headers.
 import { AppConfigModule } from './config/config.module';
 import { HealthModule } from './health/health.module';
 import { AccountModule } from './modules/account/account.module';
+import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { DataRightsModule } from './modules/data-rights/data-rights.module';
 import { GamesModule } from './modules/games/games.module';
@@ -30,7 +31,7 @@ import { RedisModule } from './redis/redis.module';
     QueueModule,
     AuthModule, PointsModule, HealthModule,
     AccountModule, ProfileSurveysModule, RewardsModule, SurveysModule, PollsModule, GamesModule,
-    NotificationsModule, SupportModule, DataRightsModule,
+    NotificationsModule, SupportModule, DataRightsModule, AdminModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },

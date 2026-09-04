@@ -34,11 +34,11 @@ export class TokenService {
     }
   }
 
-  signAccess(claims: Omit<AccessTokenClaims, 'type'>): string {
+  signAccess(claims: Omit<AccessTokenClaims, 'type'>, expiresIn?: SignOptions['expiresIn']): string {
     if (!this.privateKey) throw new Error('JWT_PRIVATE_KEY not configured');
     const options: SignOptions = {
       algorithm: 'RS256',
-      expiresIn: this.config.get('JWT_ACCESS_TTL') as SignOptions['expiresIn'],
+      expiresIn: expiresIn ?? (this.config.get('JWT_ACCESS_TTL') as SignOptions['expiresIn']),
     };
     return jwt.sign({ ...claims, type: 'access' }, this.privateKey, options);
   }
