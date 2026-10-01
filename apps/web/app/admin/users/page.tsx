@@ -1,17 +1,19 @@
 'use client';
 
 import type { AdminUserRow } from '@influencer/types';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { adminApi } from '@/lib/api/admin';
 
 export default function AdminUsersPage(): React.JSX.Element {
+  const params = useSearchParams();
   const [rows, setRows] = useState<AdminUserRow[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [q, setQ] = useState('');
-  const [status, setStatus] = useState('');
-  const [verified, setVerified] = useState('');
+  const [status, setStatus] = useState(params.get('status') ?? '');
+  const [verified, setVerified] = useState(params.get('verified') ?? '');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const pageSize = 20;
@@ -47,7 +49,7 @@ export default function AdminUsersPage(): React.JSX.Element {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h1 className="text-2xl font-bold text-text">Users</h1>
+        <h1 className="text-2xl font-black text-text md:hidden">Users</h1>
         <p className="text-sm text-secondary">{total.toLocaleString()} total</p>
       </div>
 

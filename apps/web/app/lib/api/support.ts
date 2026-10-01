@@ -113,7 +113,7 @@ export const supportApi = {
   },
 
   // Admin
-  adminListTickets(params?: {
+  async adminListTickets(params?: {
     status?: string;
     issueType?: string;
     page?: number;
@@ -125,7 +125,14 @@ export const supportApi = {
     if (params?.page) qs.set('page', String(params.page));
     if (params?.pageSize) qs.set('pageSize', String(params.pageSize));
     const q = qs.toString();
-    return adminFetch(`/admin/support/tickets${q ? `?${q}` : ''}`);
+    // API returns { data, total, page, pageSize } — adapt to { items, pagination }.
+    const res = await adminFetch<{ data: AdminTicketRow[]; total: number; page: number; pageSize: number }>(
+      `/admin/support/tickets${q ? `?${q}` : ''}`,
+    );
+    return {
+      items: res.data ?? [],
+      pagination: { total: res.total ?? 0, page: res.page ?? 1, pageSize: res.pageSize ?? 20 },
+    };
   },
 
   adminGetTicket(id: string): Promise<AdminTicketDetail> {

@@ -38,7 +38,7 @@ export function ResourceList({
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-2xl font-bold text-text">{title}</h1>
+        <h1 className="text-2xl font-black text-text md:hidden">{title}</h1>
         <p className="text-sm text-secondary">{description}{rows.length ? ` · ${rows.length} items` : ''}</p>
       </div>
 
