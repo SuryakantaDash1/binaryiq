@@ -19,9 +19,9 @@ function tileFor(reward: RewardItem): string {
   if (n.includes('croma')) return 'from-teal-500 to-teal-700';
   if (n.includes('makemytrip')) return 'from-sky-500 to-blue-600';
   if (n.includes('jio')) return 'from-blue-600 to-indigo-700';
-  if (reward.rewardType === 'CHARITY') return 'from-emerald-500 to-teal-600';
+  if (reward.rewardType === 'CHARITY') return 'from-emerald-500 to-brand-600';
   if (reward.rewardType === 'PAYPAL') return 'from-sky-500 to-indigo-600';
-  return 'from-teal-600 to-teal-800';
+  return 'from-brand-600 to-brand-800';
 }
 
 export function RewardCatalogCard({ reward, balance, onRedeemed }: RewardCatalogCardProps): React.JSX.Element {
@@ -52,7 +52,7 @@ export function RewardCatalogCard({ reward, balance, onRedeemed }: RewardCatalog
   return (
     <>
       <div className="flex flex-col rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
-        <h3 className="mb-4 text-lg font-bold leading-snug text-teal-900 line-clamp-2">{reward.name}</h3>
+        <h3 className="mb-4 text-lg font-bold leading-snug text-brand-900 line-clamp-2">{reward.name}</h3>
 
         {/* Thumbnail */}
         <div className="mb-4 flex h-36 items-center justify-center overflow-hidden rounded-xl bg-gray-50 ring-1 ring-gray-100">
@@ -80,18 +80,18 @@ export function RewardCatalogCard({ reward, balance, onRedeemed }: RewardCatalog
         <button
           type="button"
           onClick={() => { setError(null); setInfo(true); }}
-          className="mt-3 self-start text-sm font-medium text-teal-800 hover:underline"
+          className="mt-3 self-start text-sm font-medium text-brand-800 hover:underline"
         >
           More information
         </button>
 
         <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
-          <span className="font-bold text-teal-800">{reward.pointsRequired.toLocaleString()} points</span>
+          <span className="font-bold text-brand-800">{reward.pointsRequired.toLocaleString()} points</span>
           {canAfford ? (
             <button
               type="button"
               onClick={() => { setError(null); setConfirm(true); }}
-              className="rounded-full bg-teal-800 px-5 py-1.5 text-sm font-semibold text-white transition hover:bg-teal-900"
+              className="rounded-full bg-brand-800 px-5 py-1.5 text-sm font-semibold text-white transition hover:bg-brand-900"
             >
               Redeem
             </button>
@@ -105,7 +105,7 @@ export function RewardCatalogCard({ reward, balance, onRedeemed }: RewardCatalog
       <Modal open={info} onOpenChange={setInfo} title={reward.name}>
         <div className="flex flex-col gap-4">
           <p className="text-sm leading-relaxed text-gray-600">{reward.description}</p>
-          <p className="font-bold text-teal-800">{reward.pointsRequired.toLocaleString()} points</p>
+          <p className="font-bold text-brand-800">{reward.pointsRequired.toLocaleString()} points</p>
           {error && <Alert variant="error">{error}</Alert>}
           {canAfford ? (
             <Button loading={loading} onClick={() => void handleRedeem()} fullWidth>

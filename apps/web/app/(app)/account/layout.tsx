@@ -29,7 +29,7 @@ export default function AccountLayout({ children }: { children: ReactNode }): Re
   return (
     <div className="mx-auto max-w-5xl">
       {/* Hero */}
-      <div className="overflow-hidden rounded-2xl bg-gradient-to-r from-black via-teal-900 to-teal-800 px-6 py-12 md:px-10">
+      <div className="overflow-hidden rounded-2xl bg-gradient-to-r from-ink via-brand-950 to-brand-800 px-6 py-12 md:px-10">
         <h1 className="max-w-md text-2xl font-black leading-snug text-white md:text-3xl">
           Need to update your personal details or track your rewards history? This is the place!
         </h1>
@@ -60,7 +60,7 @@ export default function AccountLayout({ children }: { children: ReactNode }): Re
                 key={s.key}
                 href={`/account/${s.key}`}
                 className={`text-sm font-medium transition ${
-                  seg === s.key ? 'text-teal-800' : 'text-gray-500 hover:text-gray-800'
+                  seg === s.key ? 'text-brand-800' : 'text-gray-500 hover:text-gray-800'
                 }`}
               >
                 {s.label}

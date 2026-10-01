@@ -39,7 +39,7 @@ export default function PrivacyPage(): React.JSX.Element {
         <p>
           You can access, correct, export or delete your personal data at any time from your account
           settings. To exercise any of these rights or ask a question, contact us at{' '}
-          <a href="mailto:privacy@influencers.example" className="text-teal-800 underline">
+          <a href="mailto:privacy@influencers.example" className="text-brand-800 underline">
             privacy@influencers.example
           </a>
           .

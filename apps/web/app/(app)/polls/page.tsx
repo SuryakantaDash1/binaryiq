@@ -35,7 +35,7 @@ export default function PollsPage(): React.JSX.Element {
       {/* Hero */}
       <div className="relative overflow-hidden rounded-2xl shadow-md">
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMG})` }} />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-teal-900/85 to-teal-800/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink via-brand-950/85 to-brand-800/20" />
         <div className="relative px-8 py-14 md:py-20">
           <h1 className="text-3xl font-black text-white md:text-4xl">My Sponsored polls</h1>
           <p className="mt-3 max-w-xs text-lg font-medium text-white/90">
@@ -53,7 +53,7 @@ export default function PollsPage(): React.JSX.Element {
       ) : (
         live.length > 0 && (
           <section className="mt-8">
-            <h2 className="text-2xl font-black text-teal-800">Vote &amp; earn points</h2>
+            <h2 className="text-2xl font-black text-brand-800">Vote &amp; earn points</h2>
             <p className="mt-1 text-sm text-gray-500">
               Cast your vote on these live polls to earn points instantly.
             </p>
@@ -79,7 +79,7 @@ export default function PollsPage(): React.JSX.Element {
 
       {/* Results showcase */}
       <section className="mt-10">
-        <h2 className="text-2xl font-black text-teal-800">Poll results</h2>
+        <h2 className="text-2xl font-black text-brand-800">Poll results</h2>
         <p className="mt-1 text-sm text-gray-500">See how the community voted.</p>
         <div className="mt-6 flex flex-col gap-6">
           {SHOWCASE_POLLS.slice(0, visible).map((poll) => (
@@ -92,7 +92,7 @@ export default function PollsPage(): React.JSX.Element {
             <button
               type="button"
               onClick={() => setVisible((v) => v + PAGE_SIZE)}
-              className="rounded-full bg-teal-800 px-10 py-3 text-sm font-bold tracking-wide text-white transition hover:bg-teal-900"
+              className="rounded-full bg-brand-800 px-10 py-3 text-sm font-bold tracking-wide text-white transition hover:bg-brand-900"
             >
               See More
             </button>

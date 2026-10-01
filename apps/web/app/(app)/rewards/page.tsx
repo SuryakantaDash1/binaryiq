@@ -39,7 +39,7 @@ export default function RewardsPage(): React.JSX.Element {
       {/* Hero */}
       <div className="relative overflow-hidden rounded-2xl shadow-md">
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMG})` }} />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-teal-900/85 to-teal-800/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink via-brand-950/85 to-brand-800/20" />
         <div className="relative px-8 py-14 md:py-20">
           <h1 className="max-w-md text-2xl font-black leading-snug text-white md:text-3xl">
             Check out the available rewards below. Don&apos;t forget, the more you participate, the more you can earn!
@@ -51,11 +51,11 @@ export default function RewardsPage(): React.JSX.Element {
         {/* Balance line */}
         <p className="text-right text-lg text-gray-700">
           Your current account balance is:{' '}
-          <span className="font-bold text-teal-800">🪙 {balance.toLocaleString()} points</span>.
+          <span className="font-bold text-brand-800">🪙 {balance.toLocaleString()} points</span>.
         </p>
 
         {/* PayPal notice */}
-        <p className="mt-4 border-t border-gray-100 pt-4 font-bold text-teal-900">
+        <p className="mt-4 border-t border-gray-100 pt-4 font-bold text-brand-900">
           Kindly add your email address to your PayPal account to ensure your PayPal payments are not blocked.
         </p>
 
@@ -110,7 +110,7 @@ function PaypalForm(): React.JSX.Element {
 
   return (
     <form onSubmit={onSubmit} className="max-w-md" noValidate>
-      <label className="mb-2 block text-xl font-bold text-teal-900">PayPal email address</label>
+      <label className="mb-2 block text-xl font-bold text-brand-900">PayPal email address</label>
       {success && <Alert variant="success" className="mb-3">PayPal account linked successfully.</Alert>}
       {current && <Alert variant="info" className="mb-3">Current: <strong>{current}</strong></Alert>}
       <FormField label="" error={errors.paypalEmail?.message}>

@@ -54,7 +54,7 @@ export default function GamesPage(): React.JSX.Element {
       {/* Hero banner */}
       <div className="relative overflow-hidden rounded-2xl shadow-md">
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMG})` }} />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-teal-900/85 to-teal-800/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink via-brand-950/85 to-brand-800/10" />
         <div className="relative px-8 py-14 md:py-20">
           <h1 className="max-w-xs text-2xl font-black leading-snug text-white md:text-3xl">
             Take a break and challenge yourself with awesome games
@@ -70,7 +70,7 @@ export default function GamesPage(): React.JSX.Element {
               title="Daily Wheel"
               badge="Free game"
             >
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-700 via-teal-800 to-teal-900 px-4 py-10">
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-700 via-brand-800 to-brand-900 px-4 py-10">
                 <Confetti />
                 <p className="mb-6 text-center text-2xl font-black uppercase tracking-wide text-white drop-shadow">
                   Spin the daily wheel!
@@ -94,11 +94,11 @@ export default function GamesPage(): React.JSX.Element {
           ) : (
             <GameCard title="Trivia Challenge" badge="Coming soon" badgeMuted>
               <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 px-6 py-16 text-center">
-                <p className="text-4xl font-black uppercase tracking-tight text-teal-800 drop-shadow-sm md:text-5xl">
+                <p className="text-4xl font-black uppercase tracking-tight text-brand-800 drop-shadow-sm md:text-5xl">
                   Trivia Challenge
                 </p>
                 <p className="mt-4 text-lg font-bold text-gray-700">Win up to 3,000 points daily!</p>
-                <span className="mt-8 inline-flex items-center gap-2 rounded-full bg-teal-800 px-8 py-3 text-sm font-bold uppercase tracking-wide text-white opacity-90">
+                <span className="mt-8 inline-flex items-center gap-2 rounded-full bg-brand-800 px-8 py-3 text-sm font-bold uppercase tracking-wide text-white opacity-90">
                   <Lock className="h-4 w-4" /> Coming Soon
                 </span>
                 <p className="mt-4 text-sm font-medium text-gray-500">Launching soon — stay tuned!</p>
@@ -153,12 +153,12 @@ function GameCard({
         <div className="flex items-center gap-4">
           <span
             className={`inline-flex items-center gap-1.5 text-sm font-semibold ${
-              badgeMuted ? 'text-gray-400' : 'text-teal-800'
+              badgeMuted ? 'text-gray-400' : 'text-brand-800'
             }`}
           >
             <Coins className="h-4 w-4" /> {badge}
           </span>
-          <span className="rounded-full bg-teal-800 px-6 py-2 text-sm font-semibold text-white">
+          <span className="rounded-full bg-brand-800 px-6 py-2 text-sm font-semibold text-white">
             Participate
           </span>
         </div>
@@ -187,12 +187,12 @@ function MoreGameCard({
       onClick={onClick}
       className="flex w-full items-center gap-4 rounded-2xl bg-white p-4 text-left shadow-sm ring-1 ring-gray-100 transition hover:-translate-y-0.5 hover:shadow-md"
     >
-      <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal-700 to-teal-900">
+      <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-700 to-brand-900">
         {icon}
       </span>
       <span>
         <span className="block font-bold text-gray-900">{title}</span>
-        <span className={`text-sm font-medium ${muted ? 'text-gray-400' : 'text-teal-800'}`}>{label}</span>
+        <span className={`text-sm font-medium ${muted ? 'text-gray-400' : 'text-brand-800'}`}>{label}</span>
       </span>
     </button>
   );

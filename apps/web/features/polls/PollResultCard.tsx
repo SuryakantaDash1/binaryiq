@@ -23,7 +23,7 @@ export function PollResultCard({ poll }: { poll: ShowcasePoll }): React.JSX.Elem
     <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
       {/* Voted header */}
       <div className="flex items-center gap-2 border-b border-gray-100 px-6 py-4">
-        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-teal-800 text-white">
+        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-800 text-white">
           <Check className="h-3 w-3" strokeWidth={3} />
         </span>
         <span className="text-sm text-gray-500">
@@ -35,24 +35,24 @@ export function PollResultCard({ poll }: { poll: ShowcasePoll }): React.JSX.Elem
       <div className="grid grid-cols-2 divide-gray-100 border-b border-gray-100 bg-gray-50/60 md:grid-cols-4 md:divide-x">
         <div className="p-5">
           <p className="text-lg font-black text-gray-900">Infographics</p>
-          <button type="button" className="text-sm font-medium text-teal-800 hover:underline">
+          <button type="button" className="text-sm font-medium text-brand-800 hover:underline">
             Click to show more options
           </button>
         </div>
         <div className="flex flex-col items-center justify-center p-5">
-          <p className="text-2xl font-bold text-teal-700">
+          <p className="text-2xl font-bold text-brand-700">
             <span className="align-middle">♀</span> {poll.femalePct}%
           </p>
           <p className="text-sm text-gray-600">{poll.femaleCount.toLocaleString()} female</p>
         </div>
         <div className="flex flex-col items-center justify-center p-5">
-          <p className="text-2xl font-bold text-teal-700">
+          <p className="text-2xl font-bold text-brand-700">
             <span className="align-middle">♂</span> {poll.malePct}%
           </p>
           <p className="text-sm text-gray-600">{poll.maleCount.toLocaleString()} male</p>
         </div>
         <div className="flex flex-col items-center justify-center p-5">
-          <p className="text-3xl font-bold text-teal-700">{poll.totalVotes.toLocaleString()}</p>
+          <p className="text-3xl font-bold text-brand-700">{poll.totalVotes.toLocaleString()}</p>
           <p className="text-sm text-gray-600">People voted</p>
         </div>
       </div>
@@ -60,10 +60,10 @@ export function PollResultCard({ poll }: { poll: ShowcasePoll }): React.JSX.Elem
       {/* Question + bars */}
       <div className="p-6">
         <div className="mb-6 flex items-start gap-4">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal-600 to-teal-800 text-white">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-800 text-white">
             <HelpCircle className="h-6 w-6" />
           </span>
-          <h3 className="text-lg font-bold leading-snug text-teal-900 md:text-xl">{poll.question}</h3>
+          <h3 className="text-lg font-bold leading-snug text-brand-900 md:text-xl">{poll.question}</h3>
         </div>
 
         <div className="flex flex-col gap-3">

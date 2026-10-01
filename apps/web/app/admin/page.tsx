@@ -20,7 +20,7 @@ import { adminApi } from '@/lib/api/admin';
 type Tone = 'teal' | 'blue' | 'green' | 'amber' | 'red' | 'purple' | 'orange' | 'pink';
 
 const TONES: Record<Tone, { chip: string; grad: string }> = {
-  teal: { chip: 'bg-teal-100 text-teal-700', grad: 'from-teal-50' },
+  teal: { chip: 'bg-brand-100 text-brand-700', grad: 'from-brand-50' },
   blue: { chip: 'bg-sky-100 text-sky-700', grad: 'from-sky-50' },
   green: { chip: 'bg-emerald-100 text-emerald-700', grad: 'from-emerald-50' },
   amber: { chip: 'bg-amber-100 text-amber-700', grad: 'from-amber-50' },
@@ -112,21 +112,21 @@ function SignupsLineChart({ data }: { data: { date: string; count: number }[] })
     <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="h-40 w-full overflow-visible">
       <defs>
         <linearGradient id="signupsArea" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0d9488" stopOpacity="0.32" />
-          <stop offset="100%" stopColor="#0d9488" stopOpacity="0" />
+          <stop offset="0%" stopColor="#9a268f" stopOpacity="0.32" />
+          <stop offset="100%" stopColor="#9a268f" stopOpacity="0" />
         </linearGradient>
       </defs>
       <path d={areaPath} fill="url(#signupsArea)" stroke="none" />
       <path
         d={linePath}
         fill="none"
-        stroke="#0d9488"
+        stroke="#9a268f"
         strokeWidth={2.5}
         strokeLinecap="round"
         strokeLinejoin="round"
         vectorEffect="non-scaling-stroke"
       />
-      <circle cx={last[0]} cy={last[1]} r={4.5} fill="#0d9488" stroke="white" strokeWidth={2} vectorEffect="non-scaling-stroke" />
+      <circle cx={last[0]} cy={last[1]} r={4.5} fill="#9a268f" stroke="white" strokeWidth={2} vectorEffect="non-scaling-stroke" />
     </svg>
   );
 }
@@ -176,7 +176,7 @@ export default function AdminDashboardPage(): React.JSX.Element {
       <section className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="font-bold text-text">New signups — last 30 days</h2>
-          <span className="text-sm font-semibold text-teal-700">
+          <span className="text-sm font-semibold text-brand-700">
             {stats.signupsByDay[stats.signupsByDay.length - 1]?.count} today
           </span>
         </div>
@@ -225,13 +225,13 @@ export default function AdminDashboardPage(): React.JSX.Element {
         <section className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-bold text-text">Recent signups</h2>
-            <Link href="/admin/users" className="text-sm font-medium text-teal-700 hover:underline">View all users →</Link>
+            <Link href="/admin/users" className="text-sm font-medium text-brand-700 hover:underline">View all users →</Link>
           </div>
           <ul className="divide-y divide-border">
             {stats.recentSignups.map((u) => (
               <li key={u.id} className="flex items-center justify-between py-2.5 text-sm">
                 <div className="flex min-w-0 items-center gap-3">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-100 text-xs font-bold text-teal-700">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
                     {u.username.slice(0, 2).toUpperCase()}
                   </span>
                   <div className="min-w-0">
@@ -261,7 +261,7 @@ export default function AdminDashboardPage(): React.JSX.Element {
             {stats.recentActivity.map((a) => (
               <li key={a.id} className="flex items-center justify-between py-2.5 text-sm">
                 <span className="flex items-center gap-2 text-text">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-teal-100 text-teal-700">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-100 text-brand-700">
                     <Activity className="h-3.5 w-3.5" />
                   </span>
                   <span className="text-secondary">{a.actorType}</span> · {a.action}

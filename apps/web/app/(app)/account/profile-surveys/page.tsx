@@ -127,7 +127,7 @@ export default function ProfileSurveysPage(): React.JSX.Element {
 
       {thanks && (
         <div className="mt-6 flex items-start gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
-          <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 text-white">
+          <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-900 text-white">
             <Heart className="h-8 w-8 fill-white" />
           </span>
           <div className="flex-1">
@@ -162,7 +162,7 @@ export default function ProfileSurveysPage(): React.JSX.Element {
               >
                 <span className="relative">
                   <Icon
-                    className="h-12 w-12 text-teal-800 transition group-hover:scale-110"
+                    className="h-12 w-12 text-brand-800 transition group-hover:scale-110"
                     strokeWidth={1.75}
                     fill="currentColor"
                   />

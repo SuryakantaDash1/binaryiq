@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
@@ -21,16 +22,8 @@ export default function AuthLayout({ children }: { children: ReactNode }): React
         <div className="flex h-screen w-full flex-col bg-white md:w-1/2">
           {/* Logo */}
           <div className="shrink-0 px-8 pt-8 lg:px-14">
-            <Link href="/" className="inline-flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-teal-700 to-teal-900 text-white">
-                <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div className="leading-tight">
-                <p className="text-base font-bold text-gray-900">Influencers</p>
-                <p className="text-[10px] text-gray-500">surveys &amp; rewards</p>
-              </div>
+            <Link href="/" className="inline-flex items-center">
+              <Image src="/BinaryIQ_logo.svg" alt="BinaryIQ" width={1600} height={420} priority className="h-9 w-auto" />
             </Link>
           </div>
 

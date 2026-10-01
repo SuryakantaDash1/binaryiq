@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -163,16 +164,8 @@ export default function LandingPage(): React.JSX.Element {
       {/* ── Left Panel (50%) ───────────────────────────────────────── */}
       <div className="relative flex w-full flex-col justify-between overflow-y-auto bg-white px-8 py-8 md:w-1/2 lg:px-14">
         {/* Logo */}
-        <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-teal-700 to-teal-900 text-white">
-            <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
-          <div className="leading-tight">
-            <p className="text-base font-bold text-gray-900">Influencers</p>
-            <p className="text-[10px] text-gray-500">surveys &amp; rewards</p>
-          </div>
+        <div className="flex items-center">
+          <Image src="/BinaryIQ_logo.svg" alt="BinaryIQ" width={1600} height={420} priority className="h-9 w-auto" />
         </div>
 
         {/* Hero text */}
@@ -186,7 +179,7 @@ export default function LandingPage(): React.JSX.Element {
           {/* CTA buttons */}
           <div className="mt-7 flex gap-3">
             <Link href="/register">
-              <button className="rounded-full bg-teal-800 px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-teal-900 active:scale-95">
+              <button className="rounded-full bg-brand-800 px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-brand-900 active:scale-95">
                 {t('register')}
               </button>
             </Link>
@@ -209,9 +202,9 @@ export default function LandingPage(): React.JSX.Element {
               {BENEFITS.map((b) => (
                 <div
                   key={b.key}
-                  className="group flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-md"
+                  className="group flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-md"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-xl transition-transform duration-200 group-hover:scale-110">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-xl transition-transform duration-200 group-hover:scale-110">
                     {b.icon}
                   </div>
                   <p className="text-sm font-medium text-gray-700">{t(b.key)}</p>
@@ -228,7 +221,7 @@ export default function LandingPage(): React.JSX.Element {
             <div className="flex items-start justify-between gap-2">
               {STEPS.map((s, i) => (
                 <div key={s} className="group flex flex-1 flex-col items-center text-center">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-cyan-500 text-sm font-bold text-white shadow-sm transition-transform duration-200 group-hover:scale-110">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-900 text-sm font-bold text-white shadow-sm transition-transform duration-200 group-hover:scale-110">
                     {i + 1}
                   </div>
                   <p className="mt-2 text-xs font-medium leading-tight text-gray-600">{t(s)}</p>
@@ -243,7 +236,7 @@ export default function LandingPage(): React.JSX.Element {
           <select
             value={lang}
             onChange={handleLangChange}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 shadow-sm focus:border-teal-400 focus:outline-none focus:ring-1 focus:ring-teal-300"
+            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 shadow-sm focus:border-brand-400 focus:outline-none focus:ring-1 focus:ring-brand-300"
           >
             <option value="">{t('pleaseSelect')}</option>
             {LANGUAGES.map((l) => (
@@ -256,19 +249,14 @@ export default function LandingPage(): React.JSX.Element {
       </div>
 
       {/* ── Right Panel (50%) — cross-fading real photos ───────────── */}
-      <div className="relative hidden w-1/2 overflow-hidden bg-gradient-to-br from-teal-900 to-cyan-900 md:flex">
+      <div className="relative hidden w-1/2 overflow-hidden bg-gradient-to-br from-ink to-brand-950 md:flex">
         {/* Real lifestyle photos cross-fade to feel like a looping video */}
         <div className="photo-scene ps-1 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMAGES[0]})` }} />
         <div className="photo-scene ps-2 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMAGES[1]})` }} />
         <div className="photo-scene ps-3 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMAGES[2]})` }} />
 
-        {/* Brand tint overlay (blue → purple → pink) over the photos */}
-        <div className="absolute inset-0 bg-gradient-to-br from-teal-800/80 via-cyan-700/65 to-emerald-600/70" />
-
-        {/* Moving light blobs */}
-        <div className="animate-blob absolute left-1/4 top-1/4 h-64 w-64 rounded-full bg-teal-400 opacity-30 mix-blend-screen blur-3xl" />
-        <div className="animate-blob animation-delay-2000 absolute bottom-1/3 right-1/4 h-72 w-72 rounded-full bg-teal-400 opacity-25 mix-blend-screen blur-3xl" />
-        <div className="animate-blob animation-delay-4000 absolute left-1/3 top-2/3 h-56 w-56 rounded-full bg-blue-300 opacity-20 mix-blend-screen blur-3xl" />
+        {/* Neutral scrim so the photos show naturally — just enough for text contrast */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/15 to-black/5" />
 
         {/* Cycling hero phrase */}
         <div

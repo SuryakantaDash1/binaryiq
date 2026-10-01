@@ -26,7 +26,7 @@ export default function CommunityPage(): React.JSX.Element {
       {/* Hero */}
       <div className="relative overflow-hidden rounded-2xl shadow-md">
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMG})` }} />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-teal-900/85 to-teal-800/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink via-brand-950/85 to-brand-800/20" />
         <div className="relative px-8 py-14 md:py-20">
           <h1 className="max-w-sm text-2xl font-black leading-snug text-white md:text-3xl">
             Welcome to your activities centre, where you will find content, contests and our latest news.
@@ -66,10 +66,10 @@ function NewsTab(): React.JSX.Element {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-2xl font-black text-teal-800">Today&apos;s Focus</h2>
+        <h2 className="text-2xl font-black text-brand-800">Today&apos;s Focus</h2>
         <button
           type="button"
-          className="rounded-full border border-teal-700 px-6 py-2 text-sm font-semibold text-teal-800 transition hover:bg-teal-50"
+          className="rounded-full border border-brand-700 px-6 py-2 text-sm font-semibold text-brand-800 transition hover:bg-brand-50"
         >
           Subscribe
         </button>
@@ -92,11 +92,11 @@ function NewsTab(): React.JSX.Element {
             </div>
             {/* Body */}
             <div className="flex flex-1 flex-col p-5">
-              <h3 className="text-lg font-bold leading-snug text-teal-800">
+              <h3 className="text-lg font-bold leading-snug text-brand-800">
                 {n.emoji} {n.title}
               </h3>
               <div className="mt-3 flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-teal-700 to-teal-900 text-[10px] font-bold text-white">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-brand-700 to-brand-900 text-[10px] font-bold text-white">
                   In
                 </span>
                 <span className="text-xs text-gray-500">{n.date}</span>
@@ -119,7 +119,7 @@ function NewsTab(): React.JSX.Element {
             <span
               key={i}
               className={`flex h-9 min-w-9 items-center justify-center rounded-md px-3 text-sm font-semibold ${
-                p === '1' ? 'bg-teal-800 text-white' : 'text-teal-800'
+                p === '1' ? 'bg-brand-800 text-white' : 'text-brand-800'
               }`}
             >
               {p}
@@ -134,7 +134,7 @@ function NewsTab(): React.JSX.Element {
 function ContestsTab(): React.JSX.Element {
   return (
     <div>
-      <h2 className="text-2xl font-black text-teal-800">Latest Contests</h2>
+      <h2 className="text-2xl font-black text-brand-800">Latest Contests</h2>
       <p className="mt-3 text-gray-600">
         Participate in our contests to have some much needed fun, while earning some bonus points!
       </p>
@@ -158,7 +158,7 @@ function ForumTab(): React.JSX.Element {
 
   return (
     <div>
-      <h2 className="text-2xl font-black text-teal-800">Community Discussions</h2>
+      <h2 className="text-2xl font-black text-brand-800">Community Discussions</h2>
       <p className="mt-3 text-gray-600">Join in to share your thoughts and debate the topics that matter to you!</p>
 
       {/* Search */}
@@ -167,7 +167,7 @@ function ForumTab(): React.JSX.Element {
           <input
             type="search"
             placeholder="Search"
-            className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 pr-10 text-sm text-gray-700 outline-none focus:border-teal-700"
+            className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 pr-10 text-sm text-gray-700 outline-none focus:border-brand-700"
           />
           <Search className="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
         </div>
@@ -181,7 +181,7 @@ function ForumTab(): React.JSX.Element {
             type="button"
             onClick={() => setSub(s.key)}
             className={`-mb-px border-b-2 pb-3 text-sm font-semibold transition ${
-              sub === s.key ? 'border-teal-800 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-800'
+              sub === s.key ? 'border-brand-800 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-800'
             }`}
           >
             {s.label}
@@ -199,7 +199,7 @@ function ForumTab(): React.JSX.Element {
                   key={c.id}
                   className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
                 >
-                  <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal-700 to-teal-900 text-white">
+                  <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-700 to-brand-900 text-white">
                     <FolderClosed className="h-6 w-6" />
                   </span>
                   <div className="flex-1">

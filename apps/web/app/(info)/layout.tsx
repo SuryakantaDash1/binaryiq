@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function InfoLayout({
@@ -9,18 +10,10 @@ export default function InfoLayout({
     <div className="flex min-h-screen flex-col bg-gray-50">
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-teal-700 to-teal-900 text-white">
-              <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <div className="leading-tight">
-              <p className="text-base font-bold text-gray-900">Influencers</p>
-              <p className="text-[10px] text-gray-500">surveys &amp; rewards</p>
-            </div>
+          <Link href="/" className="flex items-center">
+            <Image src="/BinaryIQ_logo.svg" alt="BinaryIQ" width={1600} height={420} className="h-9 w-auto" />
           </Link>
-          <Link href="/" className="text-sm font-medium text-teal-800 hover:underline">
+          <Link href="/" className="text-sm font-medium text-brand-800 hover:underline">
             ← Home
           </Link>
         </div>

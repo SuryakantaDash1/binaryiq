@@ -173,7 +173,7 @@ export function CommunityNotificationSettings(): React.JSX.Element {
   return (
     <div>
       <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-        <h2 className="text-2xl font-black text-teal-800">Notification Settings</h2>
+        <h2 className="text-2xl font-black text-brand-800">Notification Settings</h2>
         {/* Channel column headers */}
         <div className="grid grid-cols-4 gap-6 md:gap-8">
           {CHANNELS.map((c) => {
@@ -204,7 +204,7 @@ export function CommunityNotificationSettings(): React.JSX.Element {
         <div className="mt-8 space-y-10">
           {SECTIONS.map((section) => (
             <div key={section.title}>
-              <h3 className="mb-2 text-lg font-bold text-teal-800">{section.title}</h3>
+              <h3 className="mb-2 text-lg font-bold text-brand-800">{section.title}</h3>
               <div className="divide-y divide-gray-100">
                 {section.rows.map((row) => {
                   const prefs = state[row.key] ?? emptyPrefs();
@@ -224,7 +224,7 @@ export function CommunityNotificationSettings(): React.JSX.Element {
                               type="checkbox"
                               checked={prefs[c.key]}
                               onChange={() => toggle(row.key, c.key)}
-                              className="h-5 w-5 cursor-pointer rounded border-gray-300 text-teal-800 accent-teal-800 focus:ring-teal-700"
+                              className="h-5 w-5 cursor-pointer rounded border-gray-300 text-brand-800 accent-brand-800 focus:ring-brand-700"
                             />
                           </label>
                         ))}
@@ -241,11 +241,11 @@ export function CommunityNotificationSettings(): React.JSX.Element {
               type="button"
               onClick={() => void handleSave()}
               disabled={saving}
-              className="rounded-full bg-teal-800 px-10 py-3 text-sm font-bold tracking-wide text-white transition hover:bg-teal-900 disabled:opacity-60"
+              className="rounded-full bg-brand-800 px-10 py-3 text-sm font-bold tracking-wide text-white transition hover:bg-brand-900 disabled:opacity-60"
             >
               {saving ? 'Saving…' : 'Save'}
             </button>
-            {saved && <span className="text-sm font-medium text-teal-800">Saved ✓</span>}
+            {saved && <span className="text-sm font-medium text-brand-800">Saved ✓</span>}
           </div>
         </div>
       )}

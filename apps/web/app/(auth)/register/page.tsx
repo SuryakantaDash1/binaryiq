@@ -20,9 +20,9 @@ import { useAuthPanel } from '@/features/auth/AuthPanel.js';
 type Step = 1 | 2 | 'done';
 
 const INPUT =
-  'h-12 w-full rounded-lg border border-gray-300 px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-teal-400 focus:outline-none focus:ring-1 focus:ring-teal-300';
+  'h-12 w-full rounded-lg border border-gray-300 px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-400 focus:outline-none focus:ring-1 focus:ring-brand-300';
 const PINK_BTN =
-  'rounded-full bg-teal-800 px-9 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-teal-900 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60';
+  'rounded-full bg-brand-800 px-9 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-brand-900 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60';
 const BLUE_BTN =
   'rounded-full bg-blue-500 px-9 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-600 active:scale-95';
 
@@ -36,7 +36,7 @@ const COUNTRIES = [
 
 const GENDERS = [
   { value: 'MALE', symbol: '♂', color: 'text-blue-500', labelKey: 'male' },
-  { value: 'FEMALE', symbol: '♀', color: 'text-teal-500', labelKey: 'female' },
+  { value: 'FEMALE', symbol: '♀', color: 'text-rose-500', labelKey: 'female' },
   { value: 'OTHER', symbol: '⚧', color: 'text-purple-500', labelKey: 'other' },
   { value: 'PREFER_NOT_TO_SAY', symbol: '?', color: 'text-gray-400', labelKey: 'preferNotToSay' },
 ] as const;
@@ -74,7 +74,7 @@ export default function RegisterPage(): React.JSX.Element {
       {step === 2 && <Heading level={3}>{t('accountStep')}</Heading>}
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-teal-500 to-cyan-500 transition-all duration-300"
+          className="h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-900 transition-all duration-300"
           style={{ width: step === 1 ? '50%' : '100%' }}
         />
       </div>
@@ -437,7 +437,7 @@ function Step2Form({
       </Field>
 
       <Field label={t('mobileLabel')} error={errors.mobile?.message}>
-        <div className="flex h-12 items-center rounded-lg border border-gray-300 focus-within:border-teal-400 focus-within:ring-1 focus-within:ring-teal-300">
+        <div className="flex h-12 items-center rounded-lg border border-gray-300 focus-within:border-brand-400 focus-within:ring-1 focus-within:ring-brand-300">
           <span className="pl-4 pr-2 text-sm font-semibold text-gray-700">+91</span>
           <input
             className="h-full flex-1 rounded-r-lg bg-transparent pr-4 text-sm placeholder:text-gray-400 focus:outline-none"
@@ -454,7 +454,7 @@ function Step2Form({
           type="checkbox"
           checked={sms}
           onChange={(e) => setSms(e.target.checked)}
-          className="h-4 w-4 rounded border-gray-300 text-teal-800 focus:ring-teal-400"
+          className="h-4 w-4 rounded border-gray-300 text-brand-800 focus:ring-brand-400"
         />
         {t('smsConsent')}
       </label>
@@ -487,7 +487,7 @@ function Field({
     <div>
       <label className="mb-1.5 block text-sm font-medium text-blue-500">
         {label}
-        {required && <span className="text-teal-800"> *</span>}
+        {required && <span className="text-brand-800"> *</span>}
       </label>
       {children}
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
@@ -513,7 +513,7 @@ function GenderCard({
       type="button"
       onClick={onClick}
       className={`flex min-h-[84px] flex-col items-center justify-center gap-1.5 rounded-xl border-2 px-1 py-3 text-center transition ${
-        active ? 'border-teal-500 bg-teal-50 shadow-sm' : 'border-gray-200 hover:border-gray-300'
+        active ? 'border-brand-500 bg-brand-50 shadow-sm' : 'border-gray-200 hover:border-gray-300'
       }`}
     >
       <span className={`text-2xl leading-none ${color}`}>{symbol}</span>

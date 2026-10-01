@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 420" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 420" role="img" aria-labelledby="title desc">
   <title id="title">BinaryIQ premium technology logo</title>
   <desc id="desc">A refined fingerprint and circuit mark beside the BinaryIQ wordmark.</desc>
 
@@ -60,7 +60,7 @@
 
   <!-- Geometric wordmark -->
   <g font-family="Avenir Next, Montserrat, Poppins, Segoe UI, Arial, sans-serif"
-     font-size="128" font-weight="600" letter-spacing="-4">
-    <text x="390" y="260" fill="url(#brand)">Binary<tspan fill="#582C9F" dx="3">IQ</tspan></text>
+     font-size="250" font-weight="600" letter-spacing="-5">
+    <text x="370" y="265" fill="url(#brand)">Binary<tspan fill="#582C9F" dx="5">IQ</tspan></text>
   </g>
 </svg>

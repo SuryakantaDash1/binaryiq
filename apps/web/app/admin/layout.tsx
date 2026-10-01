@@ -15,6 +15,7 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
@@ -89,11 +90,16 @@ export default function AdminLayout({ children }: { children: ReactNode }): Reac
   return (
     <div className="min-h-screen bg-[#f6f8f9]">
       {/* Sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-white/10 bg-[#0b0a14] md:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-white/10 bg-ink md:flex">
         <div className="flex h-16 shrink-0 items-center justify-center border-b border-white/10 px-5">
-          <span className="bg-gradient-to-r from-teal-300 via-white to-teal-300 bg-clip-text text-xl font-black tracking-tight text-transparent">
-            BinaryIQ
-          </span>
+          <Image
+            src="/BinaryIQ_logo.svg"
+            alt="BinaryIQ"
+            width={1600}
+            height={420}
+            priority
+            className="h-9 w-auto"
+          />
         </div>
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
           {NAV.map((n) => {
@@ -105,7 +111,7 @@ export default function AdminLayout({ children }: { children: ReactNode }): Reac
                 href={n.href}
                 className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                   active
-                    ? 'bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-sm'
+                    ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-sm'
                     : 'text-white/55 hover:bg-white/5 hover:text-white'
                 }`}
               >
@@ -121,7 +127,7 @@ export default function AdminLayout({ children }: { children: ReactNode }): Reac
       {/* Main column */}
       <div className="md:pl-64">
         {/* Top bar */}
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-4 border-b border-black/20 bg-[#0b0a14] px-5 md:px-8">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-4 border-b border-black/20 bg-ink px-5 md:px-8">
           {/* Page title — shown on desktop */}
           <div className="hidden min-w-0 md:block">
             <h1 className="truncate text-lg font-bold leading-tight text-white">{current?.label}</h1>
@@ -135,7 +141,7 @@ export default function AdminLayout({ children }: { children: ReactNode }): Reac
                 key={n.href}
                 href={n.href}
                 className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium ${
-                  isActive(n.href) ? 'bg-teal-500 text-white' : 'text-white/50'
+                  isActive(n.href) ? 'bg-brand-500 text-white' : 'text-white/50'
                 }`}
               >
                 {n.label}
@@ -151,7 +157,7 @@ export default function AdminLayout({ children }: { children: ReactNode }): Reac
                 onClick={() => setMenuOpen((o) => !o)}
                 className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 py-1 pl-1 pr-2.5 transition hover:bg-white/10"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-teal-700 text-xs font-bold text-white">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-xs font-bold text-white">
                   {initials(admin.name)}
                 </span>
                 <span className="hidden text-sm font-semibold text-white sm:block">{admin.name}</span>
@@ -163,7 +169,7 @@ export default function AdminLayout({ children }: { children: ReactNode }): Reac
                   <div className="border-b border-border px-4 py-3">
                     <p className="truncate text-sm font-semibold text-text">{admin.name}</p>
                     <p className="truncate text-xs text-secondary">{admin.email}</p>
-                    <span className="mt-2 inline-block rounded-full bg-teal-50 px-2 py-0.5 text-[11px] font-semibold text-teal-800">
+                    <span className="mt-2 inline-block rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-800">
                       {admin.role.replace('_', ' ')}
                     </span>
                   </div>

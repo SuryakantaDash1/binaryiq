@@ -11,7 +11,7 @@ export default function TermsPage(): React.JSX.Element {
         Program&quot;) or participating in any survey or study provided or hosted by Influencers
         (each, a &quot;Survey&quot; and collectively &quot;Surveys&quot;), you agree to these Terms of
         Use and Membership (&quot;Terms&quot;) and confirm that you have read and understood our{' '}
-        <a href="/privacy" className="text-teal-800 underline">Privacy Policy</a>, which sets out how
+        <a href="/privacy" className="text-brand-800 underline">Privacy Policy</a>, which sets out how
         Influencers collects, uses and stores your personal information.
       </p>
       <p>If you do not agree to the Terms and the Privacy Policy, do not use this Site.</p>
@@ -210,7 +210,7 @@ export default function TermsPage(): React.JSX.Element {
       <Section heading="Cancelling Your Account">
         <p>
           You may cancel your account at any time by contacting us via our{' '}
-          <a href="/contact" className="text-teal-800 underline">Contact Us</a> page, or by going to
+          <a href="/contact" className="text-brand-800 underline">Contact Us</a> page, or by going to
           your Account settings and selecting the &quot;Unsubscribe&quot; option. Upon closing your
           account, your right to access the Points Program will cease and all Points credited to your
           account will be forfeited. We may terminate your account at any time for any reason.
@@ -239,7 +239,7 @@ export default function TermsPage(): React.JSX.Element {
           We may give you notices by posting them on this Site or by e-mail to any address you provide
           during registration. You agree to keep your address current and to check for notices posted on
           the Site. Notices to us should be sent via our{' '}
-          <a href="/contact" className="text-teal-800 underline">Contact Us</a> page.
+          <a href="/contact" className="text-brand-800 underline">Contact Us</a> page.
         </p>
       </Section>
 
@@ -256,7 +256,7 @@ export default function TermsPage(): React.JSX.Element {
       <Section heading="Complaints, Feedback & Copyright">
         <p>
           If you have a complaint of any nature, or an issue with the content of any survey, please
-          contact us via our <a href="/contact" className="text-teal-800 underline">Contact Us</a> page.
+          contact us via our <a href="/contact" className="text-brand-800 underline">Contact Us</a> page.
           You should not contact any of our clients or the sponsors of any survey directly. If you
           believe your work has been reproduced on this Site in a way that constitutes copyright
           infringement, please notify us with the relevant details so we can investigate.
