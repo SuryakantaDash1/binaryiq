@@ -2,7 +2,6 @@
 
 import {
   BarChart3,
-  Bell,
   ClipboardList,
   Gamepad2,
   Gift,
@@ -19,6 +18,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { NotificationBell } from '@/features/notifications/NotificationBell';
 import { accountApi } from '@/lib/api/account';
 import { authApi } from '@/lib/api/auth';
 
@@ -80,11 +80,13 @@ export function AppHeader(): React.JSX.Element {
               🪙 {points.toLocaleString()}
             </span>
           )}
-          <button type="button" aria-label="Notifications" className="text-gray-400 transition hover:text-gray-700">
-            <Bell className="h-5 w-5" />
-          </button>
-          <Link href="/account/profile" aria-label="Account" className="text-gray-400 transition hover:text-gray-700">
-            <UserCircle2 className="h-6 w-6" />
+          <NotificationBell />
+          <Link
+            href="/account/profile"
+            aria-label="Account"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-brand-200 bg-brand-50 text-brand-700 transition hover:border-brand-300 hover:bg-brand-100 hover:text-brand-900"
+          >
+            <User className="h-5 w-5" />
           </Link>
         </div>
       </header>
