@@ -1,4 +1,4 @@
-import { createHmac } from 'node:crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 
 import { type SurveyType, Prisma } from '@influencer/db';
 import type { TargetingCriteria } from '@influencer/types';
@@ -76,14 +76,10 @@ export class MatchingService {
     ]);
 
     let ageYears: number | null = null;
-    if (profile?.dobEnc) {
-      try {
-        const dob = new Date(this.encryption.decrypt(profile.dobEnc));
-        const ageDiff = Date.now() - dob.getTime();
-        ageYears = Math.floor(ageDiff / (1000 * 60 * 60 * 24 * 365.25));
-      } catch {
-        // encryption not configured in dev — ignore
-      }
+    const dobStr = this.encryption.decryptOptional(profile?.dobEnc);
+    if (dobStr) {
+      const ageDiff = Date.now() - new Date(dobStr).getTime();
+      ageYears = Math.floor(ageDiff / (1000 * 60 * 60 * 24 * 365.25));
     }
 
     return {
@@ -94,7 +90,7 @@ export class MatchingService {
       areaType: address?.areaType ?? null,
       educationLevel: demographics?.educationLevel ?? null,
       employmentType: demographics?.employmentType ?? null,
-      incomeBracket: demographics?.incomeBracket ?? null,
+      incomeBracket: this.encryption.decryptOptional(demographics?.incomeBracketEnc),
       profileCategoryCount: categoryCount,
       interests: [], // loaded from profile survey responses in a future iteration
     };
@@ -167,20 +163,25 @@ export class MatchingService {
     return Buffer.from(`${payload}:${sig}`).toString('base64url');
   }
 
-  verifyReturnToken(token: string, secret: string): { userId: string; surveyId: string; responseId: string } | null {
+  verifyReturnToken(
+    token: string,
+    secret: string,
+  ): { userId: string; surveyId: string; responseId: string; issuedAt: number } | null {
     try {
       const decoded = Buffer.from(token, 'base64url').toString('utf8');
       const parts = decoded.split(':');
-      if (parts.length < 5) return null;
+      if (parts.length !== 5) return null;
       const userId = parts[0];
       const surveyId = parts[1];
       const responseId = parts[2];
+      const issuedAt = Number(parts[3]);
       const sig = parts[4];
-      if (!userId || !surveyId || !responseId || !sig) return null;
+      if (!userId || !surveyId || !responseId || !sig || !Number.isFinite(issuedAt)) return null;
       const payload = parts.slice(0, 4).join(':');
-      const expected = createHmac('sha256', secret).update(payload).digest('hex');
-      if (sig !== expected) return null;
-      return { userId, surveyId, responseId };
+      const expected = Buffer.from(createHmac('sha256', secret).update(payload).digest('hex'));
+      const given = Buffer.from(sig);
+      if (given.length !== expected.length || !timingSafeEqual(given, expected)) return null;
+      return { userId, surveyId, responseId, issuedAt };
     } catch {
       return null;
     }

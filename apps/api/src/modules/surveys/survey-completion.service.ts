@@ -6,8 +6,14 @@ import {
   NotFoundException,
   UnprocessableException,
 } from '../../common/exceptions/domain.exception';
+import { AppConfigService } from '../../config/config.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PointsService } from '../points/points.service';
+
+import { MatchingService } from './matching.service';
+
+/** Floor on how quickly a survey can be finished, to stop instant start→complete scripting. */
+const MIN_COMPLETION_MS = 30_000;
 
 @Injectable()
 export class SurveyCompletionService {
@@ -16,13 +22,23 @@ export class SurveyCompletionService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly points: PointsService,
+    private readonly matching: MatchingService,
+    private readonly config: AppConfigService,
   ) {}
 
   async complete(
     userId: string,
     surveyId: string,
+    returnToken: string,
     outcome: 'completed' | 'disqualified',
   ): Promise<CompleteSurveyResult> {
+    // The token is HMAC-signed at start and bound to this user, survey and response —
+    // points can't be claimed for a survey that wasn't started through the API.
+    const claims = this.matching.verifyReturnToken(returnToken, this.config.get('SURVEY_CALLBACK_SECRET'));
+    if (!claims || claims.userId !== userId || claims.surveyId !== surveyId) {
+      throw new UnprocessableException('invalid_return_token');
+    }
+
     return this.prisma.$transaction(async (tx) => {
       const survey = await tx.survey.findUnique({ where: { id: surveyId } });
       if (!survey || !survey.isActive) {
@@ -32,12 +48,23 @@ export class SurveyCompletionService {
         throw new UnprocessableException('survey_expired');
       }
 
-      // Idempotency: check existing response
       const existing = await tx.surveyResponse.findUnique({
         where: { userId_surveyId: { userId, surveyId } },
       });
       if (existing?.status === 'completed') {
         throw new ConflictException('already_completed');
+      }
+      // Must match the latest token issued for an in-progress response.
+      if (!existing || existing.id !== claims.responseId || existing.status !== 'started' || existing.returnToken !== returnToken) {
+        throw new UnprocessableException('invalid_return_token');
+      }
+
+      // External surveys take real time to answer; in-app surveys have no questionnaire yet.
+      if (outcome === 'completed' && survey.externalUrl) {
+        const minMs = Math.max(MIN_COMPLETION_MS, (survey.estimatedMins ?? 0) * 60_000 * 0.25);
+        if (Date.now() - claims.issuedAt < minMs) {
+          throw new UnprocessableException('completed_too_quickly');
+        }
       }
 
       if (outcome === 'disqualified') {

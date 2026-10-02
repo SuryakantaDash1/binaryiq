@@ -156,6 +156,8 @@ model User {
   createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
+  /// Set when the erasure purge has anonymised this account (DPDP s.12).
+  purgedAt     DateTime? @map("purged_at") @db.Timestamptz(6)
 
   profile         UserProfile?
   address         UserAddress?
@@ -215,11 +217,13 @@ model UserDemographics {
   userId          String   @unique @map("user_id") @db.Uuid
   educationLevel  String?  @map("education_level")
   employmentType  String?  @map("employment_type")
-  incomeBracket   String?  @map("income_bracket")
-  householdSize   Int?     @map("household_size")
-  childrenCount   Int?     @map("children_count")
-  chiefWageEarner Boolean? @map("chief_wage_earner")
-  assets          Json?    @db.JsonB
+  /// AES-256-GCM ciphertext (EncryptionService).
+  incomeBracketEnc String?  @map("income_bracket")
+  householdSize    Int?     @map("household_size")
+  childrenCount    Int?     @map("children_count")
+  chiefWageEarner  Boolean? @map("chief_wage_earner")
+  /// Encrypted JSON envelope { v, ct } (EncryptionService.encryptJson).
+  assetsEnc        Json?    @map("assets") @db.JsonB
   createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -230,7 +234,8 @@ model UserDemographics {
 model PaypalAccount {
   id          String    @id @default(uuid()) @db.Uuid
   userId      String    @unique @map("user_id") @db.Uuid
-  paypalEmail String    @map("paypal_email")
+  /// AES-256-GCM ciphertext (EncryptionService).
+  paypalEmailEnc String @map("paypal_email")
   verifiedAt  DateTime? @map("verified_at") @db.Timestamptz(6)
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
@@ -244,7 +249,8 @@ model AuthToken {
   userId    String        @map("user_id") @db.Uuid
   token     String        @unique
   tokenType AuthTokenType @map("token_type")
-  payload   Json?         @db.JsonB
+  /// Encrypted JSON envelope { v, ct } (EncryptionService.encryptJson).
+  payloadEnc Json?        @map("payload") @db.JsonB
   expiresAt DateTime      @map("expires_at") @db.Timestamptz(6)
   usedAt    DateTime?     @map("used_at") @db.Timestamptz(6)
   createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -514,7 +520,8 @@ model ProfileSurveyResponse {
   id            String                @id @default(uuid()) @db.Uuid
   userId        String                @map("user_id") @db.Uuid
   categoryId    String                @map("category_id") @db.Uuid
-  responses     Json                  @db.JsonB
+  /// Encrypted JSON envelope { v, ct } — raw answers include health/income data.
+  responsesEnc  Json                  @map("responses") @db.JsonB
   pointsAwarded Int                   @map("points_awarded")
   createdAt     DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
   user          User                  @relation(fields: [userId], references: [id], onDelete: Cascade)

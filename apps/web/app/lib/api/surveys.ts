@@ -43,10 +43,10 @@ export const surveysApi = {
   start(id: string): Promise<StartResult> {
     return apiFetch(`/surveys/${id}/start`, { method: 'POST' });
   },
-  complete(id: string, status?: 'completed' | 'disqualified'): Promise<CompleteResult> {
+  complete(id: string, returnToken: string, status?: 'completed' | 'disqualified'): Promise<CompleteResult> {
     return apiFetch(`/surveys/${id}/complete`, {
       method: 'POST',
-      body: status ? { status } : {},
+      body: status ? { returnToken, status } : { returnToken },
     });
   },
 };

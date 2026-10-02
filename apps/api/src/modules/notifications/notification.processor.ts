@@ -6,11 +6,15 @@ import type { Job } from 'bullmq';
 import { PrismaService } from '../../prisma/prisma.service';
 import { QUEUES, type SendNotificationJob } from '../../queue/queue.constants';
 
-import { ConsoleEmailProvider } from './email.provider';
+import { EmailProvider } from './email.provider';
 import { PUSH_PROVIDER, type PushProvider } from './providers/push.provider';
 import { SMS_PROVIDER, type SmsProvider } from './providers/sms.provider';
 import { WHATSAPP_PROVIDER, type WhatsAppProvider } from './providers/whatsapp.provider';
 import { TemplateRegistry } from './template.registry';
+
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] ?? c);
+}
 
 @Processor(QUEUES.NOTIFICATIONS)
 export class NotificationProcessor extends WorkerHost {
@@ -19,7 +23,7 @@ export class NotificationProcessor extends WorkerHost {
   constructor(
     private readonly prisma: PrismaService,
     private readonly templates: TemplateRegistry,
-    private readonly emailProvider: ConsoleEmailProvider,
+    private readonly emailProvider: EmailProvider,
     @Inject(SMS_PROVIDER) private readonly smsProvider: SmsProvider,
     @Inject(PUSH_PROVIDER) private readonly pushProvider: PushProvider,
     @Inject(WHATSAPP_PROVIDER) private readonly whatsappProvider: WhatsAppProvider,
@@ -31,7 +35,7 @@ export class NotificationProcessor extends WorkerHost {
     const { notificationId, channel } = job.data;
     const n = await this.prisma.notification.findUnique({
       where: { id: notificationId },
-      include: { user: { select: { email: true, phoneEnc: true } } },
+      include: { user: { select: { email: true } } },
     });
     if (!n) return;
     if (n.status !== 'QUEUED') return;
@@ -43,7 +47,8 @@ export class NotificationProcessor extends WorkerHost {
 
       switch (channel as NotificationChannel) {
         case 'EMAIL':
-          await this.emailProvider.send({ to: n.user.email, subject: tpl.subject ?? n.title ?? 'Notification', html: `<p>${tpl.body}</p>` });
+          // Body can carry free text (e.g. a support reply) — escape before embedding in HTML.
+          await this.emailProvider.send({ to: n.user.email, subject: tpl.subject ?? n.title ?? 'Notification', html: `<p>${escapeHtml(tpl.body)}</p>` });
           providerMessageId = `email-${n.id}`;
           break;
         case 'SMS':
@@ -66,7 +71,9 @@ export class NotificationProcessor extends WorkerHost {
         data: { status: 'SENT', sentAt: new Date(), metadata: { ...(n.metadata as object), providerMessageId } },
       });
     } catch (err) {
-      this.logger.error(`Notification ${notificationId} send failed (attempt ${job.attemptsMade + 1})`, err);
+      this.logger.error(
+        `Notification ${notificationId} send failed (attempt ${job.attemptsMade + 1}): ${(err as Error).message}`,
+      );
       const lastAttempt = job.attemptsMade + 1 >= (job.opts.attempts ?? 1);
       if (lastAttempt) {
         await this.prisma.notification.update({ where: { id: n.id }, data: { status: 'FAILED' } });

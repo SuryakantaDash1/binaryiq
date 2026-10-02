@@ -10,7 +10,7 @@ export interface SmsProvider {
 export class NoopSmsProvider implements SmsProvider {
   private readonly logger = new Logger('SMS');
   send(msg: SmsMessage): Promise<{ providerMessageId: string }> {
-    this.logger.log(`[NOOP SMS] To: ${msg.to} — ${msg.body.slice(0, 60)}`);
+    this.logger.log(`[NOOP SMS] not sent (${msg.body.length} chars)`);
     return Promise.resolve({ providerMessageId: `noop-sms-${Date.now()}` });
   }
 }

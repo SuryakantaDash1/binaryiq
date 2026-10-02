@@ -89,7 +89,7 @@ export class AccountService {
         userId,
         token,
         tokenType: 'EMAIL_CHANGE',
-        payload: { newEmail },
+        payloadEnc: this.enc.encryptJson({ newEmail }),
         expiresAt: new Date(Date.now() + EMAIL_CHANGE_TTL_MS),
       },
     });
@@ -112,7 +112,7 @@ export class AccountService {
     if (record.userId !== userId) throw new NotFoundException('Token not found');
     if (record.expiresAt.getTime() < Date.now()) throw new UnprocessableException('Token has expired');
 
-    const payload = record.payload as { newEmail: string };
+    const payload = this.enc.decryptJson<{ newEmail: string }>(record.payloadEnc);
     const conflict = await this.prisma.user.findUnique({ where: { email: payload.newEmail } });
     if (conflict) throw new ConflictException('Email was taken in the interim');
 
@@ -121,7 +121,8 @@ export class AccountService {
       await tx.authToken.update({ where: { id: record.id }, data: { usedAt: new Date() } });
     });
 
-    await this.auditLog(userId, 'email.change', { newEmail: payload.newEmail }, ip);
+    // Never write the address itself into the (long-retained) audit trail.
+    await this.auditLog(userId, 'email.change', {}, ip);
     return { email: payload.newEmail };
   }
 
@@ -139,13 +140,14 @@ export class AccountService {
   }
 
   async updatePaypal(userId: string, input: UpdatePaypalInput, ip: string | null = null) {
+    const paypalEmailEnc = this.enc.encrypt(input.paypalEmail);
     const paypal = await this.prisma.paypalAccount.upsert({
       where: { userId },
-      create: { userId, paypalEmail: input.paypalEmail },
-      update: { paypalEmail: input.paypalEmail },
+      create: { userId, paypalEmailEnc },
+      update: { paypalEmailEnc },
     });
-    await this.auditLog(userId, 'paypal.update', { paypalEmail: '***' }, ip);
-    return { paypalEmail: paypal.paypalEmail, verifiedAt: paypal.verifiedAt };
+    await this.auditLog(userId, 'paypal.update', {}, ip);
+    return { paypalEmail: input.paypalEmail, verifiedAt: paypal.verifiedAt };
   }
 
   async getAboutYou(userId: string) {
@@ -155,7 +157,7 @@ export class AccountService {
     ]);
     return {
       address: {
-        line1: address?.line1Enc ? this.enc.decrypt(address.line1Enc) : null,
+        line1: this.enc.decryptOptional(address?.line1Enc),
         city: address?.city ?? null,
         pinCode: address?.pinCode ?? null,
         areaType: address?.areaType ?? null,
@@ -163,11 +165,11 @@ export class AccountService {
       demographics: {
         educationLevel: demographics?.educationLevel ?? null,
         employmentType: demographics?.employmentType ?? null,
-        incomeBracket: demographics?.incomeBracket ? this.enc.decrypt(demographics.incomeBracket) : null,
+        incomeBracket: this.enc.decryptOptional(demographics?.incomeBracketEnc),
         householdSize: demographics?.householdSize ?? null,
         childrenCount: demographics?.childrenCount ?? null,
         chiefWageEarner: demographics?.chiefWageEarner ?? null,
-        assets: demographics?.assets ?? null,
+        assets: this.enc.decryptJsonOptional<Record<string, unknown>>(demographics?.assetsEnc),
       },
     };
   }
@@ -199,20 +201,20 @@ export class AccountService {
             userId,
             educationLevel: input.demographics.educationLevel,
             employmentType: input.demographics.employmentType,
-            incomeBracket: input.demographics.incomeBracket ? this.enc.encrypt(input.demographics.incomeBracket) : undefined,
+            incomeBracketEnc: input.demographics.incomeBracket ? this.enc.encrypt(input.demographics.incomeBracket) : undefined,
             householdSize: input.demographics.householdSize,
             childrenCount: input.demographics.childrenCount,
             chiefWageEarner: input.demographics.chiefWageEarner,
-            assets: input.demographics.assets ?? undefined,
+            assetsEnc: input.demographics.assets ? this.enc.encryptJson(input.demographics.assets) : undefined,
           },
           update: {
             educationLevel: input.demographics.educationLevel ?? undefined,
             employmentType: input.demographics.employmentType ?? undefined,
-            incomeBracket: input.demographics.incomeBracket ? this.enc.encrypt(input.demographics.incomeBracket) : undefined,
+            incomeBracketEnc: input.demographics.incomeBracket ? this.enc.encrypt(input.demographics.incomeBracket) : undefined,
             householdSize: input.demographics.householdSize ?? undefined,
             childrenCount: input.demographics.childrenCount ?? undefined,
             chiefWageEarner: input.demographics.chiefWageEarner ?? undefined,
-            assets: input.demographics.assets ?? undefined,
+            assetsEnc: input.demographics.assets ? this.enc.encryptJson(input.demographics.assets) : undefined,
           },
         });
       }

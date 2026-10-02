@@ -1,6 +1,5 @@
 import { Global, Module } from '@nestjs/common';
 
-import { ConsoleEmailProvider, EmailProvider } from '../notifications/email.provider';
 import { PointsModule } from '../points/points.module';
 
 import { AuthController } from './auth.controller';
@@ -15,11 +14,7 @@ import { TokenService } from './token.service';
 @Module({
   imports: [PointsModule],
   controllers: [AuthController],
-  providers: [
-    TokenService,
-    AuthService,
-    { provide: EmailProvider, useClass: ConsoleEmailProvider },
-  ],
+  providers: [TokenService, AuthService],
   exports: [TokenService],
 })
 export class AuthModule {}

@@ -6,6 +6,7 @@ import { AuthGuard } from './common/guards/auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { SecurityHeadersMiddleware } from './common/middleware/security-headers.middleware';
+import { EncryptionModule } from './common/services/encryption.module';
 import { AppConfigModule } from './config/config.module';
 import { HealthModule } from './health/health.module';
 import { AccountModule } from './modules/account/account.module';
@@ -15,6 +16,7 @@ import { CommunityModule } from './modules/community/community.module';
 import { DataRightsModule } from './modules/data-rights/data-rights.module';
 import { GamesModule } from './modules/games/games.module';
 import { NewsModule } from './modules/news/news.module';
+import { EmailModule } from './modules/notifications/email.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { PointsModule } from './modules/points/points.module';
 import { PollsModule } from './modules/polls/polls.module';
@@ -29,7 +31,7 @@ import { RedisModule } from './redis/redis.module';
 @Module({
   imports: [
     ThrottlerModule.forRoot([{ limit: 100, ttl: 60000 }]),
-    AppConfigModule, PrismaModule, RedisModule,
+    AppConfigModule, PrismaModule, RedisModule, EncryptionModule, EmailModule,
     QueueModule,
     AuthModule, PointsModule, HealthModule,
     AccountModule, ProfileSurveysModule, RewardsModule, SurveysModule, PollsModule, GamesModule,

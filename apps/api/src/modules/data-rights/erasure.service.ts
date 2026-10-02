@@ -1,22 +1,22 @@
 import type { ErasureInput } from '@influencer/types';
-import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, Logger } from '@nestjs/common';
-import { Queue } from 'bullmq';
 
 import { PrismaService } from '../../prisma/prisma.service';
-import { JOBS, QUEUES, type ErasurePurgeJob } from '../../queue/queue.constants';
 
-const GRACE_PERIOD_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+import { ERASURE_GRACE_MS } from './erasure.processor';
 
 @Injectable()
 export class ErasureService {
   private readonly logger = new Logger(ErasureService.name);
 
-  constructor(
-    private readonly prisma: PrismaService,
-    @InjectQueue(QUEUES.ERASURE) private readonly erasureQueue: Queue,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Stage 1: lock the account immediately. Stage 2 (permanent purge of all
+   * personal data) runs from the daily erasure sweep once the grace period ends,
+   * driven by `deletedAt` in the database — not by a long-lived queued job that a
+   * Redis flush could lose.
+   */
   async requestErasure(
     userId: string,
     _dto: ErasureInput,
@@ -24,16 +24,14 @@ export class ErasureService {
   ): Promise<{ status: string; purgeEligibleAt: string }> {
     const now = new Date();
 
-    // Stage 1: Soft delete — set deletedAt, lock account
     await this.prisma.user.update({
       where: { id: userId },
       data: { deletedAt: now, isActive: false },
     });
 
-    // Revoke all sessions (delete auth tokens)
+    // Pending verify/reset/email-change tokens are useless now.
     await this.prisma.authToken.deleteMany({ where: { userId } });
 
-    // Audit log
     await this.prisma.auditLog.create({
       data: {
         actorType: 'user',
@@ -45,19 +43,7 @@ export class ErasureService {
       },
     });
 
-    // Enqueue purge job with grace period delay
-    const purgeEligibleAt = new Date(now.getTime() + GRACE_PERIOD_MS);
-    await this.erasureQueue.add(
-      JOBS.ERASURE_PURGE,
-      { userId } as ErasurePurgeJob,
-      {
-        delay: GRACE_PERIOD_MS,
-        attempts: 3,
-        backoff: { type: 'exponential', delay: 5000 },
-        removeOnComplete: true,
-      },
-    );
-
+    const purgeEligibleAt = new Date(now.getTime() + ERASURE_GRACE_MS);
     this.logger.log(`Erasure requested for user ${userId}; purge eligible at ${purgeEligibleAt.toISOString()}`);
     return { status: 'SOFT_DELETED', purgeEligibleAt: purgeEligibleAt.toISOString() };
   }

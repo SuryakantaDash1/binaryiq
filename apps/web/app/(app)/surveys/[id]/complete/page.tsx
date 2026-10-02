@@ -18,8 +18,9 @@ export default function SurveyCompletePage(): React.JSX.Element {
 
   useEffect(() => {
     const outcome = (searchParams.get('status') as 'disqualified' | null) ?? 'completed';
+    const returnToken = searchParams.get('returnToken') ?? '';
     surveysApi
-      .complete(id, outcome)
+      .complete(id, returnToken, outcome)
       .then((res) => {
         setPointsAwarded(res.pointsAwarded);
         setStatus(res.status);

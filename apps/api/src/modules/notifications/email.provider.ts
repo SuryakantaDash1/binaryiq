@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 
 export interface EmailMessage {
   to: string;
@@ -6,23 +6,65 @@ export interface EmailMessage {
   html: string;
 }
 
-/** Provider abstraction — swap the console impl for SendGrid in Phase 7. */
 export abstract class EmailProvider {
   abstract send(message: EmailMessage): Promise<void>;
 }
 
+/** "jane.doe@example.com" → "j***@example.com" — safe to put in logs. */
+export function maskEmail(email: string): string {
+  const [local, domain] = email.split('@');
+  if (!local || !domain) return '***';
+  return `${local[0]}***@${domain}`;
+}
+
 /**
- * Dev/no-op email provider: logs the message (and any links) instead of sending.
- * Lets the registration + reset flows work end-to-end without SendGrid.
+ * Fallback when SendGrid isn't configured. Never sends, never logs the full
+ * address, and only prints links (which carry one-time reset/verify tokens)
+ * in local development. Production refuses to boot without SendGrid
+ * (env.schema.ts), so this can't silently swallow real user mail.
  */
-@Injectable()
 export class ConsoleEmailProvider extends EmailProvider {
   private readonly logger = new Logger('Email');
 
+  constructor(private readonly isDevelopment: boolean) {
+    super();
+  }
+
   send(message: EmailMessage): Promise<void> {
-    this.logger.log(`✉  To: ${message.to} — ${message.subject}`);
-    const link = /href="([^"]+)"/.exec(message.html)?.[1];
-    if (link) this.logger.log(`   Link: ${link}`);
+    this.logger.log(`(not sent — no email provider) to ${maskEmail(message.to)}: ${message.subject}`);
+    if (this.isDevelopment) {
+      const link = /href="([^"]+)"/.exec(message.html)?.[1];
+      if (link) this.logger.log(`   [dev only] link: ${link}`);
+    }
     return Promise.resolve();
+  }
+}
+
+/** SendGrid v3 mail-send over plain fetch — no SDK dependency. */
+export class SendGridEmailProvider extends EmailProvider {
+  private readonly logger = new Logger('Email');
+
+  constructor(
+    private readonly apiKey: string,
+    private readonly from: string,
+  ) {
+    super();
+  }
+
+  async send(message: EmailMessage): Promise<void> {
+    const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${this.apiKey}`, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: message.to }] }],
+        from: { email: this.from },
+        subject: message.subject,
+        content: [{ type: 'text/html', value: message.html }],
+      }),
+    });
+    if (!res.ok) {
+      this.logger.error(`SendGrid rejected mail to ${maskEmail(message.to)} (HTTP ${res.status})`);
+      throw new Error(`Email delivery failed (${res.status})`);
+    }
   }
 }

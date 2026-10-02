@@ -19,6 +19,7 @@ import {
   UnauthenticatedException,
   UnprocessableException,
 } from '../../common/exceptions/domain.exception';
+import { EncryptionService } from '../../common/services/encryption.service';
 import { AppConfigService } from '../../config/config.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RedisService } from '../../redis/redis.service';
@@ -51,14 +52,15 @@ export class AuthService {
     private readonly points: PointsService,
     private readonly email: EmailProvider,
     private readonly config: AppConfigService,
+    private readonly enc: EncryptionService,
   ) {}
 
-  /** Step 1 — stash identity basics in a short-lived Redis draft. */
+  /** Step 1 — stash identity basics (name, DOB, gender) in a short-lived, encrypted Redis draft. */
   async registerStep1(input: RegisterStep1Input): Promise<RegisterStep1Result> {
     const draftId = randomUUID();
     await this.redis.instance.set(
       this.draftKey(draftId),
-      JSON.stringify(input),
+      JSON.stringify(this.enc.encryptJson(input)),
       'EX',
       DRAFT_TTL_SECONDS,
     );
@@ -71,7 +73,7 @@ export class AuthService {
     if (!raw) {
       throw new UnprocessableException('Registration session expired — please restart.');
     }
-    const step1 = JSON.parse(raw) as RegisterStep1Input;
+    const step1 = this.enc.decryptJson<RegisterStep1Input>(JSON.parse(raw));
 
     const [emailTaken, usernameTaken] = await Promise.all([
       this.prisma.user.findUnique({ where: { email: input.email.toLowerCase() } }),
@@ -89,12 +91,12 @@ export class AuthService {
           email: input.email.toLowerCase(),
           username: input.username,
           passwordHash,
-          phoneEnc: input.mobile ?? null,
+          phoneEnc: this.enc.encryptOptional(input.mobile),
           profile: {
             create: {
               firstName: step1.firstName,
               surname: step1.surname,
-              dobEnc: step1.dob,
+              dobEnc: this.enc.encrypt(step1.dob),
               gender: step1.gender,
               country: step1.country,
             },
@@ -127,9 +129,9 @@ export class AuthService {
     if (this.config.get('AUTO_VERIFY_EMAIL') === 'true') {
       try {
         await this.verifyEmail(token);
-        this.logger.log(`Auto-verified ${input.email}`);
+        this.logger.log('Auto-verified new registration');
       } catch (e) {
-        this.logger.error(`Auto-verify failed for ${input.email}`, e as Error);
+        this.logger.error('Auto-verify failed for new registration', (e as Error).message);
       }
     }
 

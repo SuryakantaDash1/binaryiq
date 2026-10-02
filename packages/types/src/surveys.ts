@@ -36,6 +36,8 @@ export interface CompleteSurveyResult {
 
 // ─── Input schemas (input == output type so ZodValidationPipe is happy) ──
 export const completeSurveyInputSchema = z.object({
+  /** Signed token issued by POST /surveys/:id/start — proves this user actually started it. */
+  returnToken: z.string().min(16).max(1024),
   responseId: z.string().uuid().optional(),
   // Provider callback fields (optional)
   status: z.enum(['completed', 'disqualified']).optional(),

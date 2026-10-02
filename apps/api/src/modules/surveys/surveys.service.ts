@@ -13,6 +13,7 @@ import {
   NotFoundException,
   UnprocessableException,
 } from '../../common/exceptions/domain.exception';
+import { AppConfigService } from '../../config/config.service';
 import { PrismaService } from '../../prisma/prisma.service';
 
 import { MatchingService } from './matching.service';
@@ -26,6 +27,7 @@ export class SurveysService {
     private readonly prisma: PrismaService,
     private readonly matching: MatchingService,
     private readonly completion: SurveyCompletionService,
+    private readonly config: AppConfigService,
   ) {}
 
   // ─── Member listing ───────────────────────────────────────────
@@ -66,7 +68,14 @@ export class SurveysService {
     });
     if (existing?.status === 'completed') throw new ConflictException('already_completed');
 
-    const secret = process.env['SURVEY_CALLBACK_SECRET'] ?? 'dev-secret';
+    // Only surveys the member is targeted for can be started (not just any active id).
+    if (!existing) {
+      const eligible = await this.matching.match(userId);
+      const ids = new Set([...eligible.priority, ...eligible.quick, ...eligible.premium].map((s) => s.id));
+      if (!ids.has(surveyId)) throw new NotFoundException('Survey not found');
+    }
+
+    const secret = this.config.get('SURVEY_CALLBACK_SECRET');
     let response = existing;
     if (!response || response.status === 'disqualified') {
       response = await this.prisma.surveyResponse.create({
@@ -91,8 +100,13 @@ export class SurveysService {
   }
 
   // ─── Complete (member or callback) ───────────────────────────
-  async complete(userId: string, surveyId: string, outcome: 'completed' | 'disqualified' = 'completed') {
-    return this.completion.complete(userId, surveyId, outcome);
+  async complete(
+    userId: string,
+    surveyId: string,
+    returnToken: string,
+    outcome: 'completed' | 'disqualified' = 'completed',
+  ) {
+    return this.completion.complete(userId, surveyId, returnToken, outcome);
   }
 
   // ─── Admin CRUD ───────────────────────────────────────────────

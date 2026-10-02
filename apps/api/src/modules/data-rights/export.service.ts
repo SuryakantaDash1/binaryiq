@@ -60,74 +60,72 @@ export class ExportService {
     return data;
   }
 
+  /** Everything we hold about the user, decrypted — DPDP s.11 right to a summary. */
   private async assembleBundle(userId: string): Promise<object> {
-    const [user, profile, address, demographics, paypal, points, consents, surveys, polls, games] =
-      await Promise.all([
-        this.prisma.user.findUnique({
-          where: { id: userId },
-          select: { id: true, email: true, username: true, createdAt: true },
-        }),
-        this.prisma.userProfile.findUnique({ where: { userId } }),
-        this.prisma.userAddress.findUnique({ where: { userId } }),
-        this.prisma.userDemographics.findUnique({ where: { userId } }),
-        this.prisma.paypalAccount.findUnique({ where: { userId } }),
-        this.prisma.pointsTransaction.findMany({ where: { userId }, orderBy: { createdAt: 'asc' } }),
-        this.prisma.consentLog.findMany({ where: { userId }, orderBy: { createdAt: 'asc' } }),
-        this.prisma.surveyResponse.findMany({ where: { userId }, orderBy: { createdAt: 'asc' } }),
-        this.prisma.pollVote.findMany({ where: { userId }, orderBy: { votedAt: 'asc' } }),
-        this.prisma.gamePlay.findMany({ where: { userId }, orderBy: { playedAt: 'asc' } }),
-      ]);
-
-    // Decrypt _enc fields
-    let dob: string | null = null;
-    let phone: string | null = null;
-    let addressLine1: string | null = null;
-
-    if (profile?.dobEnc) {
-      try {
-        dob = this.enc.decrypt(profile.dobEnc);
-      } catch {
-        dob = null;
-      }
-    }
-
-    const userWithPhone = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { phoneEnc: true },
-    });
-    if (userWithPhone?.phoneEnc) {
-      try {
-        phone = this.enc.decrypt(userWithPhone.phoneEnc);
-      } catch {
-        phone = null;
-      }
-    }
-
-    if (address?.line1Enc) {
-      try {
-        addressLine1 = this.enc.decrypt(address.line1Enc);
-      } catch {
-        addressLine1 = null;
-      }
-    }
+    const [
+      user,
+      profile,
+      address,
+      demographics,
+      paypal,
+      points,
+      consents,
+      surveys,
+      polls,
+      games,
+      profileSurveys,
+      redemptions,
+      tickets,
+      notifications,
+    ] = await Promise.all([
+      this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, email: true, username: true, phoneEnc: true, createdAt: true },
+      }),
+      this.prisma.userProfile.findUnique({ where: { userId } }),
+      this.prisma.userAddress.findUnique({ where: { userId } }),
+      this.prisma.userDemographics.findUnique({ where: { userId } }),
+      this.prisma.paypalAccount.findUnique({ where: { userId } }),
+      this.prisma.pointsTransaction.findMany({ where: { userId }, orderBy: { createdAt: 'asc' } }),
+      this.prisma.consentLog.findMany({ where: { userId }, orderBy: { createdAt: 'asc' } }),
+      this.prisma.surveyResponse.findMany({ where: { userId }, orderBy: { createdAt: 'asc' } }),
+      this.prisma.pollVote.findMany({ where: { userId }, orderBy: { votedAt: 'asc' } }),
+      this.prisma.gamePlay.findMany({ where: { userId }, orderBy: { playedAt: 'asc' } }),
+      this.prisma.profileSurveyResponse.findMany({
+        where: { userId },
+        include: { category: { select: { key: true, name: true } } },
+        orderBy: { createdAt: 'asc' },
+      }),
+      this.prisma.rewardRedemption.findMany({
+        where: { userId },
+        include: { reward: { select: { name: true } } },
+        orderBy: { createdAt: 'asc' },
+      }),
+      this.prisma.supportTicket.findMany({
+        where: { userId },
+        include: { messages: { orderBy: { createdAt: 'asc' } } },
+        orderBy: { createdAt: 'asc' },
+      }),
+      this.prisma.notification.findMany({ where: { userId }, orderBy: { createdAt: 'asc' } }),
+    ]);
 
     return {
       exportedAt: new Date().toISOString(),
-      user: { ...user },
+      user: user ? { id: user.id, email: user.email, username: user.username, createdAt: user.createdAt } : null,
       profile: profile
         ? {
             firstName: profile.firstName,
             surname: profile.surname,
-            dob,
+            dob: this.enc.decryptOptional(profile.dobEnc),
             gender: profile.gender,
             photoUrl: profile.photoUrl,
             country: profile.country,
           }
         : null,
-      contact: { phone },
+      contact: { phone: this.enc.decryptOptional(user?.phoneEnc) },
       address: address
         ? {
-            line1: addressLine1,
+            line1: this.enc.decryptOptional(address.line1Enc),
             city: address.city,
             pinCode: address.pinCode,
             areaType: address.areaType,
@@ -137,10 +135,20 @@ export class ExportService {
         ? {
             educationLevel: demographics.educationLevel,
             employmentType: demographics.employmentType,
-            incomeBracket: demographics.incomeBracket,
+            incomeBracket: this.enc.decryptOptional(demographics.incomeBracketEnc),
+            householdSize: demographics.householdSize,
+            childrenCount: demographics.childrenCount,
+            chiefWageEarner: demographics.chiefWageEarner,
+            assets: this.enc.decryptJsonOptional(demographics.assetsEnc),
           }
         : null,
-      paypal: paypal ? { paypalEmail: paypal.paypalEmail } : null,
+      paypal: paypal ? { paypalEmail: this.enc.decrypt(paypal.paypalEmailEnc) } : null,
+      profileSurveyAnswers: profileSurveys.map((r) => ({
+        category: r.category.name,
+        answers: this.enc.decryptJson(r.responsesEnc),
+        pointsAwarded: r.pointsAwarded,
+        createdAt: r.createdAt,
+      })),
       pointsHistory: points.map((p) => ({
         action: p.action,
         direction: p.direction,
@@ -148,13 +156,34 @@ export class ExportService {
         description: p.description,
         createdAt: p.createdAt,
       })),
+      redemptions: redemptions.map((r) => ({
+        reward: r.reward.name,
+        pointsSpent: r.pointsSpent,
+        status: r.status,
+        createdAt: r.createdAt,
+      })),
       surveys: surveys.map((s) => ({ surveyId: s.surveyId, status: s.status, createdAt: s.createdAt })),
       polls: polls.map((p) => ({ pollId: p.pollId, votedAt: p.votedAt })),
       games: games.map((g) => ({ gameId: g.gameId, pointsWon: g.pointsWon, playDate: g.playDate, playedAt: g.playedAt })),
+      supportTickets: tickets.map((t) => ({
+        subject: t.subject,
+        issueType: t.issueType,
+        status: t.status,
+        createdAt: t.createdAt,
+        messages: t.messages.map((m) => ({ from: m.senderType, message: m.message, createdAt: m.createdAt })),
+      })),
+      notifications: notifications.map((n) => ({
+        channel: n.channel,
+        type: n.type,
+        title: n.title,
+        message: n.message,
+        createdAt: n.createdAt,
+      })),
       consents: consents.map((c) => ({
         consentType: c.consentType,
         consentVersion: c.consentVersion,
         granted: c.granted,
+        ipAddress: c.ipAddress,
         createdAt: c.createdAt,
       })),
     };

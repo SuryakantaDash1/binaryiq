@@ -1,44 +1,53 @@
-import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
-
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import { AppConfigService } from '../../config/config.service';
+import {
+  decryptJsonWithKey,
+  decryptWithKey,
+  encryptJsonWithKey,
+  encryptWithKey,
+  parseKey,
+  type EncryptedJson,
+} from '../crypto/encryption.core';
 
-const ALGO = 'aes-256-gcm';
-
+/**
+ * Field-level encryption for personal data. ENCRYPTION_KEY is required at boot
+ * (env.schema.ts), and decryption throws on any non-ciphertext input — callers
+ * never get plaintext back silently.
+ */
 @Injectable()
 export class EncryptionService {
-  private readonly logger = new Logger(EncryptionService.name);
-  private readonly key: Buffer | null;
+  private readonly key: Buffer;
 
-  constructor(private readonly config: AppConfigService) {
-    const hex = this.config.get('ENCRYPTION_KEY') as string | undefined;
-    this.key = hex ? Buffer.from(hex, 'hex') : null;
-    if (!this.key) this.logger.warn('ENCRYPTION_KEY not set — PII fields stored as plaintext (dev only)');
+  constructor(config: AppConfigService) {
+    this.key = parseKey(config.get('ENCRYPTION_KEY'));
   }
 
   encrypt(plaintext: string): string {
-    if (!this.key) return plaintext;
-    const iv = randomBytes(12);
-    const cipher = createCipheriv(ALGO, this.key, iv);
-    const enc = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
-    const tag = cipher.getAuthTag();
-    return Buffer.concat([iv, tag, enc]).toString('base64');
+    return encryptWithKey(this.key, plaintext);
   }
 
   decrypt(ciphertext: string): string {
-    if (!this.key) return ciphertext;
-    try {
-      const buf = Buffer.from(ciphertext, 'base64');
-      const iv = buf.subarray(0, 12);
-      const tag = buf.subarray(12, 28);
-      const enc = buf.subarray(28);
-      const decipher = createDecipheriv(ALGO, this.key, iv);
-      decipher.setAuthTag(tag);
-      return Buffer.concat([decipher.update(enc), decipher.final()]).toString('utf8');
-    } catch {
-      // If decryption fails (e.g. plaintext stored in dev), return as-is
-      return ciphertext;
-    }
+    return decryptWithKey(this.key, ciphertext);
+  }
+
+  encryptOptional(plaintext: string | null | undefined): string | null {
+    return plaintext ? this.encrypt(plaintext) : null;
+  }
+
+  decryptOptional(ciphertext: string | null | undefined): string | null {
+    return ciphertext ? this.decrypt(ciphertext) : null;
+  }
+
+  encryptJson(value: unknown): EncryptedJson {
+    return encryptJsonWithKey(this.key, value);
+  }
+
+  decryptJson<T = unknown>(value: unknown): T {
+    return decryptJsonWithKey<T>(this.key, value);
+  }
+
+  decryptJsonOptional<T = unknown>(value: unknown): T | null {
+    return value === null || value === undefined ? null : this.decryptJson<T>(value);
   }
 }

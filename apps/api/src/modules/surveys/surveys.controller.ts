@@ -60,7 +60,7 @@ export class SurveysController {
     @Body(new ZodValidationPipe(completeSurveyInputSchema)) body: CompleteSurveyInput,
   ) {
     const outcome = body.status === 'disqualified' ? 'disqualified' : 'completed';
-    return this.service.complete(user.id, id, outcome);
+    return this.service.complete(user.id, id, body.returnToken, outcome);
   }
 
   // ─── Admin endpoints ──────────────────────────────────────────

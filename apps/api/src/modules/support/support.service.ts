@@ -88,11 +88,13 @@ export class SupportService {
       const admins = await this.prisma.admin.findMany({
         where: { role: { in: ['SUPPORT', 'ADMIN', 'SUPER_ADMIN'] }, isActive: true },
       });
-      const subject = `New support ticket — ${ticket.subject ?? flow.title}`;
-      const html = `<p>Ticket <strong>#${ticket.id}</strong> — ${flow.title}: ${ticket.subject ?? flow.title}</p><p>User ID: ${userId}</p>`;
+      // Subject is member-supplied: strip it to plain text before it reaches a mail client.
+      const safeSubject = (ticket.subject ?? flow.title).replace(/[<>&"'\r\n]/g, ' ').slice(0, 120);
+      const subject = `New support ticket — ${safeSubject}`;
+      const html = `<p>Ticket <strong>#${ticket.id}</strong> — ${flow.title}: ${safeSubject}</p><p>User ID: ${userId}</p>`;
       for (const admin of admins) {
         await this.emailProvider.send({ to: admin.email, subject, html }).catch((err: unknown) => {
-          this.logger.warn(`Failed to email admin ${admin.email}: ${String(err)}`);
+          this.logger.warn(`Failed to email admin ${admin.id}: ${String(err)}`);
         });
       }
 
@@ -100,11 +102,11 @@ export class SupportService {
         const dpoAdmins = await this.prisma.admin.findMany({
           where: { role: 'DPO', isActive: true },
         });
-        const dpoSubject = `DPO routing — ${ticket.subject ?? flow.title}`;
+        const dpoSubject = `DPO routing — ${safeSubject}`;
         const dpoHtml = `<p>Ticket <strong>#${ticket.id}</strong> has been routed to the DPO team.</p><p>User ID: ${userId}</p>`;
         for (const dpo of dpoAdmins) {
           await this.emailProvider.send({ to: dpo.email, subject: dpoSubject, html: dpoHtml }).catch((err: unknown) => {
-            this.logger.warn(`Failed to email DPO ${dpo.email}: ${String(err)}`);
+            this.logger.warn(`Failed to email DPO ${dpo.id}: ${String(err)}`);
           });
         }
       }

@@ -1,4 +1,3 @@
-import type { Prisma } from '@influencer/db';
 import type { CategorySchema } from '@influencer/types';
 import { Injectable, Logger } from '@nestjs/common';
 
@@ -84,16 +83,16 @@ export class ProfileSurveysService {
       pointsValue: category.pointsValue,
       completed: !!existing,
       schema: category.schema as unknown as CategorySchema,
-      responses: existing?.responses,
+      responses: existing ? this.enc.decryptJson<Record<string, unknown>>(existing.responsesEnc) : undefined,
     };
   }
 
-  async submitCategory(userId: string, key: string, answers: Record<string, unknown>) {
+  async submitCategory(userId: string, key: string, rawAnswers: Record<string, unknown>) {
     const category = await this.prisma.profileSurveyCategory.findUnique({ where: { key } });
     if (!category) throw new NotFoundException(`Category '${key}' not found`);
     if (!category.isActive) throw new UnprocessableException('Category is not active');
 
-    this.validateAnswers(category.schema as unknown as CategorySchema, answers);
+    const answers = this.validateAnswers(category.schema as unknown as CategorySchema, rawAnswers);
 
     return this.prisma.$transaction(async (tx) => {
       try {
@@ -101,7 +100,8 @@ export class ProfileSurveysService {
           data: {
             userId,
             categoryId: category.id,
-            responses: answers as unknown as Prisma.InputJsonValue,
+            // Raw answers include health, pregnancy, gender identity and income — always encrypted.
+            responsesEnc: this.enc.encryptJson(answers),
             pointsAwarded: category.pointsValue,
           },
         });
@@ -131,28 +131,70 @@ export class ProfileSurveysService {
     });
   }
 
-  private validateAnswers(schema: CategorySchema, answers: Record<string, unknown>): void {
+  /**
+   * Strict validation against the category schema. Unknown keys are rejected and
+   * every value must match its question type/options — nothing arbitrary is stored.
+   * Returns the sanitised answer object.
+   */
+  private validateAnswers(schema: CategorySchema, answers: Record<string, unknown>): Record<string, unknown> {
     const errors: Array<{ field: string; issue: string }> = [];
+    const known = new Map(schema.questions.map((q) => [q.key, q]));
+    for (const key of Object.keys(answers)) {
+      if (!known.has(key)) errors.push({ field: key, issue: 'Unknown question' });
+    }
+
+    const clean: Record<string, unknown> = {};
     for (const q of schema.questions) {
       const val = answers[q.key];
-      if (q.required && (val === undefined || val === null || val === '')) {
-        errors.push({ field: q.key, issue: `${q.label} is required` });
+      const empty = val === undefined || val === null || val === '' || (Array.isArray(val) && val.length === 0);
+      if (empty) {
+        if (q.required) errors.push({ field: q.key, issue: `${q.label} is required` });
+        continue;
       }
-      if (q.type === 'number' && val !== undefined) {
-        const n = Number(val);
-        if (isNaN(n)) errors.push({ field: q.key, issue: `${q.label} must be a number` });
-        else if (q.min !== undefined && n < q.min) errors.push({ field: q.key, issue: `${q.label} must be at least ${q.min}` });
-        else if (q.max !== undefined && n > q.max) errors.push({ field: q.key, issue: `${q.label} must be at most ${q.max}` });
-      }
-      if (q.type === 'multiselect' && Array.isArray(val) && q.maxSelections !== undefined) {
-        if ((val as unknown[]).length > q.maxSelections) {
-          errors.push({ field: q.key, issue: `${q.label}: max ${q.maxSelections} selections` });
+      const allowed = q.options ? new Set(q.options.map((o) => o.value)) : null;
+
+      switch (q.type) {
+        case 'number': {
+          const n = Number(val);
+          if (typeof val === 'boolean' || Number.isNaN(n)) errors.push({ field: q.key, issue: `${q.label} must be a number` });
+          else if (q.min !== undefined && n < q.min) errors.push({ field: q.key, issue: `${q.label} must be at least ${q.min}` });
+          else if (q.max !== undefined && n > q.max) errors.push({ field: q.key, issue: `${q.label} must be at most ${q.max}` });
+          else clean[q.key] = n;
+          break;
         }
+        case 'select':
+        case 'radio':
+          if (typeof val !== 'string' || (allowed && !allowed.has(val))) {
+            errors.push({ field: q.key, issue: `${q.label} has an invalid option` });
+          } else clean[q.key] = val;
+          break;
+        case 'multiselect':
+          if (!Array.isArray(val) || val.some((v) => typeof v !== 'string' || (allowed && !allowed.has(v)))) {
+            errors.push({ field: q.key, issue: `${q.label} has an invalid option` });
+          } else if (q.maxSelections !== undefined && val.length > q.maxSelections) {
+            errors.push({ field: q.key, issue: `${q.label}: max ${q.maxSelections} selections` });
+          } else clean[q.key] = val;
+          break;
+        case 'checkbox':
+          if (typeof val !== 'boolean') errors.push({ field: q.key, issue: `${q.label} must be true or false` });
+          else clean[q.key] = val;
+          break;
+        case 'date':
+          if (typeof val !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+            errors.push({ field: q.key, issue: `${q.label} must be a date` });
+          } else clean[q.key] = val;
+          break;
+        case 'text':
+        default:
+          if (typeof val !== 'string' || val.length > 300) {
+            errors.push({ field: q.key, issue: `${q.label} must be text of at most 300 characters` });
+          } else clean[q.key] = val.trim();
       }
     }
     if (errors.length > 0) {
       throw new ValidationException('Answers do not satisfy category schema', errors);
     }
+    return clean;
   }
 
   private async mapStructuredAnswers(
@@ -206,19 +248,15 @@ export class ProfileSurveysService {
         },
       });
     } else if (key === 'finance') {
+      const incomeBracketEnc = answers['income_bracket'] ? this.enc.encrypt(answers['income_bracket'] as string) : undefined;
+      // Seeded answers are 'yes'/'no' strings; the column is a boolean.
+      const cwe = answers['chief_wage_earner'];
+      const chiefWageEarner = cwe === undefined ? undefined : cwe === true || cwe === 'yes';
+      const assetsEnc = answers['assets'] !== undefined ? this.enc.encryptJson(answers['assets']) : undefined;
       await tx.userDemographics.upsert({
         where: { userId },
-        create: {
-          userId,
-          incomeBracket: answers['income_bracket'] ? this.enc.encrypt(answers['income_bracket'] as string) : undefined,
-          chiefWageEarner: answers['chief_wage_earner'] as boolean | undefined,
-          assets: answers['assets'] as object | undefined,
-        },
-        update: {
-          incomeBracket: answers['income_bracket'] ? this.enc.encrypt(answers['income_bracket'] as string) : undefined,
-          chiefWageEarner: (answers['chief_wage_earner'] as boolean | undefined) ?? undefined,
-          assets: (answers['assets'] as object | undefined) ?? undefined,
-        },
+        create: { userId, incomeBracketEnc, chiefWageEarner, assetsEnc },
+        update: { incomeBracketEnc, chiefWageEarner, assetsEnc },
       });
     }
   }
