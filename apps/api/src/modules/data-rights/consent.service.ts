@@ -36,6 +36,8 @@ export class ConsentService {
           action: 'consent.change',
           targetType: 'consent',
           targetId: row.id,
+          ipAddress: ip,
+          userAgent: ua,
           metadata: { consentType: dto.consentType, granted: dto.granted, version: dto.consentVersion },
         },
       });

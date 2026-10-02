@@ -14,7 +14,7 @@ import {
   type RegisterStep2Result,
   type VerifyEmailResult,
 } from '@influencer/types';
-import { Body, Controller, Get, HttpCode, Post, Query, Req, Res, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Ip, Post, Query, Req, Res, UsePipes } from '@nestjs/common';
 import type { Request, Response } from 'express';
 
 import { Public } from '../../common/decorators/public.decorator';
@@ -61,8 +61,9 @@ export class AuthController {
   async login(
     @Body() body: LoginInput,
     @Res({ passthrough: true }) res: Response,
+    @Ip() ip: string,
   ): Promise<AuthSession> {
-    const { session, refreshToken } = await this.auth.login(body);
+    const { session, refreshToken } = await this.auth.login(body, ip);
     this.setRefreshCookie(res, refreshToken);
     return session;
   }

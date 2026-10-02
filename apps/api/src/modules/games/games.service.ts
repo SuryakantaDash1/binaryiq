@@ -287,7 +287,7 @@ export class GamesService {
     return { items: games, total, page, pageSize };
   }
 
-  async adminCreate(input: CreateGameInput, adminId: string) {
+  async adminCreate(input: CreateGameInput, adminId: string, ip: string | null = null) {
     validateProbabilitySum(input.segments);
     const game = await this.prisma.$transaction(async (tx) => {
       return tx.game.create({
@@ -308,11 +308,11 @@ export class GamesService {
         include: { segments: { orderBy: { sortOrder: 'asc' } } },
       });
     });
-    await this.auditLog(adminId, 'game.create', { gameId: game.id });
+    await this.auditLog(adminId, 'game.create', { gameId: game.id }, ip);
     return game;
   }
 
-  async adminUpdateSegments(gameId: string, input: UpdateSegmentsInput, adminId: string) {
+  async adminUpdateSegments(gameId: string, input: UpdateSegmentsInput, adminId: string, ip: string | null = null) {
     const game = await this.prisma.game.findUnique({ where: { id: gameId } });
     if (!game) throw new NotFoundException('Game not found');
     validateProbabilitySum(input.segments);
@@ -346,13 +346,13 @@ export class GamesService {
       });
     });
 
-    await this.auditLog(adminId, 'game.segments.update', { gameId });
+    await this.auditLog(adminId, 'game.segments.update', { gameId }, ip);
     return updated;
   }
 
-  private async auditLog(actorId: string | null, action: string, metadata: object) {
+  private async auditLog(actorId: string | null, action: string, metadata: object, ip: string | null) {
     await this.prisma.auditLog.create({
-      data: { actorType: 'admin', actorId: actorId ?? undefined, action, targetType: 'game', metadata },
+      data: { actorType: 'admin', actorId: actorId ?? undefined, action, targetType: 'game', ipAddress: ip, metadata },
     }).catch((e) => this.logger.error('Audit log failed', e));
   }
 }

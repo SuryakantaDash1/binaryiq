@@ -6,7 +6,7 @@ import {
   type SpinInput,
   type UpdateSegmentsInput,
 } from '@influencer/types';
-import { Body, Controller, Get, HttpCode, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Ip, Param, Post, Put, Query } from '@nestjs/common';
 import { z } from 'zod';
 
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -75,8 +75,9 @@ export class GamesController {
   adminCreate(
     @CurrentUser() user: AuthUser,
     @Body(new ZodValidationPipe(createGameSchema)) body: CreateGameInput,
+    @Ip() ip: string,
   ) {
-    return this.service.adminCreate(body, user.id);
+    return this.service.adminCreate(body, user.id, ip);
   }
 
   @Put('admin/games/:id/segments')
@@ -85,7 +86,8 @@ export class GamesController {
     @Param('id') id: string,
     @CurrentUser() user: AuthUser,
     @Body(new ZodValidationPipe(updateSegmentsSchema)) body: UpdateSegmentsInput,
+    @Ip() ip: string,
   ) {
-    return this.service.adminUpdateSegments(id, body, user.id);
+    return this.service.adminUpdateSegments(id, body, user.id, ip);
   }
 }

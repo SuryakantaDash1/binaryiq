@@ -16,6 +16,7 @@ import {
   Get,
   Headers,
   HttpCode,
+  Ip,
   Param,
   Post,
   Put,
@@ -69,8 +70,9 @@ export class RewardsController {
     @CurrentUser() user: AuthUser,
     @Headers('idempotency-key') idempotencyKey: string | undefined,
     @Body(new ZodValidationPipe(redeemInputSchema)) body: RedeemInput,
+    @Ip() ip: string,
   ) {
-    return this.service.redeem(user.id, body, idempotencyKey);
+    return this.service.redeem(user.id, body, idempotencyKey, ip);
   }
 
   @Get('redemptions')
@@ -115,8 +117,9 @@ export class RewardsController {
     @Param('id') id: string,
     @CurrentUser() user: AuthUser,
     @Body(new ZodValidationPipe(updateRedemptionStatusSchema)) body: UpdateRedemptionStatusInput,
+    @Ip() ip: string,
   ) {
-    return this.service.adminUpdateRedemptionStatus(id, body, user.id);
+    return this.service.adminUpdateRedemptionStatus(id, body, user.id, ip);
   }
 
   // ─── PayPal webhook ──────────────────────────────────────────────

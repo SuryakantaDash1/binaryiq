@@ -41,7 +41,7 @@ export class AccountService {
     };
   }
 
-  async updateProfile(userId: string, input: UpdateProfileInput) {
+  async updateProfile(userId: string, input: UpdateProfileInput, ip: string | null = null) {
     const profile = await this.prisma.userProfile.update({
       where: { userId },
       data: {
@@ -51,7 +51,7 @@ export class AccountService {
         gender: input.gender,
       },
     });
-    await this.auditLog(userId, 'profile.update', { fields: ['firstName', 'surname', 'dob', 'gender'] });
+    await this.auditLog(userId, 'profile.update', { fields: ['firstName', 'surname', 'dob', 'gender'] }, ip);
     return {
       firstName: profile.firstName,
       surname: profile.surname,
@@ -104,7 +104,7 @@ export class AccountService {
     return { pending: true, email: newEmail };
   }
 
-  async confirmEmailChange(userId: string, token: string) {
+  async confirmEmailChange(userId: string, token: string, ip: string | null = null) {
     const record = await this.prisma.authToken.findUnique({ where: { token } });
     if (!record || record.tokenType !== 'EMAIL_CHANGE' || record.usedAt) {
       throw new UnprocessableException('Invalid or used token');
@@ -121,11 +121,11 @@ export class AccountService {
       await tx.authToken.update({ where: { id: record.id }, data: { usedAt: new Date() } });
     });
 
-    await this.auditLog(userId, 'email.change', { newEmail: payload.newEmail });
+    await this.auditLog(userId, 'email.change', { newEmail: payload.newEmail }, ip);
     return { email: payload.newEmail };
   }
 
-  async changePassword(userId: string, input: ChangePasswordInput) {
+  async changePassword(userId: string, input: ChangePasswordInput, ip: string | null = null) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('User not found');
 
@@ -134,17 +134,17 @@ export class AccountService {
 
     const passwordHash = await bcrypt.hash(input.newPassword, BCRYPT_COST);
     await this.prisma.user.update({ where: { id: userId }, data: { passwordHash } });
-    await this.auditLog(userId, 'password.change', {});
+    await this.auditLog(userId, 'password.change', {}, ip);
     return { ok: true };
   }
 
-  async updatePaypal(userId: string, input: UpdatePaypalInput) {
+  async updatePaypal(userId: string, input: UpdatePaypalInput, ip: string | null = null) {
     const paypal = await this.prisma.paypalAccount.upsert({
       where: { userId },
       create: { userId, paypalEmail: input.paypalEmail },
       update: { paypalEmail: input.paypalEmail },
     });
-    await this.auditLog(userId, 'paypal.update', { paypalEmail: '***' });
+    await this.auditLog(userId, 'paypal.update', { paypalEmail: '***' }, ip);
     return { paypalEmail: paypal.paypalEmail, verifiedAt: paypal.verifiedAt };
   }
 
@@ -172,7 +172,7 @@ export class AccountService {
     };
   }
 
-  async updateAboutYou(userId: string, input: UpdateAboutYouInput) {
+  async updateAboutYou(userId: string, input: UpdateAboutYouInput, ip: string | null = null) {
     await this.prisma.$transaction(async (tx) => {
       if (input.address) {
         await tx.userAddress.upsert({
@@ -218,7 +218,7 @@ export class AccountService {
       }
     });
 
-    await this.auditLog(userId, 'about_you.update', {});
+    await this.auditLog(userId, 'about_you.update', {}, ip);
     return this.getAboutYou(userId);
   }
 
@@ -227,9 +227,9 @@ export class AccountService {
     return { balance: balance?.balance ?? 0, lifetimeEarned: balance?.lifetimeEarned ?? 0 };
   }
 
-  private async auditLog(userId: string, action: string, metadata: object) {
+  private async auditLog(userId: string, action: string, metadata: object, ip: string | null) {
     await this.prisma.auditLog.create({
-      data: { actorType: 'user', actorId: userId, action, targetType: 'user', targetId: userId, metadata },
+      data: { actorType: 'user', actorId: userId, action, targetType: 'user', targetId: userId, ipAddress: ip, metadata },
     }).catch((e) => this.logger.error('Audit log failed', e));
   }
 }

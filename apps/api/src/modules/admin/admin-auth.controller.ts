@@ -1,5 +1,5 @@
 import { adminLoginSchema, type AdminLoginInput, type AdminSession } from '@influencer/types';
-import { Body, Controller, Get, HttpCode, Post, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Ip, Post, UsePipes } from '@nestjs/common';
 
 import { CurrentUser, type AuthenticatedUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
@@ -16,8 +16,8 @@ export class AdminAuthController {
   @Post('login')
   @HttpCode(200)
   @UsePipes(new ZodValidationPipe(adminLoginSchema))
-  login(@Body() body: AdminLoginInput): Promise<AdminSession> {
-    return this.admin.login(body.email, body.password);
+  login(@Body() body: AdminLoginInput, @Ip() ip: string): Promise<AdminSession> {
+    return this.admin.login(body.email, body.password, ip);
   }
 
   @Get('me')

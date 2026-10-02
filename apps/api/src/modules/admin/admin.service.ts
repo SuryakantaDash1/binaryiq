@@ -16,11 +16,24 @@ export class AdminService {
     private readonly tokens: TokenService,
   ) {}
 
-  async login(email: string, password: string): Promise<AdminSession> {
+  async login(email: string, password: string, ip: string | null = null): Promise<AdminSession> {
     const admin = await this.prisma.admin.findUnique({ where: { email: email.toLowerCase() } });
     if (!admin || !admin.isActive) throw new UnauthenticatedException('Invalid email or password');
     const ok = await bcrypt.compare(password, admin.passwordHash);
     if (!ok) throw new UnauthenticatedException('Invalid email or password');
+
+    await this.prisma.auditLog
+      .create({
+        data: {
+          actorType: 'admin',
+          actorId: admin.id,
+          action: 'admin.login',
+          targetType: 'admin',
+          targetId: admin.id,
+          ipAddress: ip,
+        },
+      })
+      .catch(() => void 0);
 
     const accessToken = this.tokens.signAccess(
       { sub: admin.id, email: admin.email, roles: [admin.role] },
@@ -74,7 +87,12 @@ export class AdminService {
     };
   }
 
-  async setUserActive(userId: string, isActive: boolean, actorId: string): Promise<{ id: string; isActive: boolean }> {
+  async setUserActive(
+    userId: string,
+    isActive: boolean,
+    actorId: string,
+    ip: string | null = null,
+  ): Promise<{ id: string; isActive: boolean }> {
     const user = await this.prisma.user.update({ where: { id: userId }, data: { isActive } });
     await this.prisma.auditLog
       .create({
@@ -84,6 +102,7 @@ export class AdminService {
           action: isActive ? 'user.unblock' : 'user.block',
           targetType: 'user',
           targetId: userId,
+          ipAddress: ip,
         },
       })
       .catch(() => void 0);

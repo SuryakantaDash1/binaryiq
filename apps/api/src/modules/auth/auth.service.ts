@@ -168,7 +168,7 @@ export class AuthService {
     return { verified: true, pointsAwarded: bonus };
   }
 
-  async login(input: LoginInput): Promise<LoginResult> {
+  async login(input: LoginInput, ip: string | null = null): Promise<LoginResult> {
     const user = await this.prisma.user.findUnique({ where: { email: input.email.toLowerCase() } });
     if (!user || !user.isActive) throw new UnauthenticatedException('Invalid email or password');
 
@@ -194,6 +194,19 @@ export class AuthService {
       where: { id: user.id },
       data: { failedLogins: 0, lockedUntil: null, lastLoginAt: new Date() },
     });
+
+    await this.prisma.auditLog
+      .create({
+        data: {
+          actorType: 'user',
+          actorId: user.id,
+          action: 'user.login',
+          targetType: 'user',
+          targetId: user.id,
+          ipAddress: ip,
+        },
+      })
+      .catch((e: unknown) => this.logger.error('Audit log failed', e));
 
     const accessToken = this.tokens.signAccess({ sub: user.id, email: user.email, roles: [] });
     const refreshToken = this.tokens.signRefresh(user.id);

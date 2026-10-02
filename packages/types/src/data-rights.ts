@@ -34,8 +34,8 @@ export const adminAuditLogQuerySchema = z.object({
   targetId: z.string().uuid().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
-  limit: z.coerce.number().int().min(1).max(100).optional(),
-  cursor: z.string().optional(),
+  page: z.coerce.number().int().positive().optional(),
+  pageSize: z.coerce.number().int().min(1).max(100).optional(),
 });
 
 export const adminConsentQuerySchema = z.object({

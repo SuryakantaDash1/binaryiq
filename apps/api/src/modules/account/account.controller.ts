@@ -5,7 +5,7 @@ import {
   updatePaypalSchema,
   updateAboutYouSchema,
 } from '@influencer/types';
-import { Body, Controller, Delete, Get, HttpCode, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Ip, Post, Put } from '@nestjs/common';
 import { z } from 'zod';
 
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -30,8 +30,9 @@ export class AccountController {
   updateProfile(
     @CurrentUser() user: AuthenticatedUser,
     @Body(new ZodValidationPipe(updateProfileSchema)) body: Parameters<AccountService['updateProfile']>[1],
+    @Ip() ip: string,
   ) {
-    return this.service.updateProfile(user.id, body);
+    return this.service.updateProfile(user.id, body, ip);
   }
 
   @Post('profile/photo')
@@ -61,8 +62,9 @@ export class AccountController {
   confirmEmailChange(
     @CurrentUser() user: AuthenticatedUser,
     @Body(new ZodValidationPipe(tokenBodySchema)) body: { token: string },
+    @Ip() ip: string,
   ) {
-    return this.service.confirmEmailChange(user.id, body.token);
+    return this.service.confirmEmailChange(user.id, body.token, ip);
   }
 
   @Put('password')
@@ -70,16 +72,18 @@ export class AccountController {
   changePassword(
     @CurrentUser() user: AuthenticatedUser,
     @Body(new ZodValidationPipe(changePasswordSchema)) body: Parameters<AccountService['changePassword']>[1],
+    @Ip() ip: string,
   ) {
-    return this.service.changePassword(user.id, body);
+    return this.service.changePassword(user.id, body, ip);
   }
 
   @Put('paypal')
   updatePaypal(
     @CurrentUser() user: AuthenticatedUser,
     @Body(new ZodValidationPipe(updatePaypalSchema)) body: Parameters<AccountService['updatePaypal']>[1],
+    @Ip() ip: string,
   ) {
-    return this.service.updatePaypal(user.id, body);
+    return this.service.updatePaypal(user.id, body, ip);
   }
 
   @Get('about-you')
@@ -91,8 +95,9 @@ export class AccountController {
   updateAboutYou(
     @CurrentUser() user: AuthenticatedUser,
     @Body(new ZodValidationPipe(updateAboutYouSchema)) body: Parameters<AccountService['updateAboutYou']>[1],
+    @Ip() ip: string,
   ) {
-    return this.service.updateAboutYou(user.id, body);
+    return this.service.updateAboutYou(user.id, body, ip);
   }
 
   @Get('balance')

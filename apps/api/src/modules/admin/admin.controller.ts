@@ -6,7 +6,7 @@ import {
   type AdminUsersQuery,
   type AdminUsersResult,
 } from '@influencer/types';
-import { Body, Controller, Get, Param, Put, Query, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Ip, Param, Put, Query, UsePipes } from '@nestjs/common';
 
 import { CurrentUser, type AuthenticatedUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -35,7 +35,8 @@ export class AdminController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(adminUpdateUserSchema)) body: AdminUpdateUserInput,
     @CurrentUser() actor: AuthenticatedUser,
+    @Ip() ip: string,
   ): Promise<{ id: string; isActive: boolean }> {
-    return this.admin.setUserActive(id, body.isActive, actor.id);
+    return this.admin.setUserActive(id, body.isActive, actor.id, ip);
   }
 }

@@ -18,7 +18,11 @@ export class ExportService {
     private readonly redis: RedisService,
   ) {}
 
-  async generateExport(userId: string, baseUrl: string): Promise<{ downloadUrl: string; expiresAt: string }> {
+  async generateExport(
+    userId: string,
+    baseUrl: string,
+    ip: string | null,
+  ): Promise<{ downloadUrl: string; expiresAt: string }> {
     const bundle = await this.assembleBundle(userId);
     const token = randomUUID();
 
@@ -37,6 +41,7 @@ export class ExportService {
         action: 'account.data_export',
         targetType: 'user',
         targetId: userId,
+        ipAddress: ip,
       },
     });
 

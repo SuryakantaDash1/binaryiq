@@ -19,8 +19,8 @@ export class AdminDataRightsController {
   async getAuditLogs(
     @Query(new ZodValidationPipe(adminAuditLogQuerySchema)) q: AdminAuditLogQuery,
   ) {
-    const limit = q.limit ?? 50;
-    const cursorDate = q.cursor ? new Date(Buffer.from(q.cursor, 'base64url').toString()) : undefined;
+    const page = q.page ?? 1;
+    const pageSize = q.pageSize ?? 50;
 
     const where = {
       ...(q.actorType ? { actorType: q.actorType } : {}),
@@ -36,23 +36,20 @@ export class AdminDataRightsController {
             },
           }
         : {}),
-      ...(cursorDate ? { createdAt: { lt: cursorDate } } : {}),
     };
 
-    const rows = await this.prisma.auditLog.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      take: limit + 1,
-    });
-
-    const hasMore = rows.length > limit;
-    const page = rows.slice(0, limit);
-    const nextCursor = hasMore
-      ? Buffer.from(page[page.length - 1]!.createdAt.toISOString()).toString('base64url')
-      : null;
+    const [total, rows] = await Promise.all([
+      this.prisma.auditLog.count({ where }),
+      this.prisma.auditLog.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+    ]);
 
     return {
-      data: page.map((r) => ({
+      items: rows.map((r) => ({
         id: r.id,
         actorType: r.actorType,
         actorId: r.actorId,
@@ -63,7 +60,9 @@ export class AdminDataRightsController {
         metadata: r.metadata,
         createdAt: r.createdAt.toISOString(),
       })),
-      meta: { pagination: { nextCursor, hasMore, limit } },
+      total,
+      page,
+      pageSize,
     };
   }
 

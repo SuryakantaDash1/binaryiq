@@ -43,10 +43,10 @@ export const dataRightsApi = {
     action?: string;
     from?: string;
     to?: string;
-    limit?: number;
-    cursor?: string;
+    page?: number;
+    pageSize?: number;
   }): Promise<{
-    data: Array<{
+    items: Array<{
       id: string;
       actorType: string;
       actorId: string | null;
@@ -57,17 +57,19 @@ export const dataRightsApi = {
       metadata: unknown;
       createdAt: string;
     }>;
-    meta: { pagination: { nextCursor: string | null; hasMore: boolean; limit: number } };
+    total: number;
+    page: number;
+    pageSize: number;
   }> {
     const qs = new URLSearchParams();
     if (params?.actorType) qs.set('actorType', params.actorType);
     if (params?.action) qs.set('action', params.action);
     if (params?.from) qs.set('from', params.from);
     if (params?.to) qs.set('to', params.to);
-    if (params?.limit) qs.set('limit', String(params.limit));
-    if (params?.cursor) qs.set('cursor', params.cursor);
+    if (params?.page) qs.set('page', String(params.page));
+    if (params?.pageSize) qs.set('pageSize', String(params.pageSize));
     const q = qs.toString();
-    return adminFetch(`/admin/audit-logs${q ? `?${q}` : ''}`, { raw: true });
+    return adminFetch(`/admin/audit-logs${q ? `?${q}` : ''}`);
   },
 
   adminGetConsents(params?: {

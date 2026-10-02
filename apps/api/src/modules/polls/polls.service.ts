@@ -202,7 +202,7 @@ export class PollsService {
     return { ...this.toPollSummary(poll), isActive: poll.isActive, options: poll.options };
   }
 
-  async create(input: CreatePollInput) {
+  async create(input: CreatePollInput, ip: string | null = null) {
     if (input.options.length < 2) {
       throw new ValidationException('Need at least 2 options', [
         { field: 'options', issue: 'At least 2 options required' },
@@ -227,11 +227,11 @@ export class PollsService {
       });
       return created;
     });
-    await this.auditLog(null, 'poll.create', { pollId: poll.id });
+    await this.auditLog(null, 'poll.create', { pollId: poll.id }, ip);
     return { ...this.toPollSummary(poll), isActive: poll.isActive, options: poll.options };
   }
 
-  async update(pollId: string, input: UpdatePollInput, adminId: string) {
+  async update(pollId: string, input: UpdatePollInput, adminId: string, ip: string | null = null) {
     const poll = await this.prisma.poll.findUnique({ where: { id: pollId } });
     if (!poll) throw new NotFoundException('Poll not found');
 
@@ -247,7 +247,7 @@ export class PollsService {
     });
 
     const action = input.isActive === false ? 'poll.deactivate' : 'poll.update';
-    await this.auditLog(adminId, action, { pollId });
+    await this.auditLog(adminId, action, { pollId }, ip);
     return { ...this.toPollSummary(updated), isActive: updated.isActive, options: updated.options };
   }
 
@@ -292,7 +292,7 @@ export class PollsService {
     };
   }
 
-  private async auditLog(actorId: string | null, action: string, metadata: object) {
+  private async auditLog(actorId: string | null, action: string, metadata: object, ip: string | null) {
     await this.prisma.auditLog
       .create({
         data: {
@@ -300,6 +300,7 @@ export class PollsService {
           actorId: actorId ?? undefined,
           action,
           targetType: 'poll',
+          ipAddress: ip,
           metadata,
         },
       })

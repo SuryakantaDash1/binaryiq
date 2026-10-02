@@ -17,7 +17,11 @@ export class ErasureService {
     @InjectQueue(QUEUES.ERASURE) private readonly erasureQueue: Queue,
   ) {}
 
-  async requestErasure(userId: string, _dto: ErasureInput): Promise<{ status: string; purgeEligibleAt: string }> {
+  async requestErasure(
+    userId: string,
+    _dto: ErasureInput,
+    ip: string | null,
+  ): Promise<{ status: string; purgeEligibleAt: string }> {
     const now = new Date();
 
     // Stage 1: Soft delete — set deletedAt, lock account
@@ -37,6 +41,7 @@ export class ErasureService {
         action: 'account.erasure_requested',
         targetType: 'user',
         targetId: userId,
+        ipAddress: ip,
       },
     });
 

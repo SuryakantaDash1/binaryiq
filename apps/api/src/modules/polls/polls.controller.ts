@@ -6,7 +6,7 @@ import {
   type UpdatePollInput,
   type VoteInput,
 } from '@influencer/types';
-import { Body, Controller, Get, HttpCode, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Ip, Param, Post, Put, Query } from '@nestjs/common';
 import { z } from 'zod';
 
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -79,8 +79,8 @@ export class PollsController {
   @Post('admin/polls')
   @Roles('SUPER_ADMIN', 'ADMIN')
   @HttpCode(201)
-  adminCreate(@Body(new ZodValidationPipe(createPollSchema)) body: CreatePollInput) {
-    return this.service.create(body);
+  adminCreate(@Body(new ZodValidationPipe(createPollSchema)) body: CreatePollInput, @Ip() ip: string) {
+    return this.service.create(body, ip);
   }
 
   @Put('admin/polls/:id')
@@ -89,7 +89,8 @@ export class PollsController {
     @Param('id') id: string,
     @CurrentUser() user: AuthUser,
     @Body(new ZodValidationPipe(updatePollSchema)) body: UpdatePollInput,
+    @Ip() ip: string,
   ) {
-    return this.service.update(id, body, user.id);
+    return this.service.update(id, body, user.id, ip);
   }
 }

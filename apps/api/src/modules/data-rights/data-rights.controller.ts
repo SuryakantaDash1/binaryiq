@@ -1,6 +1,6 @@
 import type { ConsentInput, ErasureInput } from '@influencer/types';
 import { consentInputSchema, erasureInputSchema } from '@influencer/types';
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Ip, Param, Post, Req } from '@nestjs/common';
 import type { Request } from 'express';
 
 import type { AuthenticatedUser } from '../../common/decorators/current-user.decorator';
@@ -41,10 +41,10 @@ export class DataRightsController {
 
   // GET /account/data-export — initiate export
   @Get('account/data-export')
-  getDataExport(@CurrentUser() user: AuthenticatedUser, @Req() req: Request) {
+  getDataExport(@CurrentUser() user: AuthenticatedUser, @Req() req: Request, @Ip() ip: string) {
     const protocol = req.protocol;
     const host = req.get('host') ?? 'localhost:4000';
-    return this.export_.generateExport(user.id, `${protocol}://${host}`);
+    return this.export_.generateExport(user.id, `${protocol}://${host}`, ip);
   }
 
   // GET /account/data-export/download/:token — serve bundle (public token, no auth needed)
@@ -62,7 +62,8 @@ export class DataRightsController {
   requestErasure(
     @Body(new ZodValidationPipe(erasureInputSchema)) body: ErasureInput,
     @CurrentUser() user: AuthenticatedUser,
+    @Ip() ip: string,
   ) {
-    return this.erasure.requestErasure(user.id, body);
+    return this.erasure.requestErasure(user.id, body, ip);
   }
 }

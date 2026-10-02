@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { DataTable, type Column, Skeleton, EmptyState, Heading, Button } from '@influencer/ui';
+import { DataTable, type Column, Skeleton, EmptyState, Heading, Text } from '@influencer/ui';
 import { dataRightsApi } from '@/lib/api/data-rights.js';
 
 type AuditRow = {
@@ -15,6 +15,8 @@ type AuditRow = {
   createdAt: string;
 };
 
+const PAGE_SIZE = 50;
+
 const ACTOR_TYPE_OPTIONS = [
   { value: '', label: 'All actor types' },
   { value: 'user', label: 'User' },
@@ -24,36 +26,39 @@ const ACTOR_TYPE_OPTIONS = [
 
 export default function AdminAuditLogsPage(): React.JSX.Element {
   const [rows, setRows] = useState<AuditRow[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [actorType, setActorType] = useState('');
   const [action, setAction] = useState('');
-  const [cursor, setCursor] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(false);
 
-  const load = useCallback(
-    (nextCursor?: string | null) => {
-      setLoading(true);
-      dataRightsApi
-        .adminGetAuditLogs({
-          actorType: actorType || undefined,
-          action: action || undefined,
-          limit: 50,
-          cursor: nextCursor ?? undefined,
-        })
-        .then((res) => {
-          setRows(nextCursor ? (prev) => [...prev, ...res.data] : res.data);
-          setHasMore(res.meta.pagination.hasMore);
-          setCursor(res.meta.pagination.nextCursor);
-        })
-        .catch(() => void 0)
-        .finally(() => setLoading(false));
-    },
-    [actorType, action],
-  );
+  const load = useCallback(() => {
+    setLoading(true);
+    dataRightsApi
+      .adminGetAuditLogs({
+        actorType: actorType || undefined,
+        action: action || undefined,
+        page,
+        pageSize: PAGE_SIZE,
+      })
+      .then((res) => {
+        setRows(res.items);
+        setTotal(res.total);
+      })
+      .catch(() => void 0)
+      .finally(() => setLoading(false));
+  }, [actorType, action, page]);
 
   useEffect(() => {
-    load(null);
+    load();
   }, [load]);
+
+  // Reset to page 1 whenever a filter changes.
+  useEffect(() => {
+    setPage(1);
+  }, [actorType, action]);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const columns: Column<AuditRow>[] = [
     {
@@ -99,7 +104,14 @@ export default function AdminAuditLogsPage(): React.JSX.Element {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <Heading level={3}>Audit Logs</Heading>
+        <div>
+          <Heading level={3}>Audit Logs</Heading>
+          {!loading && (
+            <Text color="secondary" size="sm">
+              {total.toLocaleString()} entr{total === 1 ? 'y' : 'ies'} found
+            </Text>
+          )}
+        </div>
       </div>
 
       <div className="mb-4 flex flex-wrap gap-3">
@@ -134,13 +146,33 @@ export default function AdminAuditLogsPage(): React.JSX.Element {
       ) : (
         <>
           <DataTable columns={columns} rows={rows} keyExtractor={(r) => r.id} />
-          {hasMore && (
-            <div className="mt-4 flex justify-center">
-              <Button variant="outline" onClick={() => load(cursor)} disabled={loading}>
-                {loading ? 'Loading…' : 'Load more'}
-              </Button>
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+            <p className="text-sm text-text-secondary">
+              Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} of {total}
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={page <= 1 || loading}
+                onClick={() => setPage((p) => p - 1)}
+                className="rounded-full border border-border px-4 py-2 text-sm font-medium text-text transition hover:bg-background disabled:opacity-40"
+              >
+                Previous
+              </button>
+              <span className="text-sm font-semibold text-text">
+                Page {page} of {totalPages}
+              </span>
+              <button
+                type="button"
+                disabled={page >= totalPages || loading}
+                onClick={() => setPage((p) => p + 1)}
+                className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-on-primary transition hover:bg-primary-hover disabled:opacity-40"
+              >
+                Next
+              </button>
             </div>
-          )}
+          </div>
         </>
       )}
     </div>

@@ -43,7 +43,7 @@ export class RewardsService {
   }
 
   // ─── Redemption ───────────────────────────────────────────────────
-  async redeem(userId: string, input: RedeemInput, idempotencyKey?: string) {
+  async redeem(userId: string, input: RedeemInput, idempotencyKey?: string, ip: string | null = null) {
     const reward = await this.prisma.reward.findUnique({ where: { id: input.rewardId } });
     if (!reward || !reward.isActive) throw new NotFoundException('Reward not found');
     if (reward.stock !== null && reward.stock <= 0) throw new UnprocessableException('out_of_stock');
@@ -76,7 +76,7 @@ export class RewardsService {
       this.logger.error('Fulfilment failed', e),
     );
 
-    await this.auditLog(userId, 'redemption.create', { rewardId: reward.id, points: reward.pointsRequired });
+    await this.auditLog(userId, 'redemption.create', { rewardId: reward.id, points: reward.pointsRequired }, ip);
 
     return this.toRedemptionView({ ...redemption, reward });
   }
@@ -184,6 +184,7 @@ export class RewardsService {
     id: string,
     input: UpdateRedemptionStatusInput,
     adminId: string,
+    ip: string | null = null,
   ) {
     const redemption = await this.prisma.rewardRedemption.findUnique({
       where: { id },
@@ -237,7 +238,7 @@ export class RewardsService {
       from: redemption.status,
       to: input.status,
       refunded: needsRefund,
-    });
+    }, ip);
     return this.toRedemptionView(updated);
   }
 
@@ -364,10 +365,10 @@ export class RewardsService {
     };
   }
 
-  private async auditLog(actorId: string, action: string, metadata: object) {
+  private async auditLog(actorId: string, action: string, metadata: object, ip: string | null) {
     await this.prisma.auditLog
       .create({
-        data: { actorType: 'user', actorId, action, targetType: 'reward', metadata },
+        data: { actorType: 'user', actorId, action, targetType: 'reward', ipAddress: ip, metadata },
       })
       .catch((e) => this.logger.error('Audit log failed', e));
   }
