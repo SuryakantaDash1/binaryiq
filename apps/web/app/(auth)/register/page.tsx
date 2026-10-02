@@ -131,18 +131,6 @@ export default function RegisterPage(): React.JSX.Element {
       )}
 
       <Text color="muted" size="sm">
-        {t('acceptPrefix')}{' '}
-        <Link href="/terms" className="text-primary">
-          {t('termsAndConditions')}
-        </Link>{' '}
-        {t('and')}{' '}
-        <Link href="/privacy" className="text-primary">
-          {t('privacyPolicy')}
-        </Link>{' '}
-        {t('acceptSuffix')}
-      </Text>
-
-      <Text color="muted" size="sm">
         {t('alreadyHaveAccount')}{' '}
         <Link href="/login" className="text-primary">
           {t('signIn')}
@@ -285,11 +273,10 @@ function Step2Form({
     formState: { errors, isSubmitting },
   } = useForm<RegisterStep2Input>({
     resolver: zodResolver(registerStep2Schema),
-    defaultValues: { draftId },
+    defaultValues: { draftId, smsOptIn: false },
   });
 
   const [showPw, setShowPw] = useState(false);
-  const [sms, setSms] = useState(true);
   const [pinDisplay, setPinDisplay] = useState('');
   const [pinOptions, setPinOptions] = useState<Array<{ pin: string; name: string }>>([]);
   const [pinOpen, setPinOpen] = useState(false);
@@ -373,13 +360,14 @@ function Step2Form({
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
       <Field label={t('emailLabel')} required error={errors.email?.message}>
-        <input type="email" className={INPUT} placeholder={t('emailPlaceholder')} {...register('email')} />
+        <input type="email" autoComplete="email" className={INPUT} placeholder={t('emailPlaceholder')} {...register('email')} />
       </Field>
 
       <Field label={t('password')} required error={errors.password?.message}>
         <div className="relative">
           <input
             type={showPw ? 'text' : 'password'}
+            autoComplete="new-password"
             className={`${INPUT} pr-11`}
             placeholder={t('passwordHint')}
             {...register('password')}
@@ -449,12 +437,35 @@ function Step2Form({
         </div>
       </Field>
 
-      <label className="flex items-center gap-2 text-sm text-gray-600">
+      {/* Consents are separate and unticked: DPDP needs a clear, affirmative action for each. */}
+      <div>
+        <label className="flex items-start gap-2 text-sm text-gray-600">
+          <input
+            type="checkbox"
+            {...register('acceptTerms')}
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-brand-800 focus:ring-brand-400"
+          />
+          <span>
+            {t('agreePrefix')}{' '}
+            <Link href="/terms" target="_blank" className="text-primary underline">
+              {t('termsAndConditions')}
+            </Link>{' '}
+            {t('and')}{' '}
+            <Link href="/privacy" target="_blank" className="text-primary underline">
+              {t('privacyPolicy')}
+            </Link>{' '}
+            {t('agreeSuffix')}
+            <span className="text-brand-800"> *</span>
+          </span>
+        </label>
+        {errors.acceptTerms && <p className="mt-1 text-xs text-red-600">{errors.acceptTerms.message}</p>}
+      </div>
+
+      <label className="flex items-start gap-2 text-sm text-gray-600">
         <input
           type="checkbox"
-          checked={sms}
-          onChange={(e) => setSms(e.target.checked)}
-          className="h-4 w-4 rounded border-gray-300 text-brand-800 focus:ring-brand-400"
+          {...register('smsOptIn')}
+          className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-brand-800 focus:ring-brand-400"
         />
         {t('smsConsent')}
       </label>

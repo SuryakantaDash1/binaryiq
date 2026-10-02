@@ -27,9 +27,11 @@ export const dataRightsApi = {
     return apiFetch('/consents', { method: 'POST', body });
   },
 
-  // Data export
-  requestExport(): Promise<{ downloadUrl: string; expiresAt: string }> {
-    return apiFetch('/account/data-export');
+  // Data export — prepared server-side, then fetched once with the member's own session.
+  async downloadExport(): Promise<Blob> {
+    const { token } = await apiFetch<{ token: string; expiresAt: string }>('/account/data-export', { method: 'POST' });
+    const bundle = await apiFetch<object>(`/account/data-export/download/${encodeURIComponent(token)}`);
+    return new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
   },
 
   // Erasure

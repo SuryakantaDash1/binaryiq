@@ -14,8 +14,10 @@ import {
   type RegisterStep2Result,
   type VerifyEmailResult,
 } from '@influencer/types';
-import { Body, Controller, Get, HttpCode, Ip, Post, Query, Req, Res, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Ip, Post, Query, Req, Res } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
+import { z } from 'zod';
 
 import { Public } from '../../common/decorators/public.decorator';
 import { UnauthenticatedException } from '../../common/exceptions/domain.exception';
@@ -25,6 +27,9 @@ import { AppConfigService } from '../../config/config.service';
 import { AuthService } from './auth.service';
 
 const REFRESH_COOKIE = 'refresh_token';
+const REFRESH_PATH = '/v1/auth';
+const MINUTE = 60_000;
+const verifyQuerySchema = z.object({ token: z.string().uuid() });
 
 @Controller('auth')
 export class AuthController {
@@ -34,32 +39,37 @@ export class AuthController {
   ) {}
 
   @Public()
+  @Throttle({ default: { limit: 10, ttl: MINUTE } })
   @Post('register/step1')
-  @UsePipes(new ZodValidationPipe(registerStep1Schema))
-  registerStep1(@Body() body: RegisterStep1Input): Promise<RegisterStep1Result> {
+  registerStep1(
+    @Body(new ZodValidationPipe(registerStep1Schema)) body: RegisterStep1Input,
+  ): Promise<RegisterStep1Result> {
     return this.auth.registerStep1(body);
   }
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: MINUTE } })
   @Post('register/step2')
-  @UsePipes(new ZodValidationPipe(registerStep2Schema))
-  registerStep2(@Body() body: RegisterStep2Input): Promise<RegisterStep2Result> {
-    return this.auth.registerStep2(body);
+  registerStep2(
+    @Body(new ZodValidationPipe(registerStep2Schema)) body: RegisterStep2Input,
+    @Ip() ip: string,
+  ): Promise<RegisterStep2Result> {
+    return this.auth.registerStep2(body, ip);
   }
 
   @Public()
+  @Throttle({ default: { limit: 10, ttl: MINUTE } })
   @Get('verify-email')
-  verifyEmail(@Query('token') token?: string): Promise<VerifyEmailResult> {
-    if (!token) throw new UnauthenticatedException('Missing token');
-    return this.auth.verifyEmail(token);
+  verifyEmail(@Query(new ZodValidationPipe(verifyQuerySchema)) q: { token: string }): Promise<VerifyEmailResult> {
+    return this.auth.verifyEmail(q.token);
   }
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: MINUTE } })
   @Post('login')
   @HttpCode(200)
-  @UsePipes(new ZodValidationPipe(loginSchema))
   async login(
-    @Body() body: LoginInput,
+    @Body(new ZodValidationPipe(loginSchema)) body: LoginInput,
     @Res({ passthrough: true }) res: Response,
     @Ip() ip: string,
   ): Promise<AuthSession> {
@@ -68,47 +78,62 @@ export class AuthController {
     return session;
   }
 
+  /** Revokes the session server-side (all tokens for this account) and clears the cookie. */
   @Public()
   @Post('logout')
   @HttpCode(200)
-  logout(@Res({ passthrough: true }) res: Response): { success: true } {
-    res.clearCookie(REFRESH_COOKIE, { path: '/v1/auth' });
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<{ success: true }> {
+    await this.auth.logout(this.readRefreshCookie(req));
+    res.clearCookie(REFRESH_COOKIE, { path: REFRESH_PATH });
     return { success: true };
   }
 
   @Public()
+  @Throttle({ default: { limit: 3, ttl: 15 * MINUTE } })
   @Post('forgot-password')
   @HttpCode(200)
-  @UsePipes(new ZodValidationPipe(forgotPasswordSchema))
-  async forgotPassword(@Body() body: ForgotPasswordInput): Promise<{ success: true }> {
+  async forgotPassword(
+    @Body(new ZodValidationPipe(forgotPasswordSchema)) body: ForgotPasswordInput,
+  ): Promise<{ success: true }> {
     await this.auth.forgotPassword(body);
     return { success: true };
   }
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 15 * MINUTE } })
   @Post('reset-password')
   @HttpCode(200)
-  @UsePipes(new ZodValidationPipe(resetPasswordSchema))
-  async resetPassword(@Body() body: ResetPasswordInput): Promise<{ success: true }> {
+  async resetPassword(
+    @Body(new ZodValidationPipe(resetPasswordSchema)) body: ResetPasswordInput,
+  ): Promise<{ success: true }> {
     await this.auth.resetPassword(body);
     return { success: true };
   }
 
+  /** Issues a fresh access token and rotates the refresh cookie. */
   @Public()
+  @Throttle({ default: { limit: 30, ttl: MINUTE } })
   @Post('refresh')
   @HttpCode(200)
-  refresh(@Req() req: Request): Promise<AuthSession> {
-    const token = (req.cookies as Record<string, string> | undefined)?.[REFRESH_COOKIE];
+  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthSession> {
+    const token = this.readRefreshCookie(req);
     if (!token) throw new UnauthenticatedException('Missing refresh token');
-    return this.auth.refresh(token);
+    const { session, refreshToken } = await this.auth.refresh(token);
+    this.setRefreshCookie(res, refreshToken);
+    return session;
+  }
+
+  private readRefreshCookie(req: Request): string | undefined {
+    return (req.cookies as Record<string, string> | undefined)?.[REFRESH_COOKIE];
   }
 
   private setRefreshCookie(res: Response, token: string): void {
     res.cookie(REFRESH_COOKIE, token, {
       httpOnly: true,
-      secure: this.config.isProduction,
+      // Secure everywhere except local development over plain http.
+      secure: this.config.get('NODE_ENV') !== 'development',
       sameSite: 'lax',
-      path: '/v1/auth',
+      path: REFRESH_PATH,
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
   }

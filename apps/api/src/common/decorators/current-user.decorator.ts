@@ -6,6 +6,7 @@ export interface AuthenticatedUser {
   email: string;
   roles: string[];
   isAdmin: boolean;
+  aud: 'member' | 'admin';
 }
 
 /** Returns the authenticated principal attached by AuthGuard. */

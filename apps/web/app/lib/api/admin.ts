@@ -1,6 +1,7 @@
 import type {
   AdminAnnouncementPage,
   AdminAnnouncementView,
+  AdminLoginChallenge,
   AdminSession,
   AdminStats,
   AdminUserRow,
@@ -17,32 +18,46 @@ import type {
 import { ApiError } from './client.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/v1';
-const ADMIN_TOKEN_KEY = 'influencer_admin_token';
+const LEGACY_ADMIN_TOKEN_KEY = 'influencer_admin_token';
 
-// ─── Isolated admin token store (separate from the member session) ───
-export function getAdminToken(): string | null {
-  if (typeof window === 'undefined') return null;
+// ─── Admin session ──────────────────────────────────────────────────
+// The short-lived access token lives only in memory, so an XSS bug can't read it
+// out of storage. The session itself is an httpOnly, path-scoped refresh cookie
+// the API sets after 2FA; reloading the page re-mints the access token from it.
+let adminAccessToken: string | null = null;
+let refreshInFlight: Promise<boolean> | null = null;
+
+if (typeof window !== 'undefined') {
   try {
-    return window.localStorage.getItem(ADMIN_TOKEN_KEY);
-  } catch {
-    return null;
-  }
-}
-export function setAdminToken(token: string): void {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(ADMIN_TOKEN_KEY, token);
+    window.localStorage.removeItem(LEGACY_ADMIN_TOKEN_KEY); // tokens used to be kept here
   } catch {
     /* storage unavailable */
   }
+}
+
+export function getAdminToken(): string | null {
+  return adminAccessToken;
 }
 export function clearAdminToken(): void {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.removeItem(ADMIN_TOKEN_KEY);
-  } catch {
-    /* storage unavailable */
-  }
+  adminAccessToken = null;
+}
+
+/** Re-mints the admin access token from the refresh cookie. Concurrent callers share one request. */
+export function refreshAdminSession(): Promise<boolean> {
+  refreshInFlight ??= (async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/admin/auth/refresh`, { method: 'POST', credentials: 'include' });
+      if (!res.ok) return false;
+      const body = (await res.json()) as ApiResponse<AdminSession>;
+      adminAccessToken = body.data?.accessToken ?? null;
+      return adminAccessToken !== null;
+    } catch {
+      return false;
+    } finally {
+      refreshInFlight = null;
+    }
+  })();
+  return refreshInFlight;
 }
 
 interface AdminFetchOptions extends Omit<RequestInit, 'body'> {
@@ -52,12 +67,14 @@ interface AdminFetchOptions extends Omit<RequestInit, 'body'> {
 }
 
 /**
- * Admin fetch — attaches the admin bearer, no silent member refresh.
- * On 401/403 it clears the admin token and throws (the layout guard redirects to login).
+ * Admin fetch — attaches the in-memory admin bearer and, on a 401, refreshes
+ * once from the cookie and retries. Auth endpoints send credentials so the API
+ * can set/read the httpOnly session cookie.
  */
-export async function adminFetch<T>(path: string, options: AdminFetchOptions = {}): Promise<T> {
+export async function adminFetch<T>(path: string, options: AdminFetchOptions = {}, retried = false): Promise<T> {
   const { body, headers, raw, ...rest } = options;
-  const token = getAdminToken();
+  const token = adminAccessToken;
+  const isAuthPath = path.startsWith('/admin/auth/');
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 25_000);
@@ -66,6 +83,7 @@ export async function adminFetch<T>(path: string, options: AdminFetchOptions = {
   try {
     res = await fetch(`${BASE_URL}${path}`, {
       ...rest,
+      credentials: isAuthPath ? 'include' : 'omit',
       body: body != null ? JSON.stringify(body) : undefined,
       signal: rest.signal ?? controller.signal,
       headers: {
@@ -81,7 +99,8 @@ export async function adminFetch<T>(path: string, options: AdminFetchOptions = {
     clearTimeout(timeout);
   }
 
-  if ((res.status === 401 || res.status === 403) && !path.startsWith('/admin/auth/login')) {
+  if (res.status === 401 && !retried && !isAuthPath) {
+    if (await refreshAdminSession()) return adminFetch<T>(path, options, true);
     clearAdminToken();
   }
 
@@ -105,8 +124,25 @@ export async function adminFetch<T>(path: string, options: AdminFetchOptions = {
 }
 
 export const adminApi = {
-  login(email: string, password: string): Promise<AdminSession> {
+  /** Password step — always followed by an authenticator-app step. */
+  login(email: string, password: string): Promise<AdminLoginChallenge> {
     return adminFetch('/admin/auth/login', { method: 'POST', body: { email, password } });
+  },
+  /** Authenticator-code step; on success the session is live. */
+  async verifyTotp(challengeToken: string, code: string): Promise<AdminSession> {
+    const session = await adminFetch<AdminSession>('/admin/auth/totp', {
+      method: 'POST',
+      body: { challengeToken, code },
+    });
+    adminAccessToken = session.accessToken;
+    return session;
+  },
+  async logout(): Promise<void> {
+    try {
+      await adminFetch('/admin/auth/logout', { method: 'POST' });
+    } finally {
+      clearAdminToken();
+    }
   },
   me(): Promise<AdminSession['admin']> {
     return adminFetch('/admin/auth/me');

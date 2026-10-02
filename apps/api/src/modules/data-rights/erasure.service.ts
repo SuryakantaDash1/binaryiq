@@ -2,6 +2,7 @@ import type { ErasureInput } from '@influencer/types';
 import { Injectable, Logger } from '@nestjs/common';
 
 import { PrismaService } from '../../prisma/prisma.service';
+import { AuthStateService } from '../auth/auth-state.service';
 
 import { ERASURE_GRACE_MS } from './erasure.processor';
 
@@ -9,7 +10,10 @@ import { ERASURE_GRACE_MS } from './erasure.processor';
 export class ErasureService {
   private readonly logger = new Logger(ErasureService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly authState: AuthStateService,
+  ) {}
 
   /**
    * Stage 1: lock the account immediately. Stage 2 (permanent purge of all
@@ -29,8 +33,9 @@ export class ErasureService {
       data: { deletedAt: now, isActive: false },
     });
 
-    // Pending verify/reset/email-change tokens are useless now.
+    // Pending verify/reset/email-change tokens are useless now, and every session ends.
     await this.prisma.authToken.deleteMany({ where: { userId } });
+    await this.authState.revoke('member', userId);
 
     await this.prisma.auditLog.create({
       data: {

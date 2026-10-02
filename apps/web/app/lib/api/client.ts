@@ -102,8 +102,20 @@ async function doFetch<T>(
   return body.data;
 }
 
-/** Exchange the httpOnly refresh cookie for a fresh access token. */
-async function tryRefresh(): Promise<boolean> {
+let refreshInFlight: Promise<boolean> | null = null;
+
+/**
+ * Exchange the httpOnly refresh cookie for a fresh access token. Refresh tokens
+ * are single-use, so concurrent callers share one request.
+ */
+function tryRefresh(): Promise<boolean> {
+  refreshInFlight ??= doRefresh().finally(() => {
+    refreshInFlight = null;
+  });
+  return refreshInFlight;
+}
+
+async function doRefresh(): Promise<boolean> {
   try {
     const res = await fetch(`${BASE_URL}/auth/refresh`, {
       method: 'POST',

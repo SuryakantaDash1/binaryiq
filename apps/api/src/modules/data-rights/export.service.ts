@@ -18,17 +18,17 @@ export class ExportService {
     private readonly redis: RedisService,
   ) {}
 
-  async generateExport(
-    userId: string,
-    baseUrl: string,
-    ip: string | null,
-  ): Promise<{ downloadUrl: string; expiresAt: string }> {
+  /**
+   * Prepares a one-time export. The bundle is encrypted at rest in Redis, keyed by
+   * the owner's id (so only they can redeem it), and expires after 15 minutes.
+   */
+  async generateExport(userId: string, ip: string | null): Promise<{ token: string; expiresAt: string }> {
     const bundle = await this.assembleBundle(userId);
     const token = randomUUID();
 
     await this.redis.instance.set(
-      `data_export:${token}`,
-      JSON.stringify(bundle),
+      this.key(userId, token),
+      JSON.stringify(this.enc.encryptJson(bundle)),
       'EX',
       EXPORT_TTL_SECONDS,
     );
@@ -45,19 +45,17 @@ export class ExportService {
       },
     });
 
-    const expiresAt = new Date(Date.now() + EXPORT_TTL_SECONDS * 1000).toISOString();
-    return {
-      downloadUrl: `${baseUrl}/v1/account/data-export/download/${token}`,
-      expiresAt,
-    };
+    return { token, expiresAt: new Date(Date.now() + EXPORT_TTL_SECONDS * 1000).toISOString() };
   }
 
-  async getBundle(token: string): Promise<string | null> {
-    const data = await this.redis.instance.get(`data_export:${token}`);
-    if (!data) return null;
-    // Consume once
-    await this.redis.instance.del(`data_export:${token}`);
-    return data;
+  /** Atomically reads and deletes the export — it can be downloaded exactly once. */
+  async consumeBundle(userId: string, token: string): Promise<object | null> {
+    const stored = await this.redis.instance.getdel(this.key(userId, token));
+    return stored ? this.enc.decryptJson<object>(JSON.parse(stored)) : null;
+  }
+
+  private key(userId: string, token: string): string {
+    return `data_export:${userId}:${token}`;
   }
 
   /** Everything we hold about the user, decrypted — DPDP s.11 right to a summary. */

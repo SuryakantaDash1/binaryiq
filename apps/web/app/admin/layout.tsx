@@ -22,7 +22,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
-import { adminApi, clearAdminToken, getAdminToken } from '@/lib/api/admin';
+import { adminApi, clearAdminToken, getAdminToken, refreshAdminSession } from '@/lib/api/admin';
 
 const NAV: { label: string; href: string; icon: LucideIcon; subtitle: string }[] = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard, subtitle: 'Platform overview' },
@@ -53,20 +53,25 @@ export default function AdminLayout({ children }: { children: ReactNode }): Reac
 
   useEffect(() => {
     if (isLogin) return;
-    if (!getAdminToken()) {
-      router.replace('/admin/login');
-      return;
-    }
-    adminApi
-      .me()
+    let cancelled = false;
+    (async () => {
+      // The access token is memory-only, so after a reload re-mint it from the session cookie.
+      if (!getAdminToken() && !(await refreshAdminSession())) throw new Error('no session');
+      return adminApi.me();
+    })()
       .then((a) => {
+        if (cancelled) return;
         setAdmin(a);
         setState('ok');
       })
       .catch(() => {
+        if (cancelled) return;
         clearAdminToken();
         router.replace('/admin/login');
       });
+    return () => {
+      cancelled = true;
+    };
   }, [isLogin, pathname, router]);
 
   useEffect(() => {
@@ -84,8 +89,8 @@ export default function AdminLayout({ children }: { children: ReactNode }): Reac
   }
 
   function signOut(): void {
-    clearAdminToken();
-    router.replace('/admin/login');
+    // Revokes the session server-side; redirect regardless of the outcome.
+    void adminApi.logout().finally(() => router.replace('/admin/login'));
   }
 
   const isActive = (href: string): boolean => (href === '/admin' ? pathname === '/admin' : pathname.startsWith(href));

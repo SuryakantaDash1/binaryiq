@@ -4,12 +4,23 @@ import { z } from 'zod';
 
 export const genderEnum = z.enum(['MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY']);
 
+function utf8ByteLength(s: string): number {
+  let n = 0;
+  for (const ch of s) {
+    const c = ch.codePointAt(0) ?? 0;
+    n += c < 0x80 ? 1 : c < 0x800 ? 2 : c < 0x10000 ? 3 : 4;
+  }
+  return n;
+}
+
 export const passwordSchema = z
   .string()
   .min(8, 'Password must be at least 8 characters')
   .regex(/[a-z]/, 'Include a lowercase letter')
   .regex(/[A-Z]/, 'Include an uppercase letter')
-  .regex(/[0-9]/, 'Include a number');
+  .regex(/[0-9]/, 'Include a number')
+  // bcrypt silently ignores everything past 72 bytes.
+  .refine((s) => utf8ByteLength(s) <= 72, 'Password must be at most 72 bytes');
 
 // Step 1 — identity basics. Stored in a Redis draft, returns a draftId.
 export const registerStep1Schema = z.object({
@@ -32,6 +43,10 @@ export const registerStep2Schema = z.object({
   pinCode: z.string().min(4, 'Enter your PIN/postal code').max(12),
   username: z.string().min(3, 'Username must be at least 3 characters').max(30),
   mobile: z.string().min(6).max(20).optional(),
+  /** Explicit, affirmative consent to the Terms and Privacy Policy (DPDP s.6). */
+  acceptTerms: z.literal(true, { errorMap: () => ({ message: 'You must accept the Terms and Privacy Policy' }) }),
+  /** Optional, separately-given consent to SMS survey invitations. Off unless ticked. */
+  smsOptIn: z.boolean().default(false),
 });
 export type RegisterStep2Input = z.infer<typeof registerStep2Schema>;
 

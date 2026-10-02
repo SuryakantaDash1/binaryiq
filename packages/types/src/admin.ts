@@ -3,9 +3,31 @@ import { z } from 'zod';
 // ─── Admin auth ───
 export const adminLoginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(1),
+  password: z.string().min(1).max(200),
 });
 export type AdminLoginInput = z.infer<typeof adminLoginSchema>;
+
+/**
+ * Result of the password step. Admins always complete a second step with an
+ * authenticator-app code; first-time admins enrol by scanning the QR code.
+ */
+export type AdminLoginChallenge =
+  | { status: 'totp_required'; challengeToken: string }
+  | {
+      status: 'enrollment_required';
+      challengeToken: string;
+      /** otpauth:// URI encoded in the QR code. */
+      otpauthUrl: string;
+      qrDataUrl: string;
+      /** Same secret as the QR code, for manual entry. */
+      secret: string;
+    };
+
+export const adminTotpSchema = z.object({
+  challengeToken: z.string().min(1).max(2000),
+  code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your authenticator app'),
+});
+export type AdminTotpInput = z.infer<typeof adminTotpSchema>;
 
 export type AdminRoleType = 'SUPER_ADMIN' | 'ADMIN' | 'SUPPORT' | 'DPO';
 

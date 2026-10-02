@@ -21,6 +21,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { z } from 'zod';
 
@@ -28,6 +29,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
+import { WebhookFrom, WebhookSignatureGuard } from '../../common/webhooks/webhook-signature.guard';
 
 import { RewardsService } from './rewards.service';
 
@@ -125,9 +127,10 @@ export class RewardsController {
   // ─── PayPal webhook ──────────────────────────────────────────────
   @Post('webhooks/paypal')
   @Public()
+  @WebhookFrom('paypal')
+  @UseGuards(WebhookSignatureGuard)
   @HttpCode(200)
   paypalWebhook(@Body() body: unknown) {
-    // In production, verify PayPal webhook signature here (Phase 7)
     return this.service.handlePaypalWebhook(
       body as Parameters<RewardsService['handlePaypalWebhook']>[0],
     );

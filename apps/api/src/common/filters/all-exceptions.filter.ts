@@ -20,6 +20,10 @@ import { DomainException } from '../exceptions/domain.exception';
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
 
+  /** `verbose` logs full stacks (local dev). Elsewhere only the error class + Prisma code are
+   *  logged, because database error messages can embed the row values being written. */
+  constructor(private readonly verbose = false) {}
+
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const res = ctx.getResponse<Response>();
@@ -39,8 +43,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
       status = exception.getStatus();
       code = mapStatusToCode(status);
       message = exception.message;
-    } else {
+    } else if (this.verbose) {
       this.logger.error(exception instanceof Error ? exception.stack : String(exception));
+    } else {
+      const name = exception instanceof Error ? exception.name : typeof exception;
+      const prismaCode = (exception as { code?: unknown } | null)?.code;
+      this.logger.error(
+        `Unhandled ${name}${typeof prismaCode === 'string' ? ` (${prismaCode})` : ''} on ${req.method} ${req.path} [${req.requestId ?? 'req_unknown'}]`,
+      );
     }
 
     const body: ApiFailure = {

@@ -25,7 +25,7 @@ export function ConsentCentre(): React.JSX.Element {
 
   // Export state
   const [exporting, setExporting] = useState(false);
-  const [exportResult, setExportResult] = useState<{ downloadUrl: string; expiresAt: string } | null>(null);
+  const [exportDone, setExportDone] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
 
   // Delete account state
@@ -71,8 +71,16 @@ export function ConsentCentre(): React.JSX.Element {
     setExporting(true);
     setExportError(null);
     try {
-      const result = await dataRightsApi.requestExport();
-      setExportResult(result);
+      const blob = await dataRightsApi.downloadExport();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `my-data-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setExportDone(true);
     } catch (err) {
       setExportError(err instanceof ApiError ? err.message : 'Export failed');
     } finally {
@@ -146,30 +154,21 @@ export function ConsentCentre(): React.JSX.Element {
           Download My Data
         </Heading>
         <Text color="secondary" size="sm" className="mb-4">
-          Request a copy of all your personal data. The download link is valid for 15 minutes.
+          Download a copy of all the personal data we hold about you, as a JSON file.
         </Text>
-        {exportResult ? (
-          <div className="rounded-lg bg-green-50 p-4">
-            <p className="mb-2 text-sm font-medium text-green-700">Your data export is ready!</p>
-            <a href={exportResult.downloadUrl} className="text-sm text-primary underline" download>
-              Download my data
-            </a>
-            <p className="mt-1 text-xs text-text-secondary">
-              Expires: {new Date(exportResult.expiresAt).toLocaleString()}
-            </p>
-          </div>
-        ) : (
-          <>
-            {exportError && (
-              <Alert variant="error" className="mb-2">
-                {exportError}
-              </Alert>
-            )}
-            <Button variant="outline" onClick={handleExport} disabled={exporting}>
-              {exporting ? 'Preparing export…' : 'Download my data'}
-            </Button>
-          </>
+        {exportDone && (
+          <p className="mb-2 rounded-lg bg-green-50 p-3 text-sm font-medium text-green-700">
+            Your data has been downloaded. Keep the file somewhere safe — it contains your personal details.
+          </p>
         )}
+        {exportError && (
+          <Alert variant="error" className="mb-2">
+            {exportError}
+          </Alert>
+        )}
+        <Button variant="outline" onClick={handleExport} disabled={exporting}>
+          {exporting ? 'Preparing export…' : 'Download my data'}
+        </Button>
       </section>
 
       {/* Delete account */}

@@ -6,11 +6,12 @@ import {
   type RegisterPushTokenInput,
   type UpdatePreferenceInput,
 } from '@influencer/types';
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
+import { WebhookFrom, WebhookSignatureGuard } from '../../common/webhooks/webhook-signature.guard';
 
 import { NotificationsService } from './notifications.service';
 import { PreferencesService } from './preferences.service';
@@ -81,6 +82,8 @@ export class NotificationsController {
 
   @Post('webhooks/sendgrid')
   @Public()
+  @WebhookFrom('sendgrid')
+  @UseGuards(WebhookSignatureGuard)
   @HttpCode(200)
   sendgridWebhook(@Body() body: unknown) {
     const events = Array.isArray(body) ? body as Record<string, unknown>[] : [body as Record<string, unknown>];
@@ -95,6 +98,8 @@ export class NotificationsController {
 
   @Post('webhooks/twilio')
   @Public()
+  @WebhookFrom('twilio')
+  @UseGuards(WebhookSignatureGuard)
   @HttpCode(200)
   twilioWebhook(@Body() body: Record<string, unknown>) {
     const msgId = body['MessageSid'] as string | undefined;
@@ -106,6 +111,8 @@ export class NotificationsController {
 
   @Post('webhooks/fcm')
   @Public()
+  @WebhookFrom('fcm')
+  @UseGuards(WebhookSignatureGuard)
   @HttpCode(200)
   async fcmWebhook(@Body() body: Record<string, unknown>) {
     const msgId = body['messageId'] as string | undefined;

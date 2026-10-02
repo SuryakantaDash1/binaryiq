@@ -1,55 +1,18 @@
-import type { AdminSession, AdminStats, AdminUsersQuery, AdminUsersResult } from '@influencer/types';
+import type { AdminStats, AdminUsersQuery, AdminUsersResult } from '@influencer/types';
 import { Injectable } from '@nestjs/common';
-import bcrypt from 'bcryptjs';
 
-import { UnauthenticatedException } from '../../common/exceptions/domain.exception';
+import { NotFoundException } from '../../common/exceptions/domain.exception';
 import { PrismaService } from '../../prisma/prisma.service';
-import { TokenService } from '../auth/token.service';
+import { AuthStateService } from '../auth/auth-state.service';
 
-const ADMIN_TOKEN_TTL = '8h';
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly tokens: TokenService,
+    private readonly authState: AuthStateService,
   ) {}
-
-  async login(email: string, password: string, ip: string | null = null): Promise<AdminSession> {
-    const admin = await this.prisma.admin.findUnique({ where: { email: email.toLowerCase() } });
-    if (!admin || !admin.isActive) throw new UnauthenticatedException('Invalid email or password');
-    const ok = await bcrypt.compare(password, admin.passwordHash);
-    if (!ok) throw new UnauthenticatedException('Invalid email or password');
-
-    await this.prisma.auditLog
-      .create({
-        data: {
-          actorType: 'admin',
-          actorId: admin.id,
-          action: 'admin.login',
-          targetType: 'admin',
-          targetId: admin.id,
-          ipAddress: ip,
-        },
-      })
-      .catch(() => void 0);
-
-    const accessToken = this.tokens.signAccess(
-      { sub: admin.id, email: admin.email, roles: [admin.role] },
-      ADMIN_TOKEN_TTL,
-    );
-    return {
-      accessToken,
-      admin: { id: admin.id, email: admin.email, name: admin.name, role: admin.role },
-    };
-  }
-
-  async me(adminId: string): Promise<AdminSession['admin']> {
-    const admin = await this.prisma.admin.findUnique({ where: { id: adminId } });
-    if (!admin) throw new UnauthenticatedException('Admin not found');
-    return { id: admin.id, email: admin.email, name: admin.name, role: admin.role };
-  }
 
   async listUsers(q: AdminUsersQuery): Promise<AdminUsersResult> {
     const where = {
@@ -93,7 +56,12 @@ export class AdminService {
     actorId: string,
     ip: string | null = null,
   ): Promise<{ id: string; isActive: boolean }> {
+    const existing = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+    if (!existing) throw new NotFoundException('User not found');
     const user = await this.prisma.user.update({ where: { id: userId }, data: { isActive } });
+    // Blocking takes effect on the member's very next request, not when their token expires.
+    if (isActive) await this.authState.evict('member', userId);
+    else await this.authState.revoke('member', userId);
     await this.prisma.auditLog
       .create({
         data: {

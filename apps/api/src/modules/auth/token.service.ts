@@ -1,81 +1,105 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+
+import { Injectable } from '@nestjs/common';
 import jwt, { type JwtPayload, type SignOptions } from 'jsonwebtoken';
 
 import { UnauthenticatedException } from '../../common/exceptions/domain.exception';
 import { AppConfigService } from '../../config/config.service';
 
+/** Members and admins get disjoint token audiences — one can never act as the other. */
+export type TokenAudience = 'member' | 'admin';
+
 export interface AccessTokenClaims {
   sub: string;
   email: string;
   roles: string[];
-  type: 'access';
+  aud: TokenAudience;
+  /** Principal's tokenVersion at issue time; a mismatch means the token was revoked. */
+  tv: number;
 }
 
-/**
- * RS256 token signing/verification. Phase 0 loads the keypair (if configured)
- * and exposes sign/verify; the register/login flows that issue tokens land in
- * Phase 1. See modules/module-00-foundation §5.6.
- */
+export interface RefreshTokenClaims {
+  sub: string;
+  aud: TokenAudience;
+  tv: number;
+  /** Unique id — each refresh token can be redeemed once (AuthStateService.consumeRefresh). */
+  jti: string;
+  /** Absolute expiry (unix seconds) — rotation keeps it so admin sessions can't be extended. */
+  exp: number;
+}
+
+const ALG = 'RS256' as const;
+
+function isAudience(v: unknown): v is TokenAudience {
+  return v === 'member' || v === 'admin';
+}
+
+/** RS256 signing/verification. Keys are required at boot (env.schema.ts). */
 @Injectable()
 export class TokenService {
-  private readonly logger = new Logger(TokenService.name);
-  private readonly privateKey?: string;
-  private readonly publicKey?: string;
+  private readonly privateKey: string;
+  private readonly publicKey: string;
 
   constructor(private readonly config: AppConfigService) {
-    const priv = this.config.get('JWT_PRIVATE_KEY');
-    const pub = this.config.get('JWT_PUBLIC_KEY');
-    this.privateKey = priv ? Buffer.from(priv, 'base64').toString('utf8') : undefined;
-    this.publicKey = pub ? Buffer.from(pub, 'base64').toString('utf8') : undefined;
-    if (!this.publicKey) {
-      this.logger.warn(
-        'JWT keys not configured — auth verification will reject all tokens (Phase 0).',
-      );
-    }
+    this.privateKey = Buffer.from(this.config.get('JWT_PRIVATE_KEY'), 'base64').toString('utf8');
+    this.publicKey = Buffer.from(this.config.get('JWT_PUBLIC_KEY'), 'base64').toString('utf8');
   }
 
-  signAccess(claims: Omit<AccessTokenClaims, 'type'>, expiresIn?: SignOptions['expiresIn']): string {
-    if (!this.privateKey) throw new Error('JWT_PRIVATE_KEY not configured');
-    const options: SignOptions = {
-      algorithm: 'RS256',
-      expiresIn: expiresIn ?? (this.config.get('JWT_ACCESS_TTL') as SignOptions['expiresIn']),
-    };
-    return jwt.sign({ ...claims, type: 'access' }, this.privateKey, options);
+  signAccess(claims: AccessTokenClaims, expiresIn?: SignOptions['expiresIn']): string {
+    const ttl =
+      expiresIn ??
+      ((claims.aud === 'admin' ? this.config.get('ADMIN_ACCESS_TTL') : this.config.get('JWT_ACCESS_TTL')) as SignOptions['expiresIn']);
+    return jwt.sign({ ...claims, type: 'access' }, this.privateKey, { algorithm: ALG, expiresIn: ttl });
   }
 
   verifyAccess(token: string): AccessTokenClaims {
-    if (!this.publicKey) throw new UnauthenticatedException('Auth not configured');
+    const d = this.verify(token, 'access', 'Invalid or expired token');
+    return {
+      sub: String(d.sub),
+      email: String(d.email),
+      roles: Array.isArray(d.roles) ? (d.roles as string[]) : [],
+      aud: d.aud as TokenAudience,
+      tv: d.tv as number,
+    };
+  }
+
+  /** Issues a refresh token. Pass `absoluteExp` when rotating to keep the original session end. */
+  signRefresh(claims: { sub: string; aud: TokenAudience; tv: number }, absoluteExp?: number): string {
+    const payload = { ...claims, type: 'refresh', jti: randomUUID() };
+    if (absoluteExp) return jwt.sign({ ...payload, exp: absoluteExp }, this.privateKey, { algorithm: ALG });
+    const ttl = (claims.aud === 'admin' ? this.config.get('ADMIN_SESSION_TTL') : this.config.get('JWT_REFRESH_TTL')) as SignOptions['expiresIn'];
+    return jwt.sign(payload, this.privateKey, { algorithm: ALG, expiresIn: ttl });
+  }
+
+  verifyRefresh(token: string): RefreshTokenClaims {
+    const d = this.verify(token, 'refresh', 'Invalid or expired refresh token');
+    if (typeof d.jti !== 'string') throw new UnauthenticatedException('Invalid or expired refresh token');
+    return { sub: String(d.sub), aud: d.aud as TokenAudience, tv: d.tv as number, jti: d.jti, exp: d.exp as number };
+  }
+
+  /** 5-minute token proving an admin passed the password step; only redeemable at the TOTP step. */
+  signAdminChallenge(adminId: string): string {
+    return jwt.sign({ sub: adminId, type: 'admin_challenge' }, this.privateKey, { algorithm: ALG, expiresIn: '5m' });
+  }
+
+  verifyAdminChallenge(token: string): string {
     try {
-      const decoded = jwt.verify(token, this.publicKey, { algorithms: ['RS256'] }) as JwtPayload;
-      if (decoded.type !== 'access') throw new Error('wrong token type');
-      return {
-        sub: String(decoded.sub),
-        email: String(decoded.email),
-        roles: Array.isArray(decoded.roles) ? (decoded.roles as string[]) : [],
-        type: 'access',
-      };
+      const d = jwt.verify(token, this.publicKey, { algorithms: [ALG] }) as JwtPayload;
+      if (d.type !== 'admin_challenge' || !d.sub) throw new Error('wrong token type');
+      return String(d.sub);
     } catch {
-      throw new UnauthenticatedException('Invalid or expired token');
+      throw new UnauthenticatedException('Login session expired — sign in again');
     }
   }
 
-  signRefresh(userId: string): string {
-    if (!this.privateKey) throw new Error('JWT_PRIVATE_KEY not configured');
-    const options: SignOptions = {
-      algorithm: 'RS256',
-      expiresIn: this.config.get('JWT_REFRESH_TTL') as SignOptions['expiresIn'],
-    };
-    return jwt.sign({ sub: userId, type: 'refresh' }, this.privateKey, options);
-  }
-
-  verifyRefresh(token: string): { sub: string } {
-    if (!this.publicKey) throw new UnauthenticatedException('Auth not configured');
+  private verify(token: string, type: 'access' | 'refresh', message: string): JwtPayload {
     try {
-      const decoded = jwt.verify(token, this.publicKey, { algorithms: ['RS256'] }) as JwtPayload;
-      if (decoded.type !== 'refresh') throw new Error('wrong token type');
-      return { sub: String(decoded.sub) };
+      const d = jwt.verify(token, this.publicKey, { algorithms: [ALG] }) as JwtPayload;
+      // Tokens issued before audiences/versions existed are rejected outright.
+      if (d.type !== type || !isAudience(d.aud) || typeof d.tv !== 'number' || !d.sub) throw new Error('bad claims');
+      return d;
     } catch {
-      throw new UnauthenticatedException('Invalid or expired refresh token');
+      throw new UnauthenticatedException(message);
     }
   }
 }

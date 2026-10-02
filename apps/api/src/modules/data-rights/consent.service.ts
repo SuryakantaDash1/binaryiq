@@ -1,7 +1,6 @@
 import type { ConsentType } from '@influencer/db';
 import type { ConsentInput } from '@influencer/types';
 import { Injectable } from '@nestjs/common';
-import type { Request } from 'express';
 
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -9,13 +8,11 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class ConsentService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async grant(userId: string | null, dto: ConsentInput, req: Request): Promise<object> {
-    const ip =
-      (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim() ??
-      req.socket.remoteAddress ??
-      null;
-    const ua = req.headers['user-agent'] ?? null;
-
+  /**
+   * `ip` comes from req.ip, which honours the configured proxy hop count — unlike
+   * reading X-Forwarded-For directly, a client can't spoof it.
+   */
+  async grant(userId: string | null, dto: ConsentInput, ip: string | null): Promise<object> {
     const row = await this.prisma.consentLog.create({
       data: {
         userId,
@@ -23,7 +20,6 @@ export class ConsentService {
         consentVersion: dto.consentVersion,
         granted: dto.granted,
         ipAddress: ip,
-        userAgent: ua,
       },
     });
 
@@ -37,7 +33,6 @@ export class ConsentService {
           targetType: 'consent',
           targetId: row.id,
           ipAddress: ip,
-          userAgent: ua,
           metadata: { consentType: dto.consentType, granted: dto.granted, version: dto.consentVersion },
         },
       });

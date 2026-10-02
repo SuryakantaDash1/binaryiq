@@ -1,9 +1,8 @@
-import { randomUUID } from 'node:crypto';
-
 import type { UpdateProfileInput, ChangeEmailInput, ChangePasswordInput, UpdatePaypalInput, UpdateAboutYouInput } from '@influencer/types';
 import { Injectable, Logger } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 
+import { hashOneTimeToken, newOneTimeToken } from '../../common/crypto/one-time-token';
 import {
   ConflictException,
   NotFoundException,
@@ -12,6 +11,7 @@ import {
 import { EncryptionService } from '../../common/services/encryption.service';
 import { AppConfigService } from '../../config/config.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { AuthStateService } from '../auth/auth-state.service';
 import { EmailProvider } from '../notifications/email.provider';
 
 const BCRYPT_COST = 12;
@@ -26,6 +26,7 @@ export class AccountService {
     private readonly enc: EncryptionService,
     private readonly email: EmailProvider,
     private readonly config: AppConfigService,
+    private readonly authState: AuthStateService,
   ) {}
 
   async getProfile(userId: string) {
@@ -83,16 +84,19 @@ export class AccountService {
     const existing = await this.prisma.user.findUnique({ where: { email: newEmail } });
     if (existing) throw new ConflictException('Email is already in use');
 
-    const token = randomUUID();
-    await this.prisma.authToken.create({
-      data: {
-        userId,
-        token,
-        tokenType: 'EMAIL_CHANGE',
-        payloadEnc: this.enc.encryptJson({ newEmail }),
-        expiresAt: new Date(Date.now() + EMAIL_CHANGE_TTL_MS),
-      },
-    });
+    const { raw: token, hash: tokenHash } = newOneTimeToken();
+    await this.prisma.$transaction([
+      this.prisma.authToken.deleteMany({ where: { userId, tokenType: 'EMAIL_CHANGE', usedAt: null } }),
+      this.prisma.authToken.create({
+        data: {
+          userId,
+          tokenHash,
+          tokenType: 'EMAIL_CHANGE',
+          payloadEnc: this.enc.encryptJson({ newEmail }),
+          expiresAt: new Date(Date.now() + EMAIL_CHANGE_TTL_MS),
+        },
+      }),
+    ]);
 
     const link = `${this.config.get('WEB_URL')}/account/email/verify?token=${token}`;
     await this.email.send({
@@ -105,7 +109,7 @@ export class AccountService {
   }
 
   async confirmEmailChange(userId: string, token: string, ip: string | null = null) {
-    const record = await this.prisma.authToken.findUnique({ where: { token } });
+    const record = await this.prisma.authToken.findUnique({ where: { tokenHash: hashOneTimeToken(token) } });
     if (!record || record.tokenType !== 'EMAIL_CHANGE' || record.usedAt) {
       throw new UnprocessableException('Invalid or used token');
     }
@@ -123,6 +127,8 @@ export class AccountService {
 
     // Never write the address itself into the (long-retained) audit trail.
     await this.auditLog(userId, 'email.change', {}, ip);
+    // The login identifier changed — sign out every existing session.
+    await this.authState.revoke('member', userId);
     return { email: payload.newEmail };
   }
 
@@ -136,6 +142,8 @@ export class AccountService {
     const passwordHash = await bcrypt.hash(input.newPassword, BCRYPT_COST);
     await this.prisma.user.update({ where: { id: userId }, data: { passwordHash } });
     await this.auditLog(userId, 'password.change', {}, ip);
+    // Any other device (or attacker) holding a session is signed out.
+    await this.authState.revoke('member', userId);
     return { ok: true };
   }
 

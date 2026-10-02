@@ -153,6 +153,8 @@ model User {
   lastLoginAt  DateTime? @map("last_login_at") @db.Timestamptz(6)
   failedLogins Int       @default(0) @map("failed_logins")
   lockedUntil  DateTime? @map("locked_until") @db.Timestamptz(6)
+  /// Bumped to revoke every outstanding access/refresh token (logout, password change, block…).
+  tokenVersion Int       @default(0) @map("token_version")
   createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt    DateTime? @map("deleted_at") @db.Timestamptz(6)
@@ -247,7 +249,8 @@ model PaypalAccount {
 model AuthToken {
   id        String        @id @default(uuid()) @db.Uuid
   userId    String        @map("user_id") @db.Uuid
-  token     String        @unique
+  /// SHA-256 of the one-time token — the raw value only ever exists in the emailed link.
+  tokenHash String        @unique @map("token")
   tokenType AuthTokenType @map("token_type")
   /// Encrypted JSON envelope { v, ct } (EncryptionService.encryptJson).
   payloadEnc Json?        @map("payload") @db.JsonB
@@ -493,6 +496,12 @@ model Admin {
   name         String
   role         AdminRole @default(ADMIN)
   isActive     Boolean   @default(true) @map("is_active")
+  failedLogins Int       @default(0) @map("failed_logins")
+  lockedUntil  DateTime? @map("locked_until") @db.Timestamptz(6)
+  tokenVersion Int       @default(0) @map("token_version")
+  /// Authenticator-app (TOTP) secret, AES-256-GCM encrypted. Null until enrolled.
+  totpSecretEnc String?  @map("totp_secret_enc")
+  totpEnabledAt DateTime? @map("totp_enabled_at") @db.Timestamptz(6)
   createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 

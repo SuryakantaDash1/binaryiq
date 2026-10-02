@@ -61,6 +61,8 @@
     "and": "and",
     "privacyPolicy": "Privacy Policy",
     "acceptSuffix": "of the Influencers Community. Please take a moment to review them.",
+    "agreePrefix": "I have read and agree to the",
+    "agreeSuffix": "of the Influencers Community.",
     "stepOf": "Step {step} of {total}",
     "checkInbox": "Check your inbox",
     "sentTo": "We have sent you an activation email on {email}.",

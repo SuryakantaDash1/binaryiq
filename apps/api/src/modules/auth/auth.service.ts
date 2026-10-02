@@ -1,19 +1,21 @@
 import { randomUUID } from 'node:crypto';
 
-import type {
-  RegisterStep1Input,
-  RegisterStep1Result,
-  RegisterStep2Input,
-  RegisterStep2Result,
-  LoginInput,
-  AuthSession,
-  VerifyEmailResult,
-  ForgotPasswordInput,
-  ResetPasswordInput,
+import {
+  CONSENT_POLICY_VERSION,
+  type RegisterStep1Input,
+  type RegisterStep1Result,
+  type RegisterStep2Input,
+  type RegisterStep2Result,
+  type LoginInput,
+  type AuthSession,
+  type VerifyEmailResult,
+  type ForgotPasswordInput,
+  type ResetPasswordInput,
 } from '@influencer/types';
 import { Injectable, Logger } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 
+import { hashOneTimeToken, newOneTimeToken } from '../../common/crypto/one-time-token';
 import {
   ConflictException,
   UnauthenticatedException,
@@ -27,6 +29,7 @@ import { EmailProvider } from '../notifications/email.provider';
 import { verificationEmail, passwordResetEmail } from '../notifications/email.templates';
 import { PointsService } from '../points/points.service';
 
+import { AuthStateService } from './auth-state.service';
 import { TokenService } from './token.service';
 
 const BCRYPT_COST = 12;
@@ -35,6 +38,8 @@ const VERIFY_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const RESET_TTL_MS = 60 * 60 * 1000; // 1 hour
 const MAX_FAILED_LOGINS = 5;
 const LOCKOUT_MS = 30 * 60 * 1000; // 30 minutes
+// bcrypt hash of a random throwaway value — compared against when the email is unknown.
+const DUMMY_HASH = bcrypt.hashSync(randomUUID(), BCRYPT_COST);
 
 export interface LoginResult {
   session: AuthSession;
@@ -53,6 +58,7 @@ export class AuthService {
     private readonly email: EmailProvider,
     private readonly config: AppConfigService,
     private readonly enc: EncryptionService,
+    private readonly authState: AuthStateService,
   ) {}
 
   /** Step 1 — stash identity basics (name, DOB, gender) in a short-lived, encrypted Redis draft. */
@@ -67,8 +73,8 @@ export class AuthService {
     return { draftId };
   }
 
-  /** Step 2 — create the user, send the verification email. */
-  async registerStep2(input: RegisterStep2Input): Promise<RegisterStep2Result> {
+  /** Step 2 — create the user, record consent, send the verification email. */
+  async registerStep2(input: RegisterStep2Input, ip: string | null = null): Promise<RegisterStep2Result> {
     const raw = await this.redis.instance.get(this.draftKey(input.draftId));
     if (!raw) {
       throw new UnprocessableException('Registration session expired — please restart.');
@@ -83,7 +89,7 @@ export class AuthService {
     if (usernameTaken) throw new ConflictException('Username is taken');
 
     const passwordHash = await bcrypt.hash(input.password, BCRYPT_COST);
-    const token = randomUUID();
+    const { raw: token, hash: tokenHash } = newOneTimeToken();
 
     await this.prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
@@ -107,10 +113,19 @@ export class AuthService {
       await tx.authToken.create({
         data: {
           userId: user.id,
-          token,
+          tokenHash,
           tokenType: 'EMAIL_VERIFICATION',
           expiresAt: new Date(Date.now() + VERIFY_TTL_MS),
         },
+      });
+      // DPDP s.6: keep evidence of the consent given at sign-up (what, which version, when, from where).
+      const consentBase = { userId: user.id, consentVersion: CONSENT_POLICY_VERSION, ipAddress: ip };
+      await tx.consentLog.createMany({
+        data: [
+          { ...consentBase, consentType: 'TERMS', granted: true },
+          { ...consentBase, consentType: 'PRIVACY', granted: true },
+          { ...consentBase, consentType: 'MARKETING', granted: input.smsOptIn },
+        ],
       });
     });
 
@@ -143,7 +158,7 @@ export class AuthService {
 
   /** Verify the email token, mark verified, award the welcome bonus (idempotent). */
   async verifyEmail(token: string): Promise<VerifyEmailResult> {
-    const record = await this.prisma.authToken.findUnique({ where: { token } });
+    const record = await this.prisma.authToken.findUnique({ where: { tokenHash: hashOneTimeToken(token) } });
     if (!record || record.tokenType !== 'EMAIL_VERIFICATION') {
       throw new UnprocessableException('Invalid verification link');
     }
@@ -171,25 +186,31 @@ export class AuthService {
   }
 
   async login(input: LoginInput, ip: string | null = null): Promise<LoginResult> {
+    const invalid = new UnauthenticatedException('Invalid email or password');
     const user = await this.prisma.user.findUnique({ where: { email: input.email.toLowerCase() } });
-    if (!user || !user.isActive) throw new UnauthenticatedException('Invalid email or password');
-
-    if (user.lockedUntil && user.lockedUntil.getTime() > Date.now()) {
-      throw new UnauthenticatedException('Account locked. Try again later.');
+    if (!user || !user.isActive || user.deletedAt) {
+      // Same bcrypt cost as a real check, so response time doesn't reveal which emails exist.
+      await bcrypt.compare(input.password, DUMMY_HASH);
+      throw invalid;
     }
 
+    const locked = user.lockedUntil && user.lockedUntil.getTime() > Date.now();
     const ok = await bcrypt.compare(input.password, user.passwordHash);
+    if (locked) throw invalid; // generic message — doesn't confirm the account exists
     if (!ok) {
-      const failed = user.failedLogins + 1;
-      const lock = failed >= MAX_FAILED_LOGINS;
-      await this.prisma.user.update({
+      // Atomic increment so parallel guesses can't share a counter value.
+      const { failedLogins } = await this.prisma.user.update({
         where: { id: user.id },
-        data: {
-          failedLogins: lock ? 0 : failed,
-          lockedUntil: lock ? new Date(Date.now() + LOCKOUT_MS) : null,
-        },
+        data: { failedLogins: { increment: 1 } },
+        select: { failedLogins: true },
       });
-      throw new UnauthenticatedException('Invalid email or password');
+      if (failedLogins >= MAX_FAILED_LOGINS) {
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: { failedLogins: 0, lockedUntil: new Date(Date.now() + LOCKOUT_MS) },
+        });
+      }
+      throw invalid;
     }
 
     await this.prisma.user.update({
@@ -210,17 +231,36 @@ export class AuthService {
       })
       .catch((e: unknown) => this.logger.error('Audit log failed', e));
 
-    const accessToken = this.tokens.signAccess({ sub: user.id, email: user.email, roles: [] });
-    const refreshToken = this.tokens.signRefresh(user.id);
+    return this.issueSession(user, ip);
+  }
+
+  /** Revokes every session of the refresh token's owner (server-side logout). */
+  async logout(refreshToken: string | undefined): Promise<void> {
+    if (!refreshToken) return;
+    try {
+      const claims = this.tokens.verifyRefresh(refreshToken);
+      if (claims.aud === 'member') await this.authState.revoke('member', claims.sub);
+    } catch {
+      // Already invalid — nothing to revoke.
+    }
+  }
+
+  private issueSession(
+    user: { id: string; email: string; username: string; isVerified: boolean; tokenVersion: number },
+    _ip: string | null,
+  ): LoginResult {
+    const accessToken = this.tokens.signAccess({
+      sub: user.id,
+      email: user.email,
+      roles: [],
+      aud: 'member',
+      tv: user.tokenVersion,
+    });
+    const refreshToken = this.tokens.signRefresh({ sub: user.id, aud: 'member', tv: user.tokenVersion });
     return {
       session: {
         accessToken,
-        user: {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          isVerified: user.isVerified,
-        },
+        user: { id: user.id, email: user.email, username: user.username, isVerified: user.isVerified },
       },
       refreshToken,
     };
@@ -232,17 +272,21 @@ export class AuthService {
       include: { profile: true },
     });
     // Always succeed to avoid leaking whether the email exists.
-    if (!user) return;
+    if (!user || !user.isActive || user.deletedAt) return;
 
-    const token = randomUUID();
-    await this.prisma.authToken.create({
-      data: {
-        userId: user.id,
-        token,
-        tokenType: 'PASSWORD_RESET',
-        expiresAt: new Date(Date.now() + RESET_TTL_MS),
-      },
-    });
+    const { raw: token, hash: tokenHash } = newOneTimeToken();
+    await this.prisma.$transaction([
+      // Only the newest reset link works.
+      this.prisma.authToken.deleteMany({ where: { userId: user.id, tokenType: 'PASSWORD_RESET', usedAt: null } }),
+      this.prisma.authToken.create({
+        data: {
+          userId: user.id,
+          tokenHash,
+          tokenType: 'PASSWORD_RESET',
+          expiresAt: new Date(Date.now() + RESET_TTL_MS),
+        },
+      }),
+    ]);
     const link = `${this.config.get('WEB_URL')}/reset-password?token=${token}`;
     const { subject, html } = passwordResetEmail({
       link,
@@ -253,7 +297,7 @@ export class AuthService {
   }
 
   async resetPassword(input: ResetPasswordInput): Promise<void> {
-    const record = await this.prisma.authToken.findUnique({ where: { token: input.token } });
+    const record = await this.prisma.authToken.findUnique({ where: { tokenHash: hashOneTimeToken(input.token) } });
     if (!record || record.tokenType !== 'PASSWORD_RESET' || record.usedAt) {
       throw new UnprocessableException('Invalid or used reset link');
     }
@@ -267,23 +311,24 @@ export class AuthService {
         data: { passwordHash, failedLogins: 0, lockedUntil: null },
       });
       await tx.authToken.update({ where: { id: record.id }, data: { usedAt: new Date() } });
+      await tx.authToken.deleteMany({
+        where: { userId: record.userId, tokenType: 'PASSWORD_RESET', usedAt: null },
+      });
     });
+    // Anyone holding an old session (e.g. whoever forced the reset) is signed out.
+    await this.authState.revoke('member', record.userId);
   }
 
-  async refresh(refreshToken: string): Promise<AuthSession> {
-    const { sub } = this.tokens.verifyRefresh(refreshToken);
-    const user = await this.prisma.user.findUnique({ where: { id: sub } });
-    if (!user || !user.isActive) throw new UnauthenticatedException('Invalid refresh token');
-    const accessToken = this.tokens.signAccess({ sub: user.id, email: user.email, roles: [] });
-    return {
-      accessToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        isVerified: user.isVerified,
-      },
-    };
+  /** Exchanges a valid refresh token for a new access token and a rotated refresh token. */
+  async refresh(refreshToken: string): Promise<LoginResult> {
+    const claims = this.tokens.verifyRefresh(refreshToken);
+    if (claims.aud !== 'member') throw new UnauthenticatedException('Invalid refresh token');
+    const user = await this.prisma.user.findUnique({ where: { id: claims.sub } });
+    if (!user || !user.isActive || user.deletedAt || user.tokenVersion !== claims.tv) {
+      throw new UnauthenticatedException('Invalid refresh token');
+    }
+    await this.authState.consumeRefresh('member', user.id, claims.jti, claims.exp);
+    return this.issueSession(user, null);
   }
 
   private draftKey(draftId: string): string {

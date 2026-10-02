@@ -2,6 +2,9 @@ import { z } from 'zod';
 
 export type ConsentType = 'TERMS' | 'PRIVACY' | 'MARKETING' | 'COOKIES';
 
+/** Version of the Terms / Privacy Policy / consent wording currently shown to users. */
+export const CONSENT_POLICY_VERSION = '1.0';
+
 export interface ConsentLogDTO {
   id: string;
   consentType: ConsentType;
