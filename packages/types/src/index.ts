@@ -11,3 +11,5 @@ export * from './notifications.js';
 export * from './support.js';
 export * from './data-rights.js';
 export * from './admin.js';
+export * from './news.js';
+export * from './community.js';

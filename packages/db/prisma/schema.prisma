@@ -627,3 +627,56 @@ model SupportTicketMessage {
   @@index([ticketId, createdAt])
   @@map("support_ticket_messages")
 }
+
+// ─────────────────────────────────────────────────────────────
+// RSS "Industry Updates" feed
+// ─────────────────────────────────────────────────────────────
+model FeedSource {
+  id           String    @id @default(uuid()) @db.Uuid
+  name         String
+  feedUrl      String    @unique @map("feed_url")
+  category     String?
+  isActive     Boolean   @default(true) @map("is_active")
+  lastPolledAt DateTime? @map("last_polled_at") @db.Timestamptz(6)
+  lastError    String?   @map("last_error")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  articles     Article[]
+
+  @@map("feed_sources")
+}
+
+model Article {
+  id          String     @id @default(uuid()) @db.Uuid
+  sourceId    String     @map("source_id") @db.Uuid
+  title       String
+  link        String     @unique
+  summary     String?
+  imageUrl    String?    @map("image_url")
+  publishedAt DateTime   @map("published_at") @db.Timestamptz(6)
+  fetchedAt   DateTime   @default(now()) @map("fetched_at") @db.Timestamptz(6)
+  source      FeedSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@index([publishedAt])
+  @@map("articles")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Community "News" tab — admin-authored announcements
+// ─────────────────────────────────────────────────────────────
+model Announcement {
+  id             String   @id @default(uuid()) @db.Uuid
+  title          String
+  excerpt        String
+  bannerHeadline String   @map("banner_headline")
+  emoji          String
+  imageUrl       String?  @map("image_url")
+  commentsCount  Int      @default(0) @map("comments_count")
+  isActive       Boolean  @default(true) @map("is_active")
+  sortOrder      Int      @default(0) @map("sort_order")
+  publishedAt    DateTime @default(now()) @map("published_at") @db.Timestamptz(6)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([isActive, publishedAt])
+  @@map("announcements")
+}

@@ -1,9 +1,17 @@
 import type {
+  AdminAnnouncementPage,
+  AdminAnnouncementView,
   AdminSession,
   AdminStats,
   AdminUserRow,
   AdminUsersResult,
   ApiResponse,
+  CreateAnnouncementInput,
+  CreateFeedSourceInput,
+  FeedSourcePage,
+  FeedSourceView,
+  UpdateAnnouncementInput,
+  UpdateFeedSourceInput,
 } from '@influencer/types';
 
 import { ApiError } from './client.js';
@@ -118,6 +126,40 @@ export const adminApi = {
   },
   setUserActive(id: string, isActive: boolean): Promise<{ id: string; isActive: boolean }> {
     return adminFetch(`/admin/users/${id}`, { method: 'PUT', body: { isActive } });
+  },
+  // News / RSS feed sources
+  listNewsSources(params?: { page?: number; pageSize?: number }): Promise<FeedSourcePage> {
+    const qs = new URLSearchParams();
+    if (params?.page) qs.set('page', String(params.page));
+    if (params?.pageSize) qs.set('pageSize', String(params.pageSize));
+    const q = qs.toString();
+    return adminFetch(`/admin/news/sources${q ? `?${q}` : ''}`);
+  },
+  createNewsSource(input: CreateFeedSourceInput): Promise<FeedSourceView> {
+    return adminFetch('/admin/news/sources', { method: 'POST', body: input });
+  },
+  updateNewsSource(id: string, input: UpdateFeedSourceInput): Promise<FeedSourceView> {
+    return adminFetch(`/admin/news/sources/${id}`, { method: 'PUT', body: input });
+  },
+  pollNewsSourceNow(id: string): Promise<FeedSourceView> {
+    return adminFetch(`/admin/news/sources/${id}/poll-now`, { method: 'POST' });
+  },
+  // Community announcements (the member-facing "News" tab)
+  listAnnouncements(params?: { page?: number; pageSize?: number }): Promise<AdminAnnouncementPage> {
+    const qs = new URLSearchParams();
+    if (params?.page) qs.set('page', String(params.page));
+    if (params?.pageSize) qs.set('pageSize', String(params.pageSize));
+    const q = qs.toString();
+    return adminFetch(`/admin/announcements${q ? `?${q}` : ''}`);
+  },
+  createAnnouncement(input: CreateAnnouncementInput): Promise<AdminAnnouncementView> {
+    return adminFetch('/admin/announcements', { method: 'POST', body: input });
+  },
+  updateAnnouncement(id: string, input: UpdateAnnouncementInput): Promise<AdminAnnouncementView> {
+    return adminFetch(`/admin/announcements/${id}`, { method: 'PUT', body: input });
+  },
+  deleteAnnouncement(id: string): Promise<{ id: string }> {
+    return adminFetch(`/admin/announcements/${id}`, { method: 'DELETE' });
   },
   // Read-only resource lists (existing admin endpoints), for the linked sections.
   listSurveys(): Promise<unknown[]> {

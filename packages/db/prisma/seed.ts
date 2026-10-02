@@ -472,6 +472,151 @@ async function seedRewards(): Promise<void> {
   console.warn(`  ✓ ${REWARDS.length} rewards`);
 }
 
+const ANNOUNCEMENTS: Array<{
+  key: string;
+  emoji: string;
+  title: string;
+  excerpt: string;
+  bannerHeadline: string;
+  comments: number;
+  sort: number;
+}> = [
+  {
+    key: 'wc-campaign',
+    emoji: '🏆',
+    title: 'Our World Cup Campaign Has Come to an End!',
+    excerpt:
+      "What an incredible World Cup it's been! Over the past several weeks, members from around the world joined us to celebrate, compete and win big.",
+    bannerHeadline: 'WORLD CUP · CAMPAIGN COMPLETE',
+    comments: 19,
+    sort: 1,
+  },
+  {
+    key: 'wc-predictions',
+    emoji: '🏆',
+    title: 'The Final Stage Is Now Live — One Last Chance to Become Champion!',
+    excerpt:
+      "Stage 1 and 2 of our World Cup Predictions game have officially ended — and after some incredible matches, we're excited to launch the final stage.",
+    bannerHeadline: 'WORLD CUP · PREDICTIONS',
+    comments: 13,
+    sort: 2,
+  },
+  {
+    key: 'wc-penalty',
+    emoji: '⚽',
+    title: 'The World Cup Penalty Game is Officially Live! Edit Entry',
+    excerpt:
+      'The wait is over — all our World Cup games are now fully live! 🌍 🏆 From predictions to penalty shootouts and fan competitions, there are now more ways to win.',
+    bannerHeadline: 'WORLD CUP · PENALTY SHOT!',
+    comments: 38,
+    sort: 3,
+  },
+  {
+    key: 'eggmatch-open',
+    emoji: '🥚',
+    title: 'World Cup Predictions Are Now Open!',
+    excerpt:
+      'The World Cup is almost here… and you can already start making your predictions! ⚽ 🏆 Our Predictions game is officially open before kick-off.',
+    bannerHeadline: 'MAKE YOUR PREDICTIONS',
+    comments: 20,
+    sort: 4,
+  },
+  {
+    key: 'eggmatch-winners',
+    emoji: '🎉',
+    title: 'Meet Our EggMatch Winners!',
+    excerpt:
+      "Our EggMatch challenge has come to an end, and we've loved seeing your memory skills in action. A huge thank you to everyone who joined and played.",
+    bannerHeadline: 'EGG MATCH · WINNERS',
+    comments: 58,
+    sort: 5,
+  },
+  {
+    key: 'eggmatch-play',
+    emoji: '🧠',
+    title: 'Test your memory with Egg Match!',
+    excerpt:
+      'Discover our latest game, Egg Match, where fun meets rewards! Ready to put your skills to the test? Visit the Games page to play and win points.',
+    bannerHeadline: 'EGG MATCH · 2–16 APRIL',
+    comments: 25,
+    sort: 6,
+  },
+  {
+    key: 'lucky-draw',
+    emoji: '🎁',
+    title: 'Win points in our festive lucky draw',
+    excerpt:
+      'Dear Members, celebrate the end of the year with a boost to your points balance! To enter the draw, all you have to do is complete two or more surveys.',
+    bannerHeadline: 'WIN 15,000 POINTS',
+    comments: 179,
+    sort: 7,
+  },
+  {
+    key: 'ski-camp',
+    emoji: '⛷️',
+    title: 'Welcome to the Ski Camp!',
+    excerpt:
+      "From 15 to 29 December, we're inviting you to play our brand-new ski-themed game with 3 fun levels, and win instant bonuses of up to 3,000 points.",
+    bannerHeadline: 'SKI CAMP · 15–29 DEC',
+    comments: 20,
+    sort: 8,
+  },
+  {
+    key: 'haunted-house',
+    emoji: '👻',
+    title: 'Enter the Haunted House, we dare you!',
+    excerpt:
+      "It's time to face the Haunted House! 🎃 Our spooky new game is now live. Face all the ghosts and monsters to win up to 10,000 points.",
+    bannerHeadline: 'HAUNTED HOUSE',
+    comments: 46,
+    sort: 9,
+  },
+];
+
+async function seedAnnouncements(): Promise<void> {
+  for (const [i, a] of ANNOUNCEMENTS.entries()) {
+    await prisma.announcement.upsert({
+      where: { id: announcementId(a.key) },
+      update: {
+        title: a.title,
+        excerpt: a.excerpt,
+        bannerHeadline: a.bannerHeadline,
+        emoji: a.emoji,
+        commentsCount: a.comments,
+        sortOrder: a.sort,
+      },
+      create: {
+        id: announcementId(a.key),
+        title: a.title,
+        excerpt: a.excerpt,
+        bannerHeadline: a.bannerHeadline,
+        emoji: a.emoji,
+        commentsCount: a.comments,
+        sortOrder: a.sort,
+        publishedAt: new Date(Date.now() - i * 86_400_000),
+      },
+    });
+  }
+  console.warn(`  ✓ ${ANNOUNCEMENTS.length} announcements`);
+}
+
+function announcementId(key: string): string {
+  const map: Record<string, string> = {
+    'wc-campaign': '00000000-0000-4000-8000-000000000201',
+    'wc-predictions': '00000000-0000-4000-8000-000000000202',
+    'wc-penalty': '00000000-0000-4000-8000-000000000203',
+    'eggmatch-open': '00000000-0000-4000-8000-000000000204',
+    'eggmatch-winners': '00000000-0000-4000-8000-000000000205',
+    'eggmatch-play': '00000000-0000-4000-8000-000000000206',
+    'lucky-draw': '00000000-0000-4000-8000-000000000207',
+    'ski-camp': '00000000-0000-4000-8000-000000000208',
+    'haunted-house': '00000000-0000-4000-8000-000000000209',
+  };
+  const id = map[key];
+  if (!id) throw new Error(`No fixed announcement id for key ${key}`);
+  return id;
+}
+
 async function seedSuperAdmin(): Promise<void> {
   const email = process.env.SEED_SUPERADMIN_EMAIL;
   const password = process.env.SEED_SUPERADMIN_PASSWORD;
@@ -686,6 +831,7 @@ async function main(): Promise<void> {
   await seedProfileCategories();
   await seedSpinGame();
   await seedRewards();
+  await seedAnnouncements();
   await seedSuperAdmin();
   await seedSurveys();
   await seedPolls(prisma);

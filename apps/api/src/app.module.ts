@@ -11,8 +11,10 @@ import { HealthModule } from './health/health.module';
 import { AccountModule } from './modules/account/account.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { CommunityModule } from './modules/community/community.module';
 import { DataRightsModule } from './modules/data-rights/data-rights.module';
 import { GamesModule } from './modules/games/games.module';
+import { NewsModule } from './modules/news/news.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { PointsModule } from './modules/points/points.module';
 import { PollsModule } from './modules/polls/polls.module';
@@ -31,7 +33,7 @@ import { RedisModule } from './redis/redis.module';
     QueueModule,
     AuthModule, PointsModule, HealthModule,
     AccountModule, ProfileSurveysModule, RewardsModule, SurveysModule, PollsModule, GamesModule,
-    NotificationsModule, SupportModule, DataRightsModule, AdminModule,
+    NotificationsModule, SupportModule, DataRightsModule, AdminModule, NewsModule, CommunityModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },
