@@ -10,7 +10,8 @@ import type {
 import { Injectable, Logger } from '@nestjs/common';
 import Parser from 'rss-parser';
 
-import { NotFoundException } from '../../common/exceptions/domain.exception';
+import { NotFoundException, ValidationException } from '../../common/exceptions/domain.exception';
+import { assertPublicHttpUrl, fetchPublicText, FetchFailedError, UnsafeUrlError } from '../../common/net/public-fetch';
 import { PrismaService } from '../../prisma/prisma.service';
 
 const MAX_ITEMS_PER_SOURCE = 20;
@@ -31,6 +32,19 @@ type FeedItem = Parser.Item & {
   'media:thumbnail'?: MediaTag | MediaTag[];
   'media:content'?: MediaTag | MediaTag[];
 };
+
+/**
+ * A short, fixed description of a poll failure. Raw error text can reveal internal
+ * hosts, ports or file paths, so it never reaches the admin UI or the database.
+ */
+function feedErrorMessage(err: unknown): string {
+  if (err instanceof UnsafeUrlError) return 'Blocked: feed address is not a public internet host';
+  if (err instanceof FetchFailedError) return err.message; // our own fixed messages, e.g. "HTTP 404"
+  if (err instanceof Error && /ENOTFOUND|EAI_AGAIN/.test((err as NodeJS.ErrnoException).code ?? '')) return 'Could not resolve host';
+  if (err instanceof Error && /ECONNREFUSED|ECONNRESET|ETIMEDOUT/.test((err as NodeJS.ErrnoException).code ?? '')) return 'Could not connect';
+  if (err instanceof Error && /xml|feed|parse|non-whitespace|unexpected/i.test(err.message)) return 'Could not parse feed';
+  return 'Could not fetch feed';
+}
 
 /** Feeds are untrusted: keep only http(s) URLs so a `javascript:` link can never reach a page. */
 function httpUrl(value: string | null | undefined): string | null {
@@ -102,6 +116,7 @@ export class NewsService {
   }
 
   async adminCreateSource(input: CreateFeedSourceInput): Promise<FeedSourceView> {
+    await this.assertFetchableFeedUrl(input.feedUrl);
     const source = await this.prisma.feedSource.create({
       data: {
         name: input.name,
@@ -116,6 +131,7 @@ export class NewsService {
   async adminUpdateSource(id: string, input: UpdateFeedSourceInput): Promise<FeedSourceView> {
     const existing = await this.prisma.feedSource.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Feed source not found');
+    if (input.feedUrl !== undefined) await this.assertFetchableFeedUrl(input.feedUrl);
     const source = await this.prisma.feedSource.update({
       where: { id },
       data: {
@@ -149,7 +165,12 @@ export class NewsService {
 
   private async pollSource(source: { id: string; name: string; feedUrl: string }): Promise<void> {
     try {
-      const feed = await this.parser.parseURL(source.feedUrl);
+      // Our own fetch (public addresses only, size/time capped) instead of
+      // parser.parseURL, which would follow the URL anywhere — including our network.
+      const xml = await fetchPublicText(source.feedUrl, {
+        accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.5',
+      });
+      const feed = await this.parser.parseString(xml);
       const items = (feed.items ?? []).slice(0, MAX_ITEMS_PER_SOURCE);
 
       for (const item of items) {
@@ -182,12 +203,24 @@ export class NewsService {
         data: { lastPolledAt: new Date(), lastError: null },
       });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      this.logger.warn(`Failed to poll feed "${source.name}" (${source.feedUrl}): ${message}`);
+      const message = feedErrorMessage(err);
+      this.logger.warn(`Failed to poll feed "${source.name}": ${message}`);
       await this.prisma.feedSource.update({
         where: { id: source.id },
-        data: { lastPolledAt: new Date(), lastError: message.slice(0, 500) },
+        data: { lastPolledAt: new Date(), lastError: message },
       });
+    }
+  }
+
+  private async assertFetchableFeedUrl(feedUrl: string): Promise<void> {
+    try {
+      await assertPublicHttpUrl(feedUrl);
+    } catch (err) {
+      throw new ValidationException(
+        err instanceof UnsafeUrlError
+          ? 'Feed URL must point to a public internet address'
+          : 'Could not resolve the feed URL host',
+      );
     }
   }
 

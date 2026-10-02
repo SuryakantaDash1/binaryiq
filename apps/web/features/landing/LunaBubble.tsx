@@ -147,7 +147,7 @@ export function LunaBubble({ authenticated = false }: { authenticated?: boolean 
       const ticket = await supportApi.createTicket({
         topic: flow.topic,
         subject: flow.title,
-        transcript: transcript.map((l) => ({ senderType: l.from, message: l.text })),
+        transcript: transcript.slice(-50).map((l) => ({ senderType: l.from, message: l.text })),
         message: ticketMessage.trim(),
       });
       setTranscript((prev) => [

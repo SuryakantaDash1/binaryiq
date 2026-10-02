@@ -59,15 +59,18 @@ export interface TranscriptLine {
 }
 
 // Zod schemas (no .default(), no .transform())
+// Members submit the chatbot conversation they had. Only 'bot'/'user' lines are
+// accepted — 'admin' lines are written by staff replies server-side, so a member
+// can't forge messages that look like they came from support.
 export const transcriptLineSchema = z.object({
-  senderType: z.enum(['bot', 'user', 'admin']),
+  senderType: z.enum(['bot', 'user']),
   message: z.string().min(1).max(4000),
 });
 
 export const createTicketSchema = z.object({
-  topic: z.string().min(1),
+  topic: z.string().min(1).max(100),
   subject: z.string().min(1).max(200).optional(),
-  transcript: z.array(transcriptLineSchema).min(1).max(100),
+  transcript: z.array(transcriptLineSchema).min(1).max(50),
   message: z.string().min(1).max(4000),
 });
 
