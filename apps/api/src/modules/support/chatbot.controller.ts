@@ -8,11 +8,11 @@ export class ChatbotController {
 
   @Get('flows')
   listFlows() {
-    return { data: this.chatbotService.listFlows() };
+    return this.chatbotService.listFlows();
   }
 
   @Get('flows/:topic')
   getFlow(@Param('topic') topic: string) {
-    return { data: this.chatbotService.getFlow(topic) };
+    return this.chatbotService.getFlow(topic);
   }
 }

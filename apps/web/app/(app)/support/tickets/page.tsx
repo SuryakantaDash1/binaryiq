@@ -74,7 +74,7 @@ export default function SupportTicketsPage(): React.JSX.Element {
       ) : tickets.length === 0 ? (
         <EmptyState
           title="No support tickets yet"
-          description="Use the Luna chat widget to raise a ticket whenever you need help."
+          description="Use the chat widget in the bottom-right corner to raise a ticket whenever you need help."
         />
       ) : (
         <div className="space-y-3">

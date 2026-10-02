@@ -9,8 +9,9 @@ export default function AppGroupLayout({ children }: { children: ReactNode }): R
       <AppHeader />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 md:px-6">{children}</main>
 
-      {/* Same Luna chat used on the landing / auth pages, across the whole app */}
-      <LunaBubble />
+      {/* Same Byte bubble as the public pages, but backed by real chatbot flows +
+          actual SupportTicket creation now that the user is authenticated. */}
+      <LunaBubble authenticated />
 
       <footer className="border-t border-gray-200 py-3 text-center text-[10px] text-gray-400">
         SSL Secured · DPDP 2023 Compliant · CERT-In Registered

@@ -4,7 +4,7 @@ import {
   updateTicketSchema,
   type UpdateTicketInput,
 } from '@influencer/types';
-import { Body, Controller, Get, HttpCode, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Ip, Param, Post, Put, Query } from '@nestjs/common';
 import { z } from 'zod';
 
 import { type AuthenticatedUser, CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -52,8 +52,9 @@ export class AdminSupportController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateTicketSchema)) body: UpdateTicketInput,
+    @Ip() ip: string,
   ) {
-    return this.supportService.adminUpdateTicket(user.id, id, body);
+    return this.supportService.adminUpdateTicket(user.id, id, body, ip);
   }
 
   @Post('tickets/:id/messages')
@@ -62,7 +63,8 @@ export class AdminSupportController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
     @Body(new ZodValidationPipe(postTicketMessageSchema)) body: PostTicketMessageInput,
+    @Ip() ip: string,
   ) {
-    return this.supportService.adminAddMessage(user.id, id, body);
+    return this.supportService.adminAddMessage(user.id, id, body, ip);
   }
 }

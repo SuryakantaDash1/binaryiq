@@ -285,7 +285,7 @@ export default function LandingPage(): React.JSX.Element {
         </div>
       </div>
 
-      {/* Luna chat bubble — floats over everything, works with no backend */}
+      {/* Byte chat bubble — floats over everything, works with no backend */}
       <LunaBubble />
 
       {/* Global styles for animations */}

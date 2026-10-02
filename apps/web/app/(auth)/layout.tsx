@@ -49,7 +49,7 @@ export default function AuthLayout({ children }: { children: ReactNode }): React
         {/* ── Right — reactive image panel ── */}
         <AuthRightPanel />
 
-        {/* Luna chatbot */}
+        {/* Byte chatbot */}
         <LunaBubble />
       </div>
     </AuthPanelProvider>

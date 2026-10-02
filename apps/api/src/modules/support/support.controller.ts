@@ -4,7 +4,7 @@ import {
   postTicketMessageSchema,
   type PostTicketMessageInput,
 } from '@influencer/types';
-import { Body, Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Ip, Param, Post, Query } from '@nestjs/common';
 import { z } from 'zod';
 
 import { type AuthenticatedUser, CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -27,8 +27,9 @@ export class SupportController {
   createTicket(
     @CurrentUser() user: AuthenticatedUser,
     @Body(new ZodValidationPipe(createTicketSchema)) body: CreateTicketInput,
+    @Ip() ip: string,
   ) {
-    return this.supportService.createTicket(user.id, body);
+    return this.supportService.createTicket(user.id, body, ip);
   }
 
   @Get('tickets')

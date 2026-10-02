@@ -26,7 +26,7 @@ export default function FaqsPage(): React.JSX.Element {
       </Section>
 
       <Section heading="Still need help?">
-        <p>Open the Luna chat assistant on any page, or visit the Contact Us page to reach our support team.</p>
+        <p>Open the Byte chat assistant on any page, or visit the Contact Us page to reach our support team.</p>
       </Section>
     </Article>
   );

@@ -15,7 +15,7 @@ export default function ContactPage(): React.JSX.Element {
   const [issueType, setIssueType] = useState('LOGIN');
   const [submitted, setSubmitted] = useState(false);
 
-  // Preselect the issue type when Luna escalates here (e.g. /contact?issue=LOGIN)
+  // Preselect the issue type when Byte escalates here (e.g. /contact?issue=LOGIN)
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get('issue');
     if (param && ISSUE_TYPES.some((i) => i.value === param)) setIssueType(param);

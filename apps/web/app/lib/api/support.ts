@@ -125,12 +125,12 @@ export const supportApi = {
     if (params?.page) qs.set('page', String(params.page));
     if (params?.pageSize) qs.set('pageSize', String(params.pageSize));
     const q = qs.toString();
-    // API returns { data, total, page, pageSize } — adapt to { items, pagination }.
-    const res = await adminFetch<{ data: AdminTicketRow[]; total: number; page: number; pageSize: number }>(
+    // API returns { items, total, page, pageSize } — adapt to { items, pagination }.
+    const res = await adminFetch<{ items: AdminTicketRow[]; total: number; page: number; pageSize: number }>(
       `/admin/support/tickets${q ? `?${q}` : ''}`,
     );
     return {
-      items: res.data ?? [],
+      items: res.items ?? [],
       pagination: { total: res.total ?? 0, page: res.page ?? 1, pageSize: res.pageSize ?? 20 },
     };
   },

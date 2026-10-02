@@ -1,15 +1,38 @@
 'use client';
 
+import { Skeleton } from '@influencer/ui';
 import { Brain } from 'lucide-react';
-import { useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
-import { LUNA_FLOWS, type LunaFlow } from './luna-flows.js';
+import { ApiError } from '@/lib/api/client.js';
+import { supportApi } from '@/lib/api/support.js';
+
+import { LUNA_FLOWS } from './luna-flows.js';
 
 type Line = { from: 'bot' | 'user'; text: string; time?: string };
 type Option = { label: string; next: string };
-type Stage = 'greeting' | 'topics' | 'options' | 'escalation' | 'done';
+type Stage = 'greeting' | 'topics' | 'options' | 'escalation' | 'compose' | 'ticketDone' | 'done';
+
+/** Minimal shape shared by the local LUNA_FLOWS and the backend's ChatbotFlow — lets
+ *  the same conversation engine walk either source without caring which one it is. */
+interface ChatFlowNode {
+  id: string;
+  message: string;
+  options?: Option[];
+  resolution?: boolean;
+  escalate?: boolean;
+  suppressEscalation?: boolean;
+  action?: { type: 'navigate'; href: string };
+}
+interface ChatFlow {
+  topic: string;
+  issueType: string;
+  title: string;
+  entryNodeId: string;
+  nodes: Record<string, ChatFlowNode>;
+}
 
 function nowTime(): string {
   const d = new Date();
@@ -17,20 +40,36 @@ function nowTime(): string {
 }
 
 /**
- * Self-contained "Luna" chat for the public landing page — a full Q&A flow that
- * needs no backend. Topics → answers → escalate to the contact form.
+ * The "Byte" chat bubble — the single chat widget used across the whole site.
+ * On public pages it runs a self-contained Q&A flow (no backend) and escalates
+ * to the contact form. When `authenticated`, it instead loads the real chatbot
+ * flows from the backend and "raise a ticket" actually creates a SupportTicket.
  */
-export function LunaBubble(): React.JSX.Element {
+export function LunaBubble({ authenticated = false }: { authenticated?: boolean }): React.JSX.Element {
   const t = useTranslations('chat');
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [stage, setStage] = useState<Stage>('greeting');
   const [transcript, setTranscript] = useState<Line[]>([]);
-  const [flow, setFlow] = useState<LunaFlow | null>(null);
+  const [flow, setFlow] = useState<ChatFlow | null>(null);
   const [options, setOptions] = useState<Option[]>([]);
+  const [flows, setFlows] = useState<ChatFlow[]>(authenticated ? [] : LUNA_FLOWS);
+  const [flowsLoading, setFlowsLoading] = useState(authenticated);
+  const [ticketMessage, setTicketMessage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!authenticated) return;
+    supportApi
+      .listFlows()
+      .then(setFlows)
+      .catch(() => void 0)
+      .finally(() => setFlowsLoading(false));
+  }, [authenticated]);
 
   const bubbleShape = { borderRadius: '50% 50% 50% 14%' };
   const canSend = message.trim().length > 0;
@@ -49,7 +88,7 @@ export function LunaBubble(): React.JSX.Element {
     scrollToBottom();
   }
 
-  function pickTopic(f: LunaFlow): void {
+  function pickTopic(f: ChatFlow): void {
     const root = f.nodes[f.entryNodeId];
     if (!root) return;
     setFlow(f);
@@ -89,8 +128,43 @@ export function LunaBubble(): React.JSX.Element {
   }
 
   function raiseTicket(): void {
+    if (authenticated) {
+      setTicketMessage('');
+      setSubmitError(null);
+      setStage('compose');
+      scrollToBottom();
+      return;
+    }
     const issue = flow?.issueType ?? 'OTHER';
     router.push(`/contact?issue=${issue}`);
+  }
+
+  async function submitTicket(): Promise<void> {
+    if (!flow || !ticketMessage.trim()) return;
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const ticket = await supportApi.createTicket({
+        topic: flow.topic,
+        subject: flow.title,
+        transcript: transcript.map((l) => ({ senderType: l.from, message: l.text })),
+        message: ticketMessage.trim(),
+      });
+      setTranscript((prev) => [
+        ...prev,
+        {
+          from: 'bot',
+          text: `Ticket raised — we'll get back to you soon. Ticket ID: ${ticket.id.slice(0, 8)}…`,
+          time: nowTime(),
+        },
+      ]);
+      setStage('ticketDone');
+      scrollToBottom();
+    } catch (err) {
+      setSubmitError(err instanceof ApiError ? err.message : 'Failed to raise ticket. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   function handleSend(): void {
@@ -163,16 +237,24 @@ export function LunaBubble(): React.JSX.Element {
               {/* Topic buttons */}
               {stage === 'topics' && (
                 <div className="space-y-2 pt-1">
-                  {LUNA_FLOWS.map((f) => (
-                    <button
-                      key={f.topic}
-                      type="button"
-                      onClick={() => pickTopic(f)}
-                      className="w-full rounded-full border border-brand-600 bg-white px-4 py-2.5 text-sm font-semibold text-brand-800 transition hover:bg-brand-50 active:scale-95"
-                    >
-                      {f.title}
-                    </button>
-                  ))}
+                  {flowsLoading && flows.length === 0 ? (
+                    <>
+                      <Skeleton className="h-10 rounded-full" />
+                      <Skeleton className="h-10 rounded-full" />
+                      <Skeleton className="h-10 rounded-full" />
+                    </>
+                  ) : (
+                    flows.map((f) => (
+                      <button
+                        key={f.topic}
+                        type="button"
+                        onClick={() => pickTopic(f)}
+                        className="w-full rounded-full border border-brand-600 bg-white px-4 py-2.5 text-sm font-semibold text-brand-800 transition hover:bg-brand-50 active:scale-95"
+                      >
+                        {f.title}
+                      </button>
+                    ))
+                  )}
                 </div>
               )}
 
@@ -212,8 +294,31 @@ export function LunaBubble(): React.JSX.Element {
                 </div>
               )}
 
+              {/* Compose a ticket (authenticated only) */}
+              {stage === 'compose' && (
+                <div className="space-y-2 pt-1">
+                  {submitError && <p className="text-xs text-red-600">{submitError}</p>}
+                  <textarea
+                    value={ticketMessage}
+                    onChange={(e) => setTicketMessage(e.target.value)}
+                    rows={3}
+                    maxLength={4000}
+                    placeholder="Describe your issue…"
+                    className="w-full resize-none rounded-xl border border-gray-300 px-3 py-2 text-sm text-gray-700 placeholder:text-gray-400 focus:border-brand-400 focus:outline-none focus:ring-1 focus:ring-brand-300"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void submitTicket()}
+                    disabled={!ticketMessage.trim() || submitting}
+                    className="w-full rounded-full bg-brand-800 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-900 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {submitting ? 'Raising ticket…' : 'Raise support ticket'}
+                  </button>
+                </div>
+              )}
+
               {/* Done — restart */}
-              {stage === 'done' && (
+              {(stage === 'done' || stage === 'ticketDone') && (
                 <div className="pt-1">
                   <button
                     type="button"

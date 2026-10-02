@@ -43,7 +43,7 @@ function formatDateTime(iso: string): string {
   });
 }
 
-function MessageBubble({ msg }: { msg: TicketMessage }): React.JSX.Element {
+function MessageBubble({ msg, username }: { msg: TicketMessage; username: string }): React.JSX.Element {
   const isUser = msg.senderType === 'user';
   const isAdmin = msg.senderType === 'admin';
   const isBot = msg.senderType === 'bot';
@@ -57,14 +57,14 @@ function MessageBubble({ msg }: { msg: TicketMessage }): React.JSX.Element {
     bubbleCls = 'bg-blue-100 text-blue-900';
     alignCls = 'justify-end';
     labelCls = 'text-blue-500 text-right';
-    label = 'User';
+    label = username;
   } else if (isAdmin) {
     bubbleCls = 'bg-green-100 text-green-900';
     alignCls = 'justify-start';
     labelCls = 'text-green-600';
     label = 'Admin';
   } else if (isBot) {
-    label = 'Luna (bot)';
+    label = 'Byte (bot)';
   }
 
   return (
@@ -144,7 +144,14 @@ export default function AdminTicketDetailPage(): React.JSX.Element {
     try {
       const msg = await supportApi.adminAddMessage(id, replyText.trim());
       setTicket((prev) =>
-        prev ? { ...prev, messages: [...prev.messages, msg], messageCount: prev.messageCount + 1 } : prev,
+        prev
+          ? {
+              ...prev,
+              messages: [...prev.messages, msg],
+              messageCount: prev.messageCount + 1,
+              updatedAt: msg.createdAt,
+            }
+          : prev,
       );
       setReplyText('');
     } catch (err) {
@@ -193,7 +200,7 @@ export default function AdminTicketDetailPage(): React.JSX.Element {
           Support Tickets
         </button>
         <span>/</span>
-        <span className="text-text font-medium">{ticket.id.slice(0, 8)}…</span>
+        <span className="text-text font-medium">{ticket.id}</span>
       </div>
 
       {/* Ticket info card */}
@@ -264,12 +271,12 @@ export default function AdminTicketDetailPage(): React.JSX.Element {
         <div className="border-b border-border px-5 py-3">
           <p className="font-medium text-sm text-text">Message Thread</p>
         </div>
-        <div className="p-5 space-y-4 max-h-[480px] overflow-y-auto">
+        <div className="p-5 space-y-4">
           {ticket.messages.length === 0 ? (
             <p className="text-sm text-text/60 text-center py-6">No messages yet.</p>
           ) : (
             ticket.messages.map((msg) => (
-              <MessageBubble key={msg.id} msg={msg} />
+              <MessageBubble key={msg.id} msg={msg} username={`@${ticket.username}`} />
             ))
           )}
           <div ref={threadBottomRef} />

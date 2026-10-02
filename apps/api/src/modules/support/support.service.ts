@@ -42,7 +42,11 @@ export class SupportService {
 
   // ─── Member: Create ticket ────────────────────────────────────────
 
-  async createTicket(userId: string, dto: CreateTicketInput): Promise<{ data: SupportTicketSummary }> {
+  async createTicket(
+    userId: string,
+    dto: CreateTicketInput,
+    ip: string | null = null,
+  ): Promise<SupportTicketSummary> {
     const flow = this.chatbot.getFlow(dto.topic);
     if (!flow.escalable) throw new UnprocessableException('topic_not_escalable');
 
@@ -116,21 +120,20 @@ export class SupportService {
         action: 'support.ticket.create',
         targetType: 'ticket',
         targetId: ticket.id,
+        ipAddress: ip,
       },
     });
 
     const count = await this.prisma.supportTicketMessage.count({ where: { ticketId: ticket.id } });
 
     return {
-      data: {
-        id: ticket.id,
-        issueType: ticket.issueType as TicketIssueType,
-        subject: ticket.subject,
-        status: ticket.status as TicketStatus,
-        messageCount: count,
-        createdAt: ticket.createdAt.toISOString(),
-        updatedAt: ticket.updatedAt.toISOString(),
-      },
+      id: ticket.id,
+      issueType: ticket.issueType as TicketIssueType,
+      subject: ticket.subject,
+      status: ticket.status as TicketStatus,
+      messageCount: count,
+      createdAt: ticket.createdAt.toISOString(),
+      updatedAt: ticket.updatedAt.toISOString(),
     };
   }
 
@@ -139,7 +142,7 @@ export class SupportService {
   async listTickets(
     userId: string,
     query: { status?: TicketStatus; limit?: number; cursor?: string },
-  ): Promise<{ data: SupportTicketSummary[]; pagination: { nextCursor: string | null; hasMore: boolean } }> {
+  ): Promise<{ items: SupportTicketSummary[]; pagination: { nextCursor: string | null; hasMore: boolean } }> {
     const limit = query.limit ?? 20;
     const cursorDate = query.cursor
       ? new Date(Buffer.from(query.cursor, 'base64url').toString())
@@ -163,7 +166,7 @@ export class SupportService {
       : null;
 
     return {
-      data: page.map((t) => ({
+      items: page.map((t) => ({
         id: t.id,
         issueType: t.issueType as TicketIssueType,
         subject: t.subject,
@@ -178,7 +181,7 @@ export class SupportService {
 
   // ─── Member: Get single ticket ────────────────────────────────────
 
-  async getTicket(userId: string, ticketId: string): Promise<{ data: SupportTicketDetail }> {
+  async getTicket(userId: string, ticketId: string): Promise<SupportTicketDetail> {
     const ticket = await this.prisma.supportTicket.findFirst({
       where: { id: ticketId, userId },
       include: {
@@ -189,16 +192,14 @@ export class SupportService {
     if (!ticket) throw new NotFoundException('Ticket not found');
 
     return {
-      data: {
-        id: ticket.id,
-        issueType: ticket.issueType as TicketIssueType,
-        subject: ticket.subject,
-        status: ticket.status as TicketStatus,
-        messageCount: ticket._count.messages,
-        createdAt: ticket.createdAt.toISOString(),
-        updatedAt: ticket.updatedAt.toISOString(),
-        messages: ticket.messages.map(this.toMessageDto),
-      },
+      id: ticket.id,
+      issueType: ticket.issueType as TicketIssueType,
+      subject: ticket.subject,
+      status: ticket.status as TicketStatus,
+      messageCount: ticket._count.messages,
+      createdAt: ticket.createdAt.toISOString(),
+      updatedAt: ticket.updatedAt.toISOString(),
+      messages: ticket.messages.map(this.toMessageDto),
     };
   }
 
@@ -208,7 +209,7 @@ export class SupportService {
     userId: string,
     ticketId: string,
     dto: PostTicketMessageInput,
-  ): Promise<{ data: SupportTicketMessage }> {
+  ): Promise<SupportTicketMessage> {
     const ticket = await this.prisma.supportTicket.findFirst({
       where: { id: ticketId, userId },
     });
@@ -217,16 +218,15 @@ export class SupportService {
 
     const reopenUpdate = ticket.status === 'RESOLVED' ? { status: 'PENDING' as TicketStatus } : {};
 
+    // Always touch the ticket (bumps updatedAt via @updatedAt) so it surfaces as recently active.
     const [msg] = await this.prisma.$transaction([
       this.prisma.supportTicketMessage.create({
         data: { ticketId, senderType: 'user', message: dto.message },
       }),
-      ...(Object.keys(reopenUpdate).length > 0
-        ? [this.prisma.supportTicket.update({ where: { id: ticketId }, data: reopenUpdate })]
-        : []),
+      this.prisma.supportTicket.update({ where: { id: ticketId }, data: reopenUpdate }),
     ]);
 
-    return { data: this.toMessageDto(msg) };
+    return this.toMessageDto(msg);
   }
 
   // ─── Admin: List tickets (offset pagination) ──────────────────────
@@ -238,7 +238,7 @@ export class SupportService {
     userId?: string;
     page?: number;
     pageSize?: number;
-  }): Promise<{ data: AdminTicketRow[]; total: number; page: number; pageSize: number }> {
+  }): Promise<{ items: AdminTicketRow[]; total: number; page: number; pageSize: number }> {
     const page = query.page ?? 1;
     const pageSize = query.pageSize ?? 20;
 
@@ -264,7 +264,7 @@ export class SupportService {
     ]);
 
     return {
-      data: tickets.map((t) => ({
+      items: tickets.map((t) => ({
         id: t.id,
         userId: t.userId,
         userEmail: t.user.email,
@@ -285,7 +285,8 @@ export class SupportService {
 
   // ─── Admin: Get single ticket ─────────────────────────────────────
 
-  async adminGetTicket(adminId: string, ticketId: string): Promise<{ data: AdminTicketDetail }> {
+  // Read-only — intentionally not audit-logged (a page view isn't an auditable action).
+  async adminGetTicket(adminId: string, ticketId: string): Promise<AdminTicketDetail> {
     const ticket = await this.prisma.supportTicket.findUnique({
       where: { id: ticketId },
       include: {
@@ -296,31 +297,19 @@ export class SupportService {
     });
     if (!ticket) throw new NotFoundException('Ticket not found');
 
-    await this.prisma.auditLog.create({
-      data: {
-        actorType: 'admin',
-        actorId: adminId,
-        action: 'admin.ticket.view',
-        targetType: 'ticket',
-        targetId: ticketId,
-      },
-    });
-
     return {
-      data: {
-        id: ticket.id,
-        userId: ticket.userId,
-        userEmail: ticket.user.email,
-        username: ticket.user.username,
-        issueType: ticket.issueType as TicketIssueType,
-        subject: ticket.subject,
-        status: ticket.status as TicketStatus,
-        assigneeAdminId: ticket.assigneeAdminId,
-        messageCount: ticket._count.messages,
-        createdAt: ticket.createdAt.toISOString(),
-        updatedAt: ticket.updatedAt.toISOString(),
-        messages: ticket.messages.map(this.toMessageDto),
-      },
+      id: ticket.id,
+      userId: ticket.userId,
+      userEmail: ticket.user.email,
+      username: ticket.user.username,
+      issueType: ticket.issueType as TicketIssueType,
+      subject: ticket.subject,
+      status: ticket.status as TicketStatus,
+      assigneeAdminId: ticket.assigneeAdminId,
+      messageCount: ticket._count.messages,
+      createdAt: ticket.createdAt.toISOString(),
+      updatedAt: ticket.updatedAt.toISOString(),
+      messages: ticket.messages.map(this.toMessageDto),
     };
   }
 
@@ -330,7 +319,8 @@ export class SupportService {
     adminId: string,
     ticketId: string,
     dto: UpdateTicketInput,
-  ): Promise<{ data: AdminTicketRow }> {
+    ip: string | null = null,
+  ): Promise<AdminTicketRow> {
     const ticket = await this.prisma.supportTicket.findUnique({
       where: { id: ticketId },
       include: { user: { select: { id: true, email: true, username: true } }, _count: { select: { messages: true } } },
@@ -360,6 +350,7 @@ export class SupportService {
         action: 'admin.ticket.update',
         targetType: 'ticket',
         targetId: ticketId,
+        ipAddress: ip,
         metadata: { status: dto.status, assigneeAdminId: dto.assigneeAdminId },
       },
     });
@@ -376,19 +367,17 @@ export class SupportService {
     }
 
     return {
-      data: {
-        id: updated.id,
-        userId: updated.userId,
-        userEmail: updated.user.email,
-        username: updated.user.username,
-        issueType: updated.issueType as TicketIssueType,
-        subject: updated.subject,
-        status: updated.status as TicketStatus,
-        assigneeAdminId: updated.assigneeAdminId,
-        messageCount: updated._count.messages,
-        createdAt: updated.createdAt.toISOString(),
-        updatedAt: updated.updatedAt.toISOString(),
-      },
+      id: updated.id,
+      userId: updated.userId,
+      userEmail: updated.user.email,
+      username: updated.user.username,
+      issueType: updated.issueType as TicketIssueType,
+      subject: updated.subject,
+      status: updated.status as TicketStatus,
+      assigneeAdminId: updated.assigneeAdminId,
+      messageCount: updated._count.messages,
+      createdAt: updated.createdAt.toISOString(),
+      updatedAt: updated.updatedAt.toISOString(),
     };
   }
 
@@ -398,13 +387,18 @@ export class SupportService {
     adminId: string,
     ticketId: string,
     dto: PostTicketMessageInput,
-  ): Promise<{ data: SupportTicketMessage }> {
+    ip: string | null = null,
+  ): Promise<SupportTicketMessage> {
     const ticket = await this.prisma.supportTicket.findUnique({ where: { id: ticketId } });
     if (!ticket) throw new NotFoundException('Ticket not found');
 
-    const msg = await this.prisma.supportTicketMessage.create({
-      data: { ticketId, senderType: 'admin', message: dto.message },
-    });
+    // Touch the ticket (bumps updatedAt via @updatedAt) so it surfaces as recently active.
+    const [msg] = await this.prisma.$transaction([
+      this.prisma.supportTicketMessage.create({
+        data: { ticketId, senderType: 'admin', message: dto.message },
+      }),
+      this.prisma.supportTicket.update({ where: { id: ticketId }, data: {} }),
+    ]);
 
     await this.prisma.auditLog.create({
       data: {
@@ -413,6 +407,7 @@ export class SupportService {
         action: 'admin.ticket.message',
         targetType: 'ticket',
         targetId: ticketId,
+        ipAddress: ip,
       },
     });
 
@@ -425,7 +420,7 @@ export class SupportService {
         this.logger.warn(`Failed to notify user on admin reply: ${String(err)}`);
       });
 
-    return { data: this.toMessageDto(msg) };
+    return this.toMessageDto(msg);
   }
 
   // ─── Private helpers ──────────────────────────────────────────────
