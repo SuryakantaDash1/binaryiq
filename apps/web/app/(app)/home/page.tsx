@@ -1,103 +1,149 @@
 'use client';
 
+import {
+  BarChart3,
+  ClipboardList,
+  Gamepad2,
+  Globe,
+  Sparkles,
+  Trophy,
+  User,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { ActivityCard } from '@/features/home/ActivityCard';
+import { IndustryUpdatesCarousel } from '@/features/home/IndustryUpdatesCarousel';
 import { accountApi } from '@/lib/api/account';
+import type { GameListItem } from '@/lib/api/games';
+import { gamesApi } from '@/lib/api/games';
 import { pollsApi } from '@/lib/api/polls';
+import type { CategoryListResult } from '@/lib/api/profile-surveys';
+import { profileSurveysApi } from '@/lib/api/profile-surveys';
+import type { RewardItem } from '@/lib/api/rewards';
+import { rewardsApi } from '@/lib/api/rewards';
 import { surveysApi } from '@/lib/api/surveys';
 
 const HERO_IMG =
   'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1600&q=80';
 
-// ─── card icons ──────────────────────────────────────────────────────────────
-const ICONS = {
-  surveys: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
-  profile: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-  social: 'M21 12a9 9 0 11-18 0 9 9 0 0118 0z M3.6 9h16.8 M3.6 15h16.8 M12 3a15 15 0 010 18 M12 3a15 15 0 000 18',
-  polls: 'M11 3.055A9 9 0 1020.945 13H11V3.055z M20.488 9A9 9 0 0011 .512V9h9.488z',
-  games: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z',
-  contests: 'M12 15a4 4 0 004-4V5H8v6a4 4 0 004 4zm0 0v3m0 0h4m-4 0H8 M4 5H2v2a3 3 0 003 3 M20 5h2v2a3 3 0 01-3 3',
-};
-
-function Icon({ d }: { d: string }): React.JSX.Element {
-  return (
-    <svg className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-      {d.split(' M').map((seg, i) => (
-        <path key={i} strokeLinecap="round" strokeLinejoin="round" d={i === 0 ? seg : `M${seg}`} />
-      ))}
-    </svg>
-  );
-}
+const PARTNER_IMAGES = [
+  'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80',
+  'https://images.unsplash.com/photo-1476231682828-37e571bc172f?auto=format&fit=crop&w=500&q=80',
+];
 
 export default function HomePage(): React.JSX.Element {
   const [name, setName] = useState('');
+  const [balance, setBalance] = useState(0);
   const [surveyCount, setSurveyCount] = useState(0);
   const [pollCount, setPollCount] = useState(0);
+  const [games, setGames] = useState<GameListItem[]>([]);
+  const [profileSurveys, setProfileSurveys] = useState<CategoryListResult | null>(null);
+  const [rewards, setRewards] = useState<RewardItem[]>([]);
 
   useEffect(() => {
     accountApi.getProfile().then((p) => setName(p.firstName)).catch(() => void 0);
+    accountApi.getBalance().then((b) => setBalance(b.balance)).catch(() => void 0);
     surveysApi
       .list()
       .then((d) => setSurveyCount((d.priority?.length ?? 0) + (d.quick?.length ?? 0) + (d.premium?.length ?? 0)))
       .catch(() => void 0);
     pollsApi.list().then((d) => setPollCount(Array.isArray(d) ? d.length : 0)).catch(() => void 0);
+    gamesApi.list().then(setGames).catch(() => void 0);
+    profileSurveysApi.list().then(setProfileSurveys).catch(() => void 0);
+    rewardsApi.list().then(setRewards).catch(() => void 0);
   }, []);
+
+  const gamesPlayedToday = games.filter((g) => g.playedToday).length;
+  const gamesAvailableToday = games.length - gamesPlayedToday;
+
+  const profileCompleted = profileSurveys?.completed ?? 0;
+  const profileTotal = profileSurveys?.total ?? 0;
+  const profileProgress = profileTotal > 0 ? (profileCompleted / profileTotal) * 100 : 0;
+
+  const nextReward = rewards
+    .filter((r) => r.pointsRequired > balance)
+    .sort((a, b) => a.pointsRequired - b.pointsRequired)[0];
+  const rewardProgress = nextReward ? Math.min(100, (balance / nextReward.pointsRequired) * 100) : 100;
 
   const cards = [
     {
       key: 'surveys',
-      title: 'Surveys',
-      count: `0 of ${surveyCount} attempted`,
-      desc: `You have ${surveyCount} survey${surveyCount === 1 ? '' : 's'} available today. Complete them before they get filled!`,
-      href: '/surveys',
+      icon: ClipboardList,
       grad: 'from-teal-500 to-cyan-600',
-      icon: ICONS.surveys,
+      eyebrow: "Today's pick",
+      title: 'Surveys',
+      badge: surveyCount > 0 ? `${surveyCount} ready` : '',
+      description: 'A few good questions. A little more in your reward jar.',
+      ctaLabel: 'Find a survey',
+      secondary: '4-8 min each',
+      href: '/surveys',
+      progress: 0,
     },
     {
       key: 'profile',
-      title: 'Profile Surveys',
-      count: '0 of 14 updated',
-      desc: 'Want to qualify for more surveys? Update 14 profile surveys.',
-      href: '/profile-surveys',
+      icon: User,
       grad: 'from-purple-500 to-violet-600',
-      icon: ICONS.profile,
-    },
-    {
-      key: 'social',
-      title: 'Social Activities',
-      count: '',
-      desc: 'All caught up with social activities for now. Stay tuned, new activities will be coming up soon!',
-      href: null,
-      grad: 'from-gray-400 to-gray-500',
-      icon: ICONS.social,
+      eyebrow: 'Make it personal',
+      title: 'Profile Surveys',
+      badge: profileSurveys ? `${profileTotal - profileCompleted} to update` : '',
+      description: 'Tell us a bit more and meet surveys that fit you.',
+      ctaLabel: 'Update profile',
+      secondary: 'Build your match',
+      href: '/profile-surveys',
+      progress: profileProgress,
     },
     {
       key: 'polls',
-      title: 'Polls',
-      count: `0 of ${pollCount} voted`,
-      desc: `Your opinion matters! ${pollCount} poll${pollCount === 1 ? '' : 's'} are eager for your input.`,
-      href: '/polls',
+      icon: BarChart3,
       grad: 'from-sky-500 to-blue-600',
-      icon: ICONS.polls,
+      eyebrow: 'Quick opinions',
+      title: 'Polls',
+      badge: pollCount > 0 ? `${pollCount} open` : '',
+      description: 'A tiny vote can help shape a very real decision.',
+      ctaLabel: 'Cast a vote',
+      secondary: 'About 1 min',
+      href: '/polls',
+      progress: 0,
+    },
+    {
+      key: 'social',
+      icon: Globe,
+      grad: 'from-gray-400 to-gray-500',
+      eyebrow: 'In good company',
+      title: 'Social Activities',
+      badge: 'More soon',
+      description: 'The community is taking a breather. New conversations are on the way.',
+      ctaLabel: 'See community',
+      secondary: 'Check back soon',
+      href: null,
+      progress: 0,
     },
     {
       key: 'games',
-      title: 'Games',
-      count: '0 of 1 played',
-      desc: 'Calling all gamers! Check out our exciting new games!',
-      href: '/games',
+      icon: Gamepad2,
       grad: 'from-emerald-500 to-green-600',
-      icon: ICONS.games,
+      eyebrow: 'A playful pause',
+      title: 'Games',
+      badge: games.length > 0 ? `${gamesAvailableToday} game${gamesAvailableToday === 1 ? '' : 's'} ready` : '',
+      description: 'Take five, play a round, and pick up a few points.',
+      ctaLabel: 'Play a game',
+      secondary: 'Points for play',
+      href: '/games',
+      progress: games.length > 0 ? (gamesPlayedToday / games.length) * 100 : 0,
     },
     {
       key: 'contests',
+      icon: Trophy,
+      grad: 'from-orange-500 to-amber-600',
+      eyebrow: 'Weekly goodies',
       title: 'Contests',
-      count: "Let's start",
-      desc: 'Join the fun! Explore the latest contest here.',
-      href: '/polls',
-      grad: 'from-blue-700 to-indigo-800',
-      icon: ICONS.contests,
+      badge: 'New this week',
+      description: "A little friendly luck never hurt. See what's on the board.",
+      ctaLabel: 'View contests',
+      secondary: 'Join the fun',
+      href: null,
+      progress: 0,
     },
   ];
 
@@ -108,65 +154,94 @@ export default function HomePage(): React.JSX.Element {
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMG})` }} />
         <div className="absolute inset-0 bg-gradient-to-r from-ink via-brand-950/85 to-brand-800/20" />
         <div className="relative px-8 py-14 md:py-20">
-          <h1 className="text-3xl font-black text-white md:text-4xl">
-            Hi, {name || 'there'}! <span className="inline-block">👋</span>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white/80">
+            <Sparkles className="h-3.5 w-3.5" />
+            Your BinaryIQ home
+          </span>
+          <h1 className="mt-4 text-3xl font-black text-white md:text-4xl">
+            Hi, {name || 'there'}<span className="text-brand-300">!</span>
           </h1>
-          <p className="mt-3 max-w-[240px] text-lg font-medium text-white/90">
-            Let&apos;s see what we have for you today!
+          <p className="mt-3 max-w-sm text-base font-medium text-white/85">
+            Your point of view has a way of going places. Pick a little something to do today.
+          </p>
+          <a href="#activities" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-white hover:underline">
+            See what&apos;s waiting →
+          </a>
+        </div>
+
+        {/* Floating reward journey card */}
+        <div className="absolute bottom-5 right-5 hidden w-72 rounded-2xl bg-white/95 p-5 shadow-xl backdrop-blur sm:block">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wide text-gray-500">Your reward journey</span>
+            <Sparkles className="h-4 w-4 text-amber-500" />
+          </div>
+          <p className="mt-2 text-3xl font-black text-gray-900">
+            {balance.toLocaleString()} <span className="text-base font-semibold text-gray-400">points earned</span>
+          </p>
+          <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-gray-100">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500"
+              style={{ width: `${rewardProgress}%` }}
+            />
+          </div>
+          <p className="mt-2 text-xs text-gray-500">
+            {nextReward
+              ? `${(nextReward.pointsRequired - balance).toLocaleString()} points to your next reward`
+              : 'You qualify for every reward — nice!'}
           </p>
         </div>
       </div>
 
       {/* Main + sidebar */}
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+      <div id="activities" className="mt-20 grid gap-6 sm:mt-6 lg:grid-cols-3">
         {/* Left: activity cards */}
         <div className="lg:col-span-2">
-          <h2 className="text-2xl font-black text-gray-900">Let&apos;s earn some points!</h2>
-          <p className="mt-1 text-sm text-gray-500">
-            {name ? `${name}, let's see what we have in store for you today` : "Let's see what we have in store for you today"}
-          </p>
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-black text-gray-900">Let&apos;s earn some points</h2>
+              <p className="mt-1 text-sm text-gray-500">Good questions, quick games, and a say in what comes next.</p>
+            </div>
+            <Link href="/surveys" className="shrink-0 text-sm font-semibold text-brand-800 hover:underline">
+              All activities →
+            </Link>
+          </div>
 
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
-            {cards.map((c) => (
-              <div key={c.key} className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-                <div className={`bg-gradient-to-r ${c.grad} px-5 py-4 text-white`}>
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <Icon d={c.icon} />
-                      <span className="text-lg font-bold">{c.title}</span>
-                    </div>
-                    {c.count && <span className="shrink-0 text-xs font-medium text-white/90">{c.count}</span>}
-                  </div>
-                  <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/30">
-                    <div className="h-full w-0 rounded-full bg-white/80" />
-                  </div>
-                </div>
-                <div className="flex min-h-[150px] flex-col p-5">
-                  <p className="flex-1 text-sm text-gray-600">{c.desc}</p>
-                  {c.href && (
-                    <Link href={c.href} className="mt-4 self-start">
-                      <button className={`rounded-full bg-gradient-to-r ${c.grad} px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-95`}>
-                        Participate
-                      </button>
-                    </Link>
-                  )}
-                </div>
-              </div>
+            {cards.map(({ key, ...c }) => (
+              <ActivityCard key={key} {...c} />
             ))}
           </div>
         </div>
 
-        {/* Right: About you + notifications */}
+        {/* Right: About you + Industry updates + partner spots */}
         <aside className="space-y-6">
           <div className="overflow-hidden rounded-2xl border-2 border-brand-300 bg-white shadow-sm">
-            <div className="flex items-center gap-2 bg-gradient-to-r from-brand-800 to-brand-600 px-5 py-4 text-white">
-              <Icon d={ICONS.profile} />
-              <span className="text-lg font-bold">About you</span>
+            <div className="flex items-center justify-between gap-2 bg-gradient-to-r from-brand-800 to-brand-600 px-5 py-4 text-white">
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                <span className="text-lg font-bold">About you</span>
+              </div>
+              {profileSurveys && (
+                <span className="rounded-full bg-white/20 px-2.5 py-1 text-xs font-bold">
+                  {Math.round(profileProgress)}%
+                </span>
+              )}
             </div>
             <div className="p-5">
               <p className="text-sm text-gray-600">
                 Let us recommend surveys just for you — complete your About You profile.
               </p>
+              <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-brand-700 to-brand-900"
+                  style={{ width: `${profileProgress}%` }}
+                />
+              </div>
+              {profileSurveys && (
+                <p className="mt-2 text-xs text-gray-400">
+                  {profileCompleted} of {profileTotal} details complete
+                </p>
+              )}
               <Link href="/profile-surveys">
                 <button className="mt-4 w-full rounded-full bg-brand-800 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-900 active:scale-95">
                   Complete Your Profile
@@ -175,16 +250,16 @@ export default function HomePage(): React.JSX.Element {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-            <h3 className="text-xl font-black text-gray-900">Let&apos;s socialize!</h3>
-            <p className="mt-1 text-sm text-gray-500">Stay tuned for upcoming notifications</p>
-            <div className="mt-6 flex justify-center">
-              <div className="flex h-32 w-32 items-center justify-center rounded-full bg-gray-100 text-gray-300">
-                <svg className="h-16 w-16" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-              </div>
-            </div>
+          <IndustryUpdatesCarousel />
+
+          <div className="flex flex-col gap-3">
+            {PARTNER_IMAGES.map((src) => (
+              <div
+                key={src}
+                className="aspect-video rounded-2xl bg-cover bg-center opacity-80"
+                style={{ backgroundImage: `url(${src})` }}
+              />
+            ))}
           </div>
         </aside>
       </div>
