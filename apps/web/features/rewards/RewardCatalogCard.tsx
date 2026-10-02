@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import { ApiError } from '@/lib/api/client';
 import { rewardsApi, type RewardItem } from '@/lib/api/rewards';
+import { safeHttpUrl } from '@/lib/safe-url';
 
 interface RewardCatalogCardProps {
   reward: RewardItem;
@@ -59,7 +60,7 @@ export function RewardCatalogCard({ reward, balance, onRedeemed }: RewardCatalog
           {showLogo ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={reward.imageUrl as string}
+              src={safeHttpUrl(reward.imageUrl)}
               alt={reward.name}
               className="h-16 w-auto object-contain"
               onError={() => setImgFailed(true)}

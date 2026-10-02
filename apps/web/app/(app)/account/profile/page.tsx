@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { accountApi } from '@/lib/api/account';
 import type { ProfileData } from '@/lib/api/account';
 import { ApiError } from '@/lib/api/client';
+import { safeHttpUrl } from '@/lib/safe-url';
 
 const GENDER_OPTIONS = [
   { value: 'MALE', label: 'Male' },
@@ -52,7 +53,7 @@ export default function ProfileTab(): React.JSX.Element {
     <div className="flex flex-col gap-6">
       {profile && (
         <div className="flex items-center gap-4">
-          <Avatar src={profile.photoUrl} name={`${profile.firstName} ${profile.surname}`} size="lg" />
+          <Avatar src={safeHttpUrl(profile.photoUrl)} name={`${profile.firstName} ${profile.surname}`} size="lg" />
           <div>
             <p className="text-text font-semibold">{profile.firstName} {profile.surname}</p>
             <p className="text-secondary text-sm">{profile.country}</p>

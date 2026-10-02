@@ -26,7 +26,7 @@ export default function LoginPage(): React.JSX.Element {
   const onSubmit = handleSubmit(async (values) => {
     try {
       await authApi.login(values);
-      router.push('/home');
+      router.push(safeNextPath(new URLSearchParams(window.location.search).get('next')));
     } catch (err) {
       setError('root', {
         message: err instanceof ApiError ? err.message : 'Sign in failed',
@@ -40,12 +40,12 @@ export default function LoginPage(): React.JSX.Element {
       <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
         <FormField label={t('email')} error={errors.email?.message} required>
           {({ id, invalid }) => (
-            <Input id={id} type="email" invalid={invalid} {...register('email')} />
+            <Input id={id} type="email" autoComplete="email" invalid={invalid} {...register('email')} />
           )}
         </FormField>
         <FormField label={t('password')} error={errors.password?.message} required>
           {({ id, invalid }) => (
-            <Input id={id} type="password" invalid={invalid} {...register('password')} />
+            <Input id={id} type="password" autoComplete="current-password" invalid={invalid} {...register('password')} />
           )}
         </FormField>
         {rootError && (
@@ -67,4 +67,9 @@ export default function LoginPage(): React.JSX.Element {
       </div>
     </div>
   );
+}
+
+/** Only same-site app paths — `?next=` must never become an open redirect. */
+function safeNextPath(next: string | null): string {
+  return next && /^\/(?![/\\])/.test(next) ? next : '/home';
 }

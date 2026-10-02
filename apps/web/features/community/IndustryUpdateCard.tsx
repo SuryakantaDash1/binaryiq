@@ -4,6 +4,7 @@ import type { ArticleView } from '@influencer/types';
 import { ExternalLink, Newspaper } from 'lucide-react';
 
 import { gradientFor } from './gradient';
+import { safeHttpUrl } from '@/lib/safe-url';
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
@@ -17,7 +18,7 @@ export function IndustryUpdateCard({ article }: { article: ArticleView }): React
         {article.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={article.imageUrl}
+            src={safeHttpUrl(article.imageUrl)}
             alt=""
             className="h-full w-full object-cover"
             onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
@@ -48,7 +49,7 @@ export function IndustryUpdateCard({ article }: { article: ArticleView }): React
         )}
         <div className="mt-4 border-t border-gray-100 pt-3">
           <a
-            href={article.link}
+            href={safeHttpUrl(article.link)}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 self-start text-sm font-semibold text-brand-800 hover:underline"

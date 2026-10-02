@@ -34,8 +34,11 @@ async function bootstrap(): Promise<void> {
       .map((o) => o.trim().replace(/\/$/, ''))
       .filter(Boolean),
   );
+  // In development any localhost port is fine (the web dev server's port varies).
+  const isDev = config.get('NODE_ENV') === 'development';
+  const localDevOrigin = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
   app.enableCors({
-    origin: (origin, cb) => cb(null, !origin || allowed.has(origin)),
+    origin: (origin, cb) => cb(null, !origin || allowed.has(origin) || (isDev && localDevOrigin.test(origin))),
     credentials: true,
   });
   app.enableShutdownHooks();

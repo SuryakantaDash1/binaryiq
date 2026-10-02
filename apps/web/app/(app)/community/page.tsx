@@ -13,7 +13,7 @@ import { communityApi } from '@/lib/api/community';
 import { newsApi } from '@/lib/api/news';
 
 const HERO_IMG =
-  'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1600&q=80';
+  '/images/community-hero.jpg';
 
 type Tab = 'news' | 'updates' | 'contests' | 'forum' | 'settings';
 const TABS: { key: Tab; label: string }[] = [

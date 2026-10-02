@@ -5,7 +5,7 @@ import { createContext, useContext, useState } from 'react';
 export type PanelVariant = 'default' | 'male' | 'female';
 
 const AUTH_IMAGE =
-  'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1400&q=80';
+  '/images/people-hero.jpg';
 
 const TEXTS: Record<PanelVariant, { top: string; big: string }> = {
   default: { top: "Let's", big: 'START' },

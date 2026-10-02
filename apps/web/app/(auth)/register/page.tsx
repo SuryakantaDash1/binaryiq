@@ -14,7 +14,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 
 import { authApi } from '@/lib/api/auth';
-import { ApiError } from '@/lib/api/client';
+import { ApiError, apiFetch } from '@/lib/api/client';
 import { useAuthPanel } from '@/features/auth/AuthPanel.js';
 
 type Step = 1 | 2 | 'done';
@@ -294,7 +294,7 @@ function Step2Form({
     setValue('username', genUsername());
   }, [setValue]);
 
-  // Look up Indian post offices for a 6-digit PIN code (free public API).
+  // Look up Indian post offices for a 6-digit PIN code (proxied through our API).
   useEffect(() => {
     if (pinDigits.length !== 6) {
       setPinOptions([]);
@@ -302,12 +302,10 @@ function Step2Form({
       return;
     }
     let cancelled = false;
-    fetch(`https://api.postalpincode.in/pincode/${pinDigits}`)
-      .then((r) => r.json())
-      .then((data) => {
+    apiFetch<Array<{ name: string }>>(`/geo/pincode/${pinDigits}`)
+      .then((offices) => {
         if (cancelled) return;
-        const offices: Array<{ Name: string }> = data?.[0]?.PostOffice ?? [];
-        setPinOptions(offices.slice(0, 12).map((o) => ({ pin: pinDigits, name: o.Name })));
+        setPinOptions(offices.slice(0, 12).map((o) => ({ pin: pinDigits, name: o.name })));
         setPinOpen(offices.length > 0);
       })
       .catch(() => void 0);

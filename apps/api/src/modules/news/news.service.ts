@@ -32,6 +32,17 @@ type FeedItem = Parser.Item & {
   'media:content'?: MediaTag | MediaTag[];
 };
 
+/** Feeds are untrusted: keep only http(s) URLs so a `javascript:` link can never reach a page. */
+function httpUrl(value: string | null | undefined): string | null {
+  if (!value || value.length > 2048) return null;
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Pulls an image URL out of whatever shape a given feed uses (standard RSS enclosure,
  *  MediaRSS thumbnail/content, or a bare <img> inside the HTML content as a last resort). */
 function extractImageUrl(item: FeedItem): string | null {
@@ -142,10 +153,10 @@ export class NewsService {
       const items = (feed.items ?? []).slice(0, MAX_ITEMS_PER_SOURCE);
 
       for (const item of items) {
-        const link = item.link;
+        const link = httpUrl(item.link);
         if (!link) continue;
         const publishedAt = item.isoDate ? new Date(item.isoDate) : item.pubDate ? new Date(item.pubDate) : new Date();
-        const imageUrl = extractImageUrl(item as FeedItem);
+        const imageUrl = httpUrl(extractImageUrl(item as FeedItem));
 
         await this.prisma.article.upsert({
           where: { link },

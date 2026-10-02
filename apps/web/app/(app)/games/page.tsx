@@ -16,7 +16,7 @@ const SpinWheelIsland = dynamic(
 );
 
 const HERO_IMG =
-  'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1600&q=80';
+  '/images/games-hero.jpg';
 
 type Selected = 'wheel' | 'trivia';
 

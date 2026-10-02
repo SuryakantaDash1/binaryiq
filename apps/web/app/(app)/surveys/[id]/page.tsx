@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 
 import { ApiError } from '@/lib/api/client';
 import { surveysApi, type SurveyDetail, type StartResult } from '@/lib/api/surveys';
+import { safeHttpUrl } from '@/lib/safe-url';
 
 const TYPE_BADGE: Record<string, { variant: 'primary' | 'default' | 'success' | 'warning'; label: string }> = {
   PRIORITY: { variant: 'primary', label: 'Priority' },
@@ -37,8 +38,12 @@ export default function SurveyDetailPage(): React.JSX.Element {
     setError(null);
     try {
       const result: StartResult = await surveysApi.start(id);
-      if (result.mode === 'external' && result.externalUrl) {
-        window.location.assign(result.externalUrl);
+      const externalUrl = result.mode === 'external' ? safeHttpUrl(result.externalUrl) : undefined;
+      if (externalUrl) {
+        window.location.assign(externalUrl);
+      } else if (result.mode === 'external') {
+        setError('This survey link is invalid. Please contact support.');
+        setStarting(false);
       } else {
         router.push(`/surveys/${id}/complete?returnToken=${result.returnToken}`);
       }

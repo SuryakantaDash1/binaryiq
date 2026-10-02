@@ -39,6 +39,11 @@ async function doFetch<T>(
   allowRefresh: boolean,
 ): Promise<T> {
   const { token, headers, ...rest } = options;
+  // The access token is memory-only: after a reload, mint it from the refresh
+  // cookie before the first request so it doesn't go out anonymously.
+  if (!token && !getToken() && !knownSignedOut && allowRefresh && !path.startsWith('/auth/')) {
+    await tryRefresh();
+  }
   const authToken = token ?? getToken() ?? undefined;
 
   const serializedBody =
@@ -103,12 +108,14 @@ async function doFetch<T>(
 }
 
 let refreshInFlight: Promise<boolean> | null = null;
+/** Set once a refresh fails, so signed-out visitors don't trigger one per request. */
+let knownSignedOut = false;
 
 /**
  * Exchange the httpOnly refresh cookie for a fresh access token. Refresh tokens
  * are single-use, so concurrent callers share one request.
  */
-function tryRefresh(): Promise<boolean> {
+export function tryRefresh(): Promise<boolean> {
   refreshInFlight ??= doRefresh().finally(() => {
     refreshInFlight = null;
   });
@@ -123,12 +130,14 @@ async function doRefresh(): Promise<boolean> {
     });
     if (!res.ok) {
       clearToken();
+      knownSignedOut = true;
       return false;
     }
     const body = (await res.json()) as ApiResponse<{ accessToken: string }>;
     const newToken = body.data?.accessToken;
     if (newToken) {
       setToken(newToken);
+      knownSignedOut = false;
       return true;
     }
     return false;

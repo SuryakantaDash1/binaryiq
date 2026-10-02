@@ -243,7 +243,11 @@ const SPIN_SEGMENTS: Array<{
   { label: '1000 Points', points: 1000, prob: '0.0200', color: '#6B0E3C', sort: 8 },
 ];
 
-const SIMPLE_ICON = (slug: string): string => `https://cdn.simpleicons.org/${slug}`;
+// Brand logos are self-hosted in apps/web/public so members' browsers never call a
+// third-party CDN. Brands without a local logo fall back to the card's placeholder.
+const LOCAL_BRAND_ICONS = new Set(['zomato', 'swiggy', 'uber']);
+const SIMPLE_ICON = (slug: string): string | undefined =>
+  LOCAL_BRAND_ICONS.has(slug) ? `/images/brands/${slug}.svg` : undefined;
 
 const REWARDS: Array<{
   key: string;
@@ -252,7 +256,7 @@ const REWARDS: Array<{
   type: 'CHARITY' | 'PAYPAL' | 'VOUCHER' | 'MERCHANDISE';
   points: number;
   sort: number;
-  imageUrl?: string;
+  imageUrl?: string | undefined;
 }> = [
   {
     key: 'meals-africa',

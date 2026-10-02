@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { imageUrlSchema } from './url.js';
+
 // ─── Points ───────────────────────────────────────────────────
 export interface PointsBalanceView {
   balance: number;
@@ -46,7 +48,7 @@ export const createRewardSchema = z.object({
   description: z.string().min(1).max(500),
   rewardType: z.enum(['CHARITY', 'PAYPAL', 'VOUCHER', 'MERCHANDISE']),
   pointsRequired: z.number().int().positive(),
-  imageUrl: z.string().url().optional(),
+  imageUrl: imageUrlSchema.optional(),
   stock: z.number().int().nonnegative().optional(),
   sortOrder: z.number().int().default(0),
   isActive: z.boolean().default(true),

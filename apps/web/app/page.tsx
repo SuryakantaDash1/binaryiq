@@ -68,9 +68,9 @@ const STEPS = ['step1', 'step2', 'step3'] as const;
 // Real lifestyle/community photos (Unsplash CDN) that cross-fade like a video.
 // If offline, the panel's base gradient shows instead — no broken images.
 const HERO_IMAGES = [
-  'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1400&q=80',
-  'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1400&q=80',
-  'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1400&q=80',
+  '/images/people-hero.jpg',
+  '/images/landing-2.jpg',
+  '/images/landing-3.jpg',
 ];
 
 // Map full locale codes to base language codes (must match i18n/request.ts)

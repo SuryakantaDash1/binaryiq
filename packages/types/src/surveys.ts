@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { httpsUrlSchema } from './url.js';
+
 // ─── Survey card / detail DTOs ────────────────────────────────
 export interface SurveyCardDto {
   id: string;
@@ -55,7 +57,7 @@ export const createSurveySchema = z.object({
   estimatedMins: z.number().int().positive().optional(),
   quota: z.number().int().positive().optional(),
   targeting: z.record(z.unknown()).optional(),
-  externalUrl: z.string().url().optional(),
+  externalUrl: httpsUrlSchema.optional(),
   expiresAt: z.string().optional(),
   isActive: z.boolean().optional(),
 });

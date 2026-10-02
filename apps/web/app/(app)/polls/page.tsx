@@ -9,7 +9,7 @@ import { SHOWCASE_POLLS } from '@/features/polls/polls-showcase-data';
 import { pollsApi, type PollSummary } from '@/lib/api/polls';
 
 const HERO_IMG =
-  'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=1600&q=80';
+  '/images/polls-hero.jpg';
 
 const PAGE_SIZE = 6;
 

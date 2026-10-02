@@ -6,6 +6,7 @@ import { ExternalLink, Rss } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { newsApi } from '@/lib/api/news';
+import { safeHttpUrl } from '@/lib/safe-url';
 
 const FETCH_PAGE_SIZE = 50;
 const ADVANCE_MS = 6000;
@@ -88,7 +89,7 @@ export function IndustryUpdatesCarousel(): React.JSX.Element {
                 )}
 
                 <a
-                  href={article.link}
+                  href={safeHttpUrl(article.link)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-800 hover:underline"

@@ -25,11 +25,11 @@ import { rewardsApi } from '@/lib/api/rewards';
 import { surveysApi } from '@/lib/api/surveys';
 
 const HERO_IMG =
-  'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1600&q=80';
+  '/images/people-hero.jpg';
 
 const PARTNER_IMAGES = [
-  'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80',
-  'https://images.unsplash.com/photo-1476231682828-37e571bc172f?auto=format&fit=crop&w=500&q=80',
+  '/images/partner-1.jpg',
+  '/images/partner-2.jpg',
 ];
 
 export default function HomePage(): React.JSX.Element {

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { feedUrlSchema } from './url.js';
+
 // ─── Articles (member-facing) ───────────────────────────────────
 export interface ArticleView {
   id: string;
@@ -40,7 +42,7 @@ export interface FeedSourceView {
 
 export const createFeedSourceSchema = z.object({
   name: z.string().min(1).max(120),
-  feedUrl: z.string().url(),
+  feedUrl: feedUrlSchema,
   category: z.string().max(60).optional(),
   isActive: z.boolean().default(true),
 });

@@ -1,7 +1,7 @@
 /** Branded, email-client-safe HTML templates (table layout + inline styles). */
 
-const HERO_IMG =
-  'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1200&q=80';
+/** Served from our own web app, so opening an email doesn't ping a third party. */
+const heroImg = (webUrl: string): string => `${webUrl}/images/community-hero.jpg`;
 
 const PINK = '#D91A98';
 const BLUE = '#4A2B9D';
@@ -27,8 +27,8 @@ function shell(webUrl: string, heroBig: string, heroSmall: string, inner: string
         <tr><td>
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
             <tr>
-              <td background="${HERO_IMG}" bgcolor="#9A268F" height="190" valign="bottom"
-                  style="background-image:url('${HERO_IMG}');background-size:cover;background-position:center;height:190px">
+              <td background="${heroImg(webUrl)}" bgcolor="#9A268F" height="190" valign="bottom"
+                  style="background-image:url('${heroImg(webUrl)}');background-size:cover;background-position:center;height:190px">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
                        style="background:linear-gradient(180deg,rgba(17,11,34,0.15),rgba(154,38,143,0.55))">
                   <tr><td style="padding:22px 32px;color:#ffffff">

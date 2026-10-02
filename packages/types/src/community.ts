@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { imageUrlSchema } from './url.js';
+
 // ─── Announcements (member-facing "News" tab) ────────────────────
 export interface AnnouncementView {
   id: string;
@@ -37,7 +39,7 @@ export const createAnnouncementSchema = z.object({
   excerpt: z.string().min(1).max(600),
   bannerHeadline: z.string().min(1).max(80),
   emoji: z.string().min(1).max(8),
-  imageUrl: z.string().url().optional(),
+  imageUrl: imageUrlSchema.optional(),
   commentsCount: z.coerce.number().int().min(0).default(0),
   isActive: z.boolean().default(true),
   sortOrder: z.coerce.number().int().default(0),

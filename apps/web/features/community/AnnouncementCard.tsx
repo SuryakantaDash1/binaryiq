@@ -4,6 +4,7 @@ import type { AnnouncementView } from '@influencer/types';
 import { MessageSquare } from 'lucide-react';
 
 import { gradientFor } from './gradient';
+import { safeHttpUrl } from '@/lib/safe-url';
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
@@ -16,7 +17,7 @@ export function AnnouncementCard({ item }: { item: AnnouncementView }): React.JS
       <div className="relative flex h-40 items-center justify-center overflow-hidden">
         {item.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
+          <img src={safeHttpUrl(item.imageUrl)} alt="" className="h-full w-full object-cover" />
         ) : (
           <div className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${gradientFor(item.id)} px-4 text-center`}>
             <span className="absolute right-3 top-3 text-[10px] font-bold uppercase tracking-widest text-white/70">

@@ -1,33 +1,29 @@
 /**
- * Client-side access-token store. The short-lived access token lives in
- * localStorage; the long-lived refresh token is an httpOnly cookie the browser
- * sends automatically to `/auth/refresh`.
+ * Client-side access-token store. The short-lived access token lives only in
+ * memory, so an XSS bug can't lift it out of storage; the long-lived refresh
+ * token is an httpOnly cookie the browser sends to `/auth/refresh`, which
+ * re-mints the access token after a reload.
  */
-const KEY = 'influencer_access_token';
+const LEGACY_KEY = 'influencer_access_token';
+
+let accessToken: string | null = null;
+
+if (typeof window !== 'undefined') {
+  try {
+    window.localStorage.removeItem(LEGACY_KEY); // tokens used to be kept here
+  } catch {
+    /* storage unavailable */
+  }
+}
 
 export function getToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    return window.localStorage.getItem(KEY);
-  } catch {
-    return null;
-  }
+  return accessToken;
 }
 
 export function setToken(token: string): void {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(KEY, token);
-  } catch {
-    /* ignore */
-  }
+  accessToken = token;
 }
 
 export function clearToken(): void {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.removeItem(KEY);
-  } catch {
-    /* ignore */
-  }
+  accessToken = null;
 }
