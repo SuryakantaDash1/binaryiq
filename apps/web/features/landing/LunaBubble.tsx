@@ -1,5 +1,6 @@
 'use client';
 
+import { Brain } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -119,8 +120,8 @@ export function LunaBubble(): React.JSX.Element {
             <div className="relative z-10 -mt-10 shrink-0 px-5">
               <div className="rounded-2xl bg-white p-5 shadow-lg ring-1 ring-black/5">
                 <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-amber-300 text-xl">
-                    😊
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-brand-700 shadow-inner ring-1 ring-black/5">
+                    <Brain className="h-5 w-5" />
                   </div>
                   <p className="text-sm leading-relaxed text-gray-700">{t('lunaIntro')}</p>
                 </div>
@@ -139,8 +140,8 @@ export function LunaBubble(): React.JSX.Element {
               {transcript.map((line, i) =>
                 line.from === 'bot' ? (
                   <div key={i} className="flex items-end gap-2">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-amber-300 text-base">
-                      😊
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-brand-700 shadow-inner ring-1 ring-black/5">
+                      <Brain className="h-4 w-4" />
                     </div>
                     <div className="max-w-[78%]">
                       <div className="whitespace-pre-line rounded-2xl rounded-bl-sm bg-white px-3 py-2 text-sm text-gray-700 shadow-sm ring-1 ring-black/5">
@@ -279,8 +280,8 @@ export function LunaBubble(): React.JSX.Element {
           className="relative flex h-[84px] w-[84px] items-center justify-center bg-gradient-to-br from-brand-700 to-brand-900 shadow-xl transition hover:scale-105 active:scale-95"
         >
           <span style={bubbleShape} className="absolute inset-0 animate-ping bg-brand-500/20" />
-          <span className="relative flex h-[58px] w-[58px] items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-amber-200 text-[38px] leading-none shadow-inner">
-            😊
+          <span className="relative flex h-[58px] w-[58px] items-center justify-center rounded-full bg-white text-brand-700 shadow-inner">
+            <Brain className="h-8 w-8" />
           </span>
         </button>
       )}
