@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { NotificationBell } from '@/features/notifications/NotificationBell';
@@ -35,6 +35,7 @@ const LINKS = [
 
 export function AppHeader(): React.JSX.Element {
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [points, setPoints] = useState<number | null>(null);
@@ -61,18 +62,20 @@ export function AppHeader(): React.JSX.Element {
   return (
     <>
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-3 md:px-6">
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label="Open menu"
-          className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-700 transition hover:bg-gray-100"
-        >
-          <Menu className="h-6 w-6" />
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            aria-label="Open menu"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-700 transition hover:bg-gray-100"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
 
-        <Link href="/home" className="flex items-center">
-          <Image src="/BinaryIQ_logo.svg" alt="BinaryIQ" width={1600} height={420} className="h-7 w-auto" />
-        </Link>
+          <Link href="/home" className="flex items-center">
+            <Image src="/BinaryIQ_logo.svg" alt="BinaryIQ" width={1600} height={420} className="h-7 w-auto" />
+          </Link>
+        </div>
 
         <div className="flex items-center gap-3">
           {points !== null && (
@@ -95,14 +98,17 @@ export function AppHeader(): React.JSX.Element {
         <>
           <div onClick={() => setOpen(false)} className="fixed inset-0 z-50 bg-black/40" aria-hidden />
           <div className="fixed left-0 top-0 z-50 flex h-full w-[280px] max-w-[85vw] flex-col bg-white shadow-2xl">
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              aria-label="Close menu"
-              className="m-3 flex h-9 w-9 items-center justify-center self-start rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200"
-            >
-              <X className="h-5 w-5" />
-            </button>
+            <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+              <Image src="/BinaryIQ_logo.svg" alt="BinaryIQ" width={1600} height={420} className="h-6 w-auto" />
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Close menu"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
             <div className="px-5 pb-5">
               <div className="flex items-center gap-3">
@@ -123,14 +129,19 @@ export function AppHeader(): React.JSX.Element {
             <nav className="flex-1 overflow-y-auto border-t border-gray-100 py-2">
               {LINKS.map((l) => {
                 const Icon = l.icon;
+                const active = pathname === l.href;
                 return (
                   <Link
                     key={l.label}
                     href={l.href}
                     onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 transition hover:bg-gray-50"
+                    className={`flex items-center gap-3 border-l-[3px] px-5 py-3 text-sm transition ${
+                      active
+                        ? 'border-brand-700 bg-brand-50 font-semibold text-brand-800'
+                        : 'border-transparent text-gray-700 hover:border-brand-200 hover:bg-brand-50 hover:text-brand-800'
+                    }`}
                   >
-                    <Icon className="h-5 w-5 text-gray-500" />
+                    <Icon className={`h-5 w-5 ${active ? 'text-brand-700' : 'text-gray-500'}`} />
                     {l.label}
                   </Link>
                 );
@@ -140,7 +151,7 @@ export function AppHeader(): React.JSX.Element {
             <button
               type="button"
               onClick={() => void signOut()}
-              className="flex items-center gap-3 border-t border-gray-100 px-5 py-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              className="flex items-center gap-3 border-t border-gray-100 px-5 py-4 text-sm font-medium text-gray-700 transition hover:bg-brand-50 hover:text-brand-800"
             >
               <LogOut className="h-5 w-5 text-gray-500" />
               Sign Out
