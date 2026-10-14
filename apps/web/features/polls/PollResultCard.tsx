@@ -68,7 +68,7 @@ export function PollResultCard({ poll }: { poll: ShowcasePoll }): React.JSX.Elem
 
         <div className="flex flex-col gap-3">
           {poll.options.map((o, i) => {
-            const c = PALETTE[i % PALETTE.length];
+            const c = PALETTE[i % PALETTE.length] ?? PALETTE[0]!;
             return (
               <div key={o.label} className="flex items-center gap-3">
                 {/* Bar with label + votes overlaid */}

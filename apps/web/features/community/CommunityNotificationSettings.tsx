@@ -128,10 +128,10 @@ export function CommunityNotificationSettings(): React.JSX.Element {
 
   function toggle(rowKey: string, channel: Channel): void {
     setSaved(false);
-    setState((prev) => ({
-      ...prev,
-      [rowKey]: { ...prev[rowKey], [channel]: !prev[rowKey]?.[channel] },
-    }));
+    setState((prev) => {
+      const current = prev[rowKey] ?? emptyPrefs();
+      return { ...prev, [rowKey]: { ...current, [channel]: !current[channel] } };
+    });
   }
 
   async function handleSave(): Promise<void> {

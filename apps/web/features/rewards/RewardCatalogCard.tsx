@@ -70,7 +70,7 @@ export function RewardCatalogCard({ reward, balance, onRedeemed }: RewardCatalog
               className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${tileFor(reward)} px-4 text-center`}
             >
               <span className="text-lg font-black uppercase tracking-wide text-white drop-shadow">
-                {reward.name.split(/[|—-]/)[0].trim()}
+                {(reward.name.split(/[|—-]/)[0] ?? reward.name).trim()}
               </span>
             </div>
           )}
