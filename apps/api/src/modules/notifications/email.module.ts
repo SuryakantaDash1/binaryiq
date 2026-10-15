@@ -2,9 +2,14 @@ import { Global, Module } from '@nestjs/common';
 
 import { AppConfigService } from '../../config/config.service';
 
-import { ConsoleEmailProvider, EmailProvider, SendGridEmailProvider } from './email.provider';
+import { ConsoleEmailProvider, EmailProvider, ResendEmailProvider, SendGridEmailProvider } from './email.provider';
 
-/** Single, app-wide EmailProvider binding: SendGrid when configured, console otherwise. */
+/**
+ * Single, app-wide EmailProvider binding: Resend when configured, else SendGrid
+ * when configured, else console. Two providers are supported (not just one)
+ * because provider sign-up/vetting can fail or get blocked unpredictably —
+ * swapping is then just an env var change, no code changes needed.
+ */
 @Global()
 @Module({
   providers: [
@@ -12,9 +17,14 @@ import { ConsoleEmailProvider, EmailProvider, SendGridEmailProvider } from './em
       provide: EmailProvider,
       inject: [AppConfigService],
       useFactory: (config: AppConfigService): EmailProvider => {
-        const apiKey = config.get('SENDGRID_API_KEY');
-        const from = config.get('SENDGRID_FROM_EMAIL');
-        if (apiKey && from) return new SendGridEmailProvider(apiKey, from);
+        const resendKey = config.get('RESEND_API_KEY');
+        const resendFrom = config.get('RESEND_FROM_EMAIL');
+        if (resendKey && resendFrom) return new ResendEmailProvider(resendKey, resendFrom);
+
+        const sendgridKey = config.get('SENDGRID_API_KEY');
+        const sendgridFrom = config.get('SENDGRID_FROM_EMAIL');
+        if (sendgridKey && sendgridFrom) return new SendGridEmailProvider(sendgridKey, sendgridFrom);
+
         return new ConsoleEmailProvider(config.get('NODE_ENV') === 'development');
       },
     },

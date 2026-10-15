@@ -37,6 +37,8 @@ export const envSchema = z
     // Testing only: instantly verify accounts on registration. Rejected in production.
     AUTO_VERIFY_EMAIL: z.enum(['true', 'false']).default('false'),
 
+    RESEND_API_KEY: z.string().optional(),
+    RESEND_FROM_EMAIL: z.string().email().optional(),
     SENDGRID_API_KEY: z.string().optional(),
     SENDGRID_FROM_EMAIL: z.string().email().optional(),
     SENDGRID_WEBHOOK_VERIFICATION_KEY: z.string().optional(),
@@ -59,11 +61,14 @@ export const envSchema = z
     if (/localhost|127\.0\.0\.1/.test(env.WEB_URL)) {
       ctx.addIssue({ code: 'custom', path: ['WEB_URL'], message: 'must not point at localhost in production' });
     }
-    if (!env.SENDGRID_API_KEY || !env.SENDGRID_FROM_EMAIL) {
+    const hasResend = !!env.RESEND_API_KEY && !!env.RESEND_FROM_EMAIL;
+    const hasSendgrid = !!env.SENDGRID_API_KEY && !!env.SENDGRID_FROM_EMAIL;
+    if (!hasResend && !hasSendgrid) {
       ctx.addIssue({
         code: 'custom',
-        path: ['SENDGRID_API_KEY'],
-        message: 'SENDGRID_API_KEY and SENDGRID_FROM_EMAIL are required in production (no console email)',
+        path: ['RESEND_API_KEY'],
+        message:
+          'A real email provider is required in production (no console email): set RESEND_API_KEY + RESEND_FROM_EMAIL, or SENDGRID_API_KEY + SENDGRID_FROM_EMAIL',
       });
     }
   });
