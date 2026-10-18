@@ -137,7 +137,17 @@ export class AuthService {
       firstName: step1.firstName,
       webUrl: this.config.get('WEB_URL'),
     });
-    await this.email.send({ to: input.email, subject, html });
+    // The account already exists at this point, so a delivery failure must not
+    // surface as a failed registration (the user would retry and hit "email
+    // already registered"). They can still sign in; the welcome bonus waits for
+    // verification.
+    const emailSent = await this.email.send({ to: input.email, subject, html }).then(
+      () => true,
+      (e: unknown) => {
+        this.logger.error(`Verification email not delivered: ${(e as Error).message}`);
+        return false;
+      },
+    );
 
     // Testing convenience: instantly verify + award points so accounts can log
     // in without clicking the emailed link. Disable in production (env flag).
@@ -152,7 +162,10 @@ export class AuthService {
 
     return {
       email: input.email,
-      message: `We have sent you an activation email on ${input.email}`,
+      emailSent,
+      message: emailSent
+        ? `We have sent you an activation email on ${input.email}`
+        : 'Your account is ready, but we could not send the activation email right now.',
     };
   }
 
@@ -293,7 +306,11 @@ export class AuthService {
       firstName: user.profile?.firstName ?? user.username,
       webUrl: this.config.get('WEB_URL'),
     });
-    await this.email.send({ to: user.email, subject, html });
+    // Swallowed (and logged) so the response is identical whether or not the
+    // address has an account — a 500 here would reveal that it does.
+    await this.email.send({ to: user.email, subject, html }).catch((e: unknown) => {
+      this.logger.error(`Password reset email not delivered: ${(e as Error).message}`);
+    });
   }
 
   async resetPassword(input: ResetPasswordInput): Promise<void> {

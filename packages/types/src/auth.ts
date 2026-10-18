@@ -52,6 +52,8 @@ export type RegisterStep2Input = z.infer<typeof registerStep2Schema>;
 
 export const registerStep2ResultSchema = z.object({
   email: z.string().email(),
+  /** False when the account was created but the activation email couldn't be delivered. */
+  emailSent: z.boolean(),
   message: z.string(),
 });
 export type RegisterStep2Result = z.infer<typeof registerStep2ResultSchema>;

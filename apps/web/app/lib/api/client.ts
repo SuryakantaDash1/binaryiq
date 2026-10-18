@@ -17,9 +17,25 @@ export class ApiError extends Error {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/v1';
 
+/**
+ * Long enough to ride out a cold start: the API host sleeps when idle and the
+ * first request after that can take ~50 s while it wakes.
+ */
+export const REQUEST_TIMEOUT_MS = 70_000;
+
+let warmedUp = false;
+/** Fire-and-forget ping so a sleeping API starts waking while the user fills in a form. */
+export function warmUpApi(): void {
+  if (warmedUp || typeof window === 'undefined') return;
+  warmedUp = true;
+  void fetch(`${BASE_URL}/health/live`, { credentials: 'omit' }).catch(() => undefined);
+}
+
 export interface ApiFetchOptions extends Omit<RequestInit, 'body'> {
   /** Bearer token override; falls back to the stored access token. */
   token?: string;
+  /** Public endpoint: send no session and never try to refresh one. */
+  anonymous?: boolean;
   /** Request body — plain objects are JSON-stringified automatically. */
   body?: BodyInit | Record<string, unknown> | null;
 }
@@ -38,13 +54,14 @@ async function doFetch<T>(
   options: ApiFetchOptions,
   allowRefresh: boolean,
 ): Promise<T> {
-  const { token, headers, ...rest } = options;
+  const { token, headers, anonymous, ...rest } = options;
+  const canRefresh = allowRefresh && !anonymous && !path.startsWith('/auth/');
   // The access token is memory-only: after a reload, mint it from the refresh
   // cookie before the first request so it doesn't go out anonymously.
-  if (!token && !getToken() && !knownSignedOut && allowRefresh && !path.startsWith('/auth/')) {
+  if (!token && !getToken() && !knownSignedOut && canRefresh) {
     await tryRefresh();
   }
-  const authToken = token ?? getToken() ?? undefined;
+  const authToken = anonymous ? undefined : (token ?? getToken() ?? undefined);
 
   const serializedBody =
     rest.body !== undefined && rest.body !== null && typeof rest.body === 'object' && !(rest.body instanceof FormData) && !(rest.body instanceof URLSearchParams) && !(rest.body instanceof ReadableStream) && !(rest.body instanceof ArrayBuffer)
@@ -54,7 +71,7 @@ async function doFetch<T>(
   // Guard against a stalled request (server restarting, DB cold start, etc.)
   // hanging the UI forever — surface it as an error after 25s instead.
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 25_000);
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   let res: Response;
   try {
@@ -82,7 +99,7 @@ async function doFetch<T>(
   }
 
   // Access token likely expired — refresh once, then retry the request.
-  if (res.status === 401 && allowRefresh && !path.startsWith('/auth/')) {
+  if (res.status === 401 && canRefresh) {
     const refreshed = await tryRefresh();
     if (refreshed) return doFetch<T>(path, options, false);
   }

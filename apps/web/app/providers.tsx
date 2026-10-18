@@ -2,7 +2,9 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from 'next-themes';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+
+import { warmUpApi } from '@/lib/api/client';
 
 /** Root client providers: server-state (TanStack Query) + theming (dark mode). */
 export function Providers({ children }: { children: ReactNode }): React.JSX.Element {
@@ -12,6 +14,8 @@ export function Providers({ children }: { children: ReactNode }): React.JSX.Elem
         defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
       }),
   );
+
+  useEffect(warmUpApi, []);
 
   return (
     <ThemeProvider attribute="data-theme" defaultTheme="light" enableSystem={false}>

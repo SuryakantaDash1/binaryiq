@@ -15,7 +15,7 @@ import type {
   UpdateFeedSourceInput,
 } from '@influencer/types';
 
-import { ApiError } from './client.js';
+import { ApiError, REQUEST_TIMEOUT_MS } from './client.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/v1';
 const LEGACY_ADMIN_TOKEN_KEY = 'influencer_admin_token';
@@ -77,7 +77,7 @@ export async function adminFetch<T>(path: string, options: AdminFetchOptions = {
   const isAuthPath = path.startsWith('/admin/auth/');
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 25_000);
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   let res: Response;
   try {

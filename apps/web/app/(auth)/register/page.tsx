@@ -46,6 +46,7 @@ export default function RegisterPage(): React.JSX.Element {
   const [step, setStep] = useState<Step>(1);
   const [draftId, setDraftId] = useState('');
   const [sentTo, setSentTo] = useState('');
+  const [emailSent, setEmailSent] = useState(true);
   const [banners, setBanners] = useState<string[]>([]);
   const [step1Data, setStep1Data] = useState<Partial<RegisterStep1Input>>({});
   const { setVariant } = useAuthPanel();
@@ -56,10 +57,10 @@ export default function RegisterPage(): React.JSX.Element {
   if (step === 'done') {
     return (
       <div className="flex flex-col gap-3 text-center">
-        <Heading level={3}>{t('checkInbox')}</Heading>
-        <Text color="secondary">{t('sentTo', { email: sentTo })}</Text>
+        <Heading level={3}>{emailSent ? t('checkInbox') : t('accountReady')}</Heading>
+        <Text color="secondary">{emailSent ? t('sentTo', { email: sentTo }) : t('emailNotSent')}</Text>
         <Text color="muted" size="sm">
-          {t('clickConfirm')}
+          {emailSent ? t('clickConfirm') : t('signInNow')}
         </Text>
         <Link href="/login" className="text-primary mt-2 text-sm">
           {t('backToSignIn')}
@@ -123,8 +124,9 @@ export default function RegisterPage(): React.JSX.Element {
           draftId={draftId}
           onBack={() => setStep(1)}
           onBanners={setBanners}
-          onDone={(email) => {
+          onDone={(email, sent) => {
             setSentTo(email);
+            setEmailSent(sent);
             setStep('done');
           }}
         />
@@ -165,6 +167,7 @@ function Step1Form({
   });
 
   const gender = watch('gender');
+  const slow = useSlowHint(isSubmitting);
 
   // Restore the right-panel headline when returning to step 1 with a gender set.
   useEffect(() => {
@@ -246,8 +249,9 @@ function Step1Form({
       </Field>
 
       <button type="submit" disabled={isSubmitting} className={`${PINK_BTN} self-start`}>
-        {isSubmitting ? '…' : t('next')}
+        {isSubmitting ? t('pleaseWait') : t('next')}
       </button>
+      {slow && <p className="-mt-2 text-sm text-gray-500">{t('wakingServer')}</p>}
     </form>
   );
 }
@@ -261,7 +265,7 @@ function Step2Form({
 }: {
   draftId: string;
   onBack: () => void;
-  onDone: (email: string) => void;
+  onDone: (email: string, emailSent: boolean) => void;
   onBanners: (msgs: string[]) => void;
 }): React.JSX.Element {
   const t = useTranslations('auth');
@@ -277,6 +281,7 @@ function Step2Form({
   });
 
   const [showPw, setShowPw] = useState(false);
+  const slow = useSlowHint(isSubmitting);
   const [pinDisplay, setPinDisplay] = useState('');
   const [pinOptions, setPinOptions] = useState<Array<{ pin: string; name: string }>>([]);
   const [pinOpen, setPinOpen] = useState(false);
@@ -302,7 +307,7 @@ function Step2Form({
       return;
     }
     let cancelled = false;
-    apiFetch<Array<{ name: string }>>(`/geo/pincode/${pinDigits}`)
+    apiFetch<Array<{ name: string }>>(`/geo/pincode/${pinDigits}`, { anonymous: true })
       .then((offices) => {
         if (cancelled) return;
         setPinOptions(offices.slice(0, 12).map((o) => ({ pin: pinDigits, name: o.name })));
@@ -331,7 +336,7 @@ function Step2Form({
     try {
       const res = await authApi.registerStep2({ ...values, draftId });
       await new Promise((r) => setTimeout(r, 1200)); // brief "getting ready" moment
-      onDone(res.email);
+      onDone(res.email, res.emailSent);
     } catch (err) {
       applyApiError(err, setError);
       onBanners(buildBanners(t('registrationFailed'), t('somethingWrong'), err));
@@ -351,6 +356,7 @@ function Step2Form({
           ))}
         </div>
         <p className="text-lg font-medium text-gray-700">{t('gettingReady')}</p>
+        {slow && <p className="text-sm text-gray-500">{t('wakingServer')}</p>}
       </div>
     );
   }
@@ -481,6 +487,24 @@ function Step2Form({
 }
 
 /* ── Small building blocks ──────────────────────────────────────────────── */
+/**
+ * True once a request has been pending for a few seconds. The API sleeps when
+ * idle on the free hosting tier and the first request can take ~50 s to wake
+ * it, so tell people it's working rather than leave them clicking again.
+ */
+function useSlowHint(pending: boolean): boolean {
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    if (!pending) {
+      setSlow(false);
+      return;
+    }
+    const timer = setTimeout(() => setSlow(true), 5000);
+    return () => clearTimeout(timer);
+  }, [pending]);
+  return slow;
+}
+
 function Field({
   label,
   required,
