@@ -49,7 +49,7 @@ export const updateAboutYouSchema = z.object({
       householdSize: z.number().int().min(1).max(20).optional(),
       childrenCount: z.number().int().min(0).max(15).optional(),
       chiefWageEarner: z.boolean().optional(),
-      // Full "About You" survey answers (extra Toluna-style questions) as JSON.
+      // Full "About You" survey answers (extra questions) as JSON.
       assets: z.any().optional(),
     })
     .optional(),

@@ -10,7 +10,7 @@ production, the evidence captured, and the owner accountable*.
 
 Read alongside:
 [00-project-overview §2 "Compliance-first"](../00-project-overview.md) ·
-[Influencer_Platform_Full_Breakdown §9](../Influencer_Platform_Full_Breakdown.md) (source security spec) ·
+[BinaryIQ_Full_Breakdown §9](../BinaryIQ_Full_Breakdown.md) (source security spec) ·
 [07-security-compliance](../architecture/07-security-compliance.md) ⭐ (**the doc this module executes**) ·
 [04-database-architecture](../architecture/04-database-architecture.md) (`consent_logs`, `audit_logs`, `_enc` columns, `deletedAt`) ·
 [05-api-conventions](../architecture/05-api-conventions.md) (envelope, error codes, auth) ·
@@ -446,7 +446,7 @@ integration (Testcontainers Postgres), journeys at e2e (Playwright); providers m
 - **API envelope / errors / auth:** [05-api-conventions](../architecture/05-api-conventions.md)
 - **Test layering & gates:** [08-testing-strategy](../architecture/08-testing-strategy.md)
 - **Backups, retention, secrets, DR:** [09-devops-cicd](../architecture/09-devops-cicd.md)
-- **Source security spec:** [Influencer_Platform_Full_Breakdown §9](../Influencer_Platform_Full_Breakdown.md)
+- **Source security spec:** [BinaryIQ_Full_Breakdown §9](../BinaryIQ_Full_Breakdown.md)
 - **Phase gates / Definition of Done / M4:** [phases/00-roadmap](../phases/00-roadmap.md)
 </content>
 </invoke>

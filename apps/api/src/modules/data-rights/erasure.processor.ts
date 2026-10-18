@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto';
 
-import { Prisma } from '@influencer/db';
+import { Prisma } from '@binaryiq/db';
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import bcrypt from 'bcryptjs';

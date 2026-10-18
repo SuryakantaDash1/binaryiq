@@ -18,7 +18,7 @@ filter, it composes the pattern here — it does **not** invent a new one.
 - Every pattern ships its accessibility behaviour by default (§10).
 
 Stack: Next.js 14 (App Router), React Hook Form + Zod, TanStack Query, `sonner` toasts,
-`@influencer/ui`, `@influencer/types`.
+`@binaryiq/ui`, `@binaryiq/types`.
 
 ---
 
@@ -29,9 +29,9 @@ this exact recipe. There is **no per-form validation logic**; the same Zod schem
 client and the server, so they can never drift.
 
 **Recipe**
-1. Import the schema + inferred type from `@influencer/types`.
+1. Import the schema + inferred type from `@binaryiq/types`.
 2. `useForm({ resolver: zodResolver(schema), defaultValues })`.
-3. Render controls with `FormField` + `Input`/`Select`/etc. from `@influencer/ui`, wired via
+3. Render controls with `FormField` + `Input`/`Select`/etc. from `@binaryiq/ui`, wired via
    `register` / `Controller`.
 4. Submit through the **typed API client**.
 5. On `VALIDATION_ERROR`, map `error.details[]` back onto fields with `setError`.
@@ -43,9 +43,9 @@ client and the server, so they can never drift.
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { updateProfileSchema, type UpdateProfileInput } from '@influencer/types';
-import { Form, FormField, Input, Select, Button } from '@influencer/ui';
-import { toast } from '@influencer/ui';
+import { updateProfileSchema, type UpdateProfileInput } from '@binaryiq/types';
+import { Form, FormField, Input, Select, Button } from '@binaryiq/ui';
+import { toast } from '@binaryiq/ui';
 import { api, isApiError } from '@/lib/api-client';
 
 export function ProfileForm({ initial }: { initial: UpdateProfileInput }) {
@@ -219,7 +219,7 @@ render each branch:
 // apps/web/features/points/PointsHistory.tsx
 'use client';
 import { useQuery } from '@tanstack/react-query';
-import { Skeleton, EmptyState, Alert, Button, DataTable } from '@influencer/ui';
+import { Skeleton, EmptyState, Alert, Button, DataTable } from '@binaryiq/ui';
 import { Coins } from 'lucide-react';
 import { api } from '@/lib/api-client';
 
@@ -312,7 +312,7 @@ history, and admin lists. The frontend never invents its own paging math — it 
 // apps/web/features/rewards/RedemptionHistory.tsx
 'use client';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { DataTable, Button } from '@influencer/ui';
+import { DataTable, Button } from '@binaryiq/ui';
 import { api } from '@/lib/api-client';
 
 export function RedemptionHistory() {
@@ -363,7 +363,7 @@ base `Card`; the grid, loading, and empty behaviour are the pattern.
 // apps/web/features/surveys/SurveyGrid.tsx
 'use client';
 import { useQuery } from '@tanstack/react-query';
-import { Box, SurveyCard, Skeleton, EmptyState, Badge } from '@influencer/ui';
+import { Box, SurveyCard, Skeleton, EmptyState, Badge } from '@binaryiq/ui';
 
 export function SurveyGrid() {
   const q = useQuery({ queryKey: ['surveys'], queryFn: () => api.surveys.list() });
@@ -420,8 +420,8 @@ owns the step index, accumulated values, and draft persistence.
 'use client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { registerSchema, type RegisterInput } from '@influencer/types';
-import { ProgressBar, Button, Form, FormField, Input, PhoneInput } from '@influencer/ui';
+import { registerSchema, type RegisterInput } from '@binaryiq/types';
+import { ProgressBar, Button, Form, FormField, Input, PhoneInput } from '@binaryiq/ui';
 import { useWizardDraft } from '@/hooks/useWizardDraft';
 
 const STEPS = ['Account', 'Profile'] as const;

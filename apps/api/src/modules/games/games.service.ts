@@ -1,4 +1,4 @@
-import { Prisma } from '@influencer/db';
+import { Prisma } from '@binaryiq/db';
 import type {
   CreateGameInput,
   GameDetail,
@@ -7,7 +7,7 @@ import type {
   SpinResult,
   SpinStatus,
   UpdateSegmentsInput,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import {

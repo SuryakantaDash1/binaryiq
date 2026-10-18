@@ -1,8 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { changeEmailSchema, type ChangeEmailInput } from '@influencer/types';
-import { FormField, Input, Button, Alert, Text } from '@influencer/ui';
+import { changeEmailSchema, type ChangeEmailInput } from '@binaryiq/types';
+import { FormField, Input, Button, Alert, Text } from '@binaryiq/ui';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 

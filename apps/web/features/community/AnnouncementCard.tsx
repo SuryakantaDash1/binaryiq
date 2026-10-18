@@ -1,6 +1,6 @@
 'use client';
 
-import type { AnnouncementView } from '@influencer/types';
+import type { AnnouncementView } from '@binaryiq/types';
 import { MessageSquare } from 'lucide-react';
 
 import { gradientFor } from './gradient';
@@ -21,7 +21,7 @@ export function AnnouncementCard({ item }: { item: AnnouncementView }): React.JS
         ) : (
           <div className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${gradientFor(item.id)} px-4 text-center`}>
             <span className="absolute right-3 top-3 text-[10px] font-bold uppercase tracking-widest text-white/70">
-              Influencers
+              BinaryIQ
             </span>
             <span className="text-lg font-black uppercase leading-tight tracking-wide text-white drop-shadow">
               {item.bannerHeadline}

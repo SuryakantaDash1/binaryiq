@@ -1,4 +1,4 @@
-import { Prisma } from '@influencer/db';
+import { Prisma } from '@binaryiq/db';
 import type {
   CreatePollInput,
   UpdatePollInput,
@@ -6,7 +6,7 @@ import type {
   PollSummary,
   PollDetail,
   PollCount,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Injectable, Logger } from '@nestjs/common';
 
 import {

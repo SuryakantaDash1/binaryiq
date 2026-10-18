@@ -1,6 +1,6 @@
 'use client';
 
-import type { CategorySchema, CategoryQuestion } from '@influencer/types';
+import type { CategorySchema, CategoryQuestion } from '@binaryiq/types';
 import { ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { profileSurveysApi } from '@/lib/api/profile-surveys';
 import { ApiError } from '@/lib/api/client';
 
-interface TolunaSurveyProps {
+interface ProfileSurveyPanelProps {
   categoryKey: string;
   name: string;
   schema: CategorySchema;
@@ -19,14 +19,14 @@ interface TolunaSurveyProps {
 
 type Answers = Record<string, unknown>;
 
-export function TolunaSurvey({
+export function ProfileSurveyPanel({
   categoryKey,
   name,
   schema,
   defaults,
   onCancel,
   onSaved,
-}: TolunaSurveyProps): React.JSX.Element {
+}: ProfileSurveyPanelProps): React.JSX.Element {
   const [answers, setAnswers] = useState<Answers>(defaults ?? {});
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);

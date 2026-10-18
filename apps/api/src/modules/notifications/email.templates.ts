@@ -20,7 +20,7 @@ function shell(webUrl: string, heroBig: string, heroSmall: string, inner: string
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;font-family:Arial,Helvetica,sans-serif">
         <!-- Logo -->
         <tr><td style="padding:22px 32px 10px">
-          <span style="font-size:22px;font-weight:bold;color:#0f172a;vertical-align:middle">✦ Influencers</span>
+          <span style="font-size:22px;font-weight:bold;color:#0f172a;vertical-align:middle">✦ BinaryIQ</span>
           <span style="font-size:12px;color:#64748b"> &nbsp;surveys &amp; rewards</span>
         </td></tr>
         <!-- Hero -->
@@ -58,7 +58,7 @@ function shell(webUrl: string, heroBig: string, heroSmall: string, inner: string
           <a href="${webUrl}/terms" style="color:${BLUE}">${webUrl}/terms</a>.
         </td></tr>
         <tr><td style="padding:2px 32px 26px;text-align:center;font-size:12px;color:#94a3b8">
-          © 2026 Influencers. All rights reserved.
+          © 2026 BinaryIQ. All rights reserved.
         </td></tr>
       </table>
     </td></tr>
@@ -76,7 +76,7 @@ export function verificationEmail(params: VerificationParams): { subject: string
     <!-- Body -->
     <tr><td style="padding:24px 40px 8px;text-align:center;color:#334155;font-size:15px;line-height:1.7">
       You&rsquo;re almost there! Just one more step to share your thoughts and get rewarded on
-      Influencers. Please click on the button below to verify your email address.
+      BinaryIQ. Please click on the button below to verify your email address.
     </td></tr>
     <!-- Button -->
     <tr><td align="center" style="padding:18px 32px 6px">
@@ -88,10 +88,10 @@ export function verificationEmail(params: VerificationParams): { subject: string
     </td></tr>
     <!-- Sign-off -->
     <tr><td style="padding:22px 32px 2px;text-align:center;color:#334155;font-size:15px">See you soon!</td></tr>
-    <tr><td style="padding:0 32px 22px;text-align:center;color:${PINK};font-size:16px;font-weight:bold">The Influencers Team</td></tr>`;
+    <tr><td style="padding:0 32px 22px;text-align:center;color:${PINK};font-size:16px;font-weight:bold">The BinaryIQ Team</td></tr>`;
 
   return {
-    subject: "Thank you for joining Influencers! Don't forget to verify your email address",
+    subject: "Thank you for joining BinaryIQ! Don't forget to verify your email address",
     html: shell(webUrl, 'Started', 'Get', inner),
   };
 }
@@ -120,10 +120,10 @@ export function passwordResetEmail(params: ResetParams): { subject: string; html
       If the button doesn&rsquo;t work, please <a href="${link}" style="color:${BLUE}">click here</a>.
       This link expires in 1 hour.
     </td></tr>
-    <tr><td style="padding:22px 32px 22px;text-align:center;color:${PINK};font-size:16px;font-weight:bold">The Influencers Team</td></tr>`;
+    <tr><td style="padding:22px 32px 22px;text-align:center;color:${PINK};font-size:16px;font-weight:bold">The BinaryIQ Team</td></tr>`;
 
   return {
-    subject: 'Reset your Influencers password',
+    subject: 'Reset your BinaryIQ password',
     html: shell(webUrl, 'Reset', 'Password', inner),
   };
 }

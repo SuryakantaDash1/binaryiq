@@ -1,4 +1,4 @@
-import type { AnnouncementPage } from '@influencer/types';
+import type { AnnouncementPage } from '@binaryiq/types';
 
 import { apiFetch } from './client.js';
 

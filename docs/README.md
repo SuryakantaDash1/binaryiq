@@ -1,6 +1,6 @@
-# Influencer Platform — Documentation
+# BinaryIQ — Documentation
 
-A survey / polls / games / rewards community web app (Toluna-style). Users register, complete
+A survey / polls / games / rewards community web app. Users register, complete
 profile surveys, take surveys/polls, play the daily Spin-the-Wheel, earn **points**, and redeem
 them for real-world rewards.
 
@@ -55,8 +55,8 @@ Redis · shared design system. Full rationale in [architecture/02-tech-stack.md]
 
 ## Source-of-truth spec
 The original product spec lives alongside these docs and remains authoritative for product intent:
-- [Influencer_Platform_Full_Breakdown.md](Influencer_Platform_Full_Breakdown.md)
-- `influencer_platform_v2.docx`
+- [BinaryIQ_Full_Breakdown.md](BinaryIQ_Full_Breakdown.md)
+- `binaryiq_v2.docx`
 
 These engineering docs translate that spec into an implementable architecture. Where the spec was
 ambiguous, decisions are recorded in [00-project-overview.md](00-project-overview.md) §"Resolved spec gaps".

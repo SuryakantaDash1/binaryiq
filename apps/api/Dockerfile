@@ -1,7 +1,7 @@
 # Multi-stage build for the NestJS API in this pnpm/turborepo monorepo.
-# Build from the REPO ROOT so workspace packages (@influencer/db, @influencer/types)
+# Build from the REPO ROOT so workspace packages (@binaryiq/db, @binaryiq/types)
 # resolve correctly:
-#   docker build -f apps/api/Dockerfile -t influencer-api .
+#   docker build -f apps/api/Dockerfile -t binaryiq-api .
 #
 # Why not Vercel: this service runs persistent BullMQ workers (daily DPDP erasure
 # sweep, RSS polling, async notification delivery) that need a long-running Node
@@ -33,14 +33,14 @@ COPY apps/api apps/api
 COPY packages/db packages/db
 COPY packages/types packages/types
 COPY packages/config packages/config
-RUN pnpm turbo run build --filter=@influencer/api
+RUN pnpm turbo run build --filter=@binaryiq/api
 
 # ---- runtime: reuses the build stage's node_modules as-is. ----
 # A separate `pnpm install --prod` prune stage was tried and dropped: pnpm's
 # content-addressable store puts the generated Prisma query engine under the
 # ROOT node_modules/.pnpm tree, not under packages/db/node_modules. A fresh
 # prod-only install creates its own store that never had `prisma generate` run
-# against it, so @influencer/db silently loads an uninitialized client. Shipping
+# against it, so @binaryiq/db silently loads an uninitialized client. Shipping
 # the build stage's node_modules (devDependencies included) costs some image
 # size but is correct, and is the pattern Prisma's own Docker docs recommend
 # for pnpm workspaces.

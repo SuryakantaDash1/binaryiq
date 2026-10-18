@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { DataTable, type Column, Badge, Skeleton, EmptyState, Heading, Button } from '@influencer/ui';
+import { DataTable, type Column, Badge, Skeleton, EmptyState, Heading, Button } from '@binaryiq/ui';
 import { dataRightsApi, type ConsentLogDTO } from '@/lib/api/data-rights.js';
 
 const CONSENT_TYPE_OPTIONS = [

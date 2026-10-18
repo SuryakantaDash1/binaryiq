@@ -5,7 +5,7 @@
  *
  *   packages/db/node_modules/.bin/tsx apps/api/src/scripts/admin-reset-2fa.ts admin@example.com
  */
-import { PrismaClient } from '@influencer/db';
+import { PrismaClient } from '@binaryiq/db';
 
 const email = process.argv[2]?.toLowerCase();
 if (!email) {

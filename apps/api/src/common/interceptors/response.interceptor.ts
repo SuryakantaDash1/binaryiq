@@ -1,4 +1,4 @@
-import type { ApiSuccess, ApiMeta } from '@influencer/types';
+import type { ApiSuccess, ApiMeta } from '@binaryiq/types';
 import {
   Injectable,
   type CallHandler,

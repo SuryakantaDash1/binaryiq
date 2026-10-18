@@ -1,4 +1,4 @@
-import { transactionQuerySchema, type TransactionQuery } from '@influencer/types';
+import { transactionQuerySchema, type TransactionQuery } from '@binaryiq/types';
 import { Controller, Get, Query } from '@nestjs/common';
 
 import { CurrentUser } from '../../common/decorators/current-user.decorator';

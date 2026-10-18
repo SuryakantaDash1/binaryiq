@@ -1,6 +1,6 @@
 'use client';
 
-import { Tabs, SurveyCard, EmptyState, Skeleton, Button, Alert, Heading, Text } from '@influencer/ui';
+import { Tabs, SurveyCard, EmptyState, Skeleton, Button, Alert, Heading, Text } from '@binaryiq/ui';
 import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 

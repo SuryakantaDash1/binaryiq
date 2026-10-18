@@ -1,6 +1,6 @@
 'use client';
 
-import type { FeedSourceView } from '@influencer/types';
+import type { FeedSourceView } from '@binaryiq/types';
 import { useCallback, useEffect, useState } from 'react';
 
 import { adminApi } from '@/lib/api/admin';

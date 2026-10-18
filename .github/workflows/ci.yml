@@ -22,7 +22,7 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @influencer/db generate
+      - run: pnpm --filter @binaryiq/db generate
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
@@ -36,10 +36,10 @@ jobs:
         env:
           POSTGRES_USER: app
           POSTGRES_PASSWORD: app
-          POSTGRES_DB: influencer
+          POSTGRES_DB: binaryiq
         ports: ['5432:5432']
         options: >-
-          --health-cmd "pg_isready -U app -d influencer"
+          --health-cmd "pg_isready -U app -d binaryiq"
           --health-interval 5s --health-timeout 5s --health-retries 10
       redis:
         image: redis:7
@@ -47,10 +47,10 @@ jobs:
         options: >-
           --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 10
     env:
-      DATABASE_URL: postgresql://app:app@localhost:5432/influencer?schema=public
-      DIRECT_URL: postgresql://app:app@localhost:5432/influencer?schema=public
+      DATABASE_URL: postgresql://app:app@localhost:5432/binaryiq?schema=public
+      DIRECT_URL: postgresql://app:app@localhost:5432/binaryiq?schema=public
       REDIS_URL: redis://localhost:6379
-      SEED_SUPERADMIN_EMAIL: admin@influencerplatform.app
+      SEED_SUPERADMIN_EMAIL: admin@binaryiq.app
       SEED_SUPERADMIN_PASSWORD: change-me-in-ci-123
     steps:
       - uses: actions/checkout@v4
@@ -62,6 +62,6 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @influencer/db migrate:deploy
-      - run: pnpm --filter @influencer/db seed
-      - run: pnpm --filter @influencer/api test:integration
+      - run: pnpm --filter @binaryiq/db migrate:deploy
+      - run: pnpm --filter @binaryiq/db seed
+      - run: pnpm --filter @binaryiq/api test:integration

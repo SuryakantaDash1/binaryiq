@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Button, Modal } from '@influencer/ui';
+import { Alert, Button, Modal } from '@binaryiq/ui';
 import { useState } from 'react';
 
 import { ApiError } from '@/lib/api/client';

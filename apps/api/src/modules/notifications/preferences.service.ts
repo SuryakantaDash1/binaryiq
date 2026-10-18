@@ -1,5 +1,5 @@
-import type { NotificationType } from '@influencer/db';
-import type { UpdatePreferenceInput } from '@influencer/types';
+import type { NotificationType } from '@binaryiq/db';
+import type { UpdatePreferenceInput } from '@binaryiq/types';
 import { Injectable } from '@nestjs/common';
 
 import { UnprocessableException } from '../../common/exceptions/domain.exception';

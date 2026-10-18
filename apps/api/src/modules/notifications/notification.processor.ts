@@ -1,4 +1,4 @@
-import type { NotificationChannel } from '@influencer/db';
+import type { NotificationChannel } from '@binaryiq/db';
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Inject, Logger } from '@nestjs/common';
 import type { Job } from 'bullmq';

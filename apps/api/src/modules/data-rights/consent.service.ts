@@ -1,5 +1,5 @@
-import type { ConsentType } from '@influencer/db';
-import type { ConsentInput } from '@influencer/types';
+import type { ConsentType } from '@binaryiq/db';
+import type { ConsentInput } from '@binaryiq/types';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../prisma/prisma.service';

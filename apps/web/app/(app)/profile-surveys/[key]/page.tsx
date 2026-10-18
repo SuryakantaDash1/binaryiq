@@ -1,6 +1,6 @@
 'use client';
 
-import { Heading, Text, Badge, Card, CardBody } from '@influencer/ui';
+import { Heading, Text, Badge, Card, CardBody } from '@binaryiq/ui';
 import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 

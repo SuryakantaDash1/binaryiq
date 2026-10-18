@@ -12,7 +12,7 @@ its invariants, and the `PointsService` gateway are authoritative elsewhere and 
 here:
 
 - Product context & the `100 pts = ₹1` constant → [../00-project-overview.md](../00-project-overview.md)
-  (§1, §6 glossary), source spec [../Influencer_Platform_Full_Breakdown.md](../Influencer_Platform_Full_Breakdown.md) §4.
+  (§1, §6 glossary), source spec [../BinaryIQ_Full_Breakdown.md](../BinaryIQ_Full_Breakdown.md) §4.
 - **`PointsService` (the ledger gateway)** → [../architecture/03-backend-architecture.md](../architecture/03-backend-architecture.md) §4.
 - **Ledger data model + invariants** → [../architecture/04-database-architecture.md](../architecture/04-database-architecture.md)
   (`PointsTransaction`, `PointsBalance`, `Reward`, `RewardRedemption`) and its
@@ -323,7 +323,7 @@ audit-logged.
 
 Follows [06-frontend-architecture](../architecture/06-frontend-architecture.md): RSC-by-default with
 client islands, TanStack Query for mutations/live data, the typed envelope-aware API client, shared
-`@influencer/ui` components only.
+`@binaryiq/ui` components only.
 
 ### 6.1 Screens & files
 
@@ -649,7 +649,7 @@ Testing seams per [03-backend §10](../architecture/03-backend-architecture.md#1
 ---
 
 ### See also
-- [00-project-overview](../00-project-overview.md) · [Full breakdown §4](../Influencer_Platform_Full_Breakdown.md)
+- [00-project-overview](../00-project-overview.md) · [Full breakdown §4](../BinaryIQ_Full_Breakdown.md)
 - [03-backend-architecture §4/§6/§7](../architecture/03-backend-architecture.md) — `PointsService`, queues, providers
 - [04-database-architecture §4/§5](../architecture/04-database-architecture.md) — models + ledger invariants
 - [05-api-conventions](../architecture/05-api-conventions.md) · [06-frontend-architecture](../architecture/06-frontend-architecture.md) · [07-security-compliance](../architecture/07-security-compliance.md)

@@ -1,4 +1,4 @@
-import baseConfig from '@influencer/config/eslint';
+import baseConfig from '@binaryiq/config/eslint';
 
 /** Root flat ESLint config — shared across all workspaces. */
 export default [

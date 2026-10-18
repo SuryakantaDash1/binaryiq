@@ -3,7 +3,7 @@ import {
   type PostTicketMessageInput,
   updateTicketSchema,
   type UpdateTicketInput,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Body, Controller, Get, HttpCode, Ip, Param, Post, Put, Query } from '@nestjs/common';
 import { z } from 'zod';
 

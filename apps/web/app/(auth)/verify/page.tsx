@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Heading, Text } from '@influencer/ui';
+import { Button, Heading, Text } from '@binaryiq/ui';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';

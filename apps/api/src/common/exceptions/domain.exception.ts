@@ -1,4 +1,4 @@
-import type { ApiErrorCode } from '@influencer/types';
+import type { ApiErrorCode } from '@binaryiq/types';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 interface DomainErrorDetail {

@@ -1,10 +1,10 @@
-import { Button, Card, CardBody, CardHeader, Heading, Text } from '@influencer/ui';
+import { Button, Card, CardBody, CardHeader, Heading, Text } from '@binaryiq/ui';
 
 import { HealthStatus } from './health-status';
 
 /**
  * Token-driven sample page (Phase 0 acceptance #7): renders inside AppShell
- * using only semantic tokens + @influencer/ui primitives, and calls the API
+ * using only semantic tokens + @binaryiq/ui primitives, and calls the API
  * through the typed client. Works in light and dark theme.
  */
 export default function SamplePage(): React.JSX.Element {

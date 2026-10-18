@@ -1,8 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { updatePaypalSchema, type UpdatePaypalInput } from '@influencer/types';
-import { Alert, Button, EmptyState, FormField, Input, Skeleton } from '@influencer/ui';
+import { updatePaypalSchema, type UpdatePaypalInput } from '@binaryiq/types';
+import { Alert, Button, EmptyState, FormField, Input, Skeleton } from '@binaryiq/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 

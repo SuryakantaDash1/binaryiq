@@ -2,7 +2,7 @@
 
 ## 1. Vision
 
-The **Influencer Platform** is a consumer engagement and market-research community. Members create a
+The **BinaryIQ** is a consumer engagement and market-research community. Members create a
 profile, answer surveys, vote on sponsored polls, and play a daily game — earning **points** that
 convert to real-world value (charity donations and PayPal cash). The business value is twofold:
 brands get high-quality opinion data; members get rewarded for their time.
@@ -66,7 +66,7 @@ phase and one module doc.
 ## 7. Resolved spec gaps (decisions of record)
 
 These clarify ambiguities in the source spec. See it flagged in
-[Influencer_Platform_Full_Breakdown.md](Influencer_Platform_Full_Breakdown.md) §13.
+[BinaryIQ_Full_Breakdown.md](BinaryIQ_Full_Breakdown.md) §13.
 
 1. **Contests** — listed once in the spec's summary table (as module 8) with no section, schema, or
    endpoints. **Decision: out of scope / deferred.** Not built in this release. Data model leaves room

@@ -1,4 +1,4 @@
-import { Heading } from '@influencer/ui';
+import { Heading } from '@binaryiq/ui';
 
 import { PointsDashboard } from '@/features/rewards/PointsDashboard';
 

@@ -4,7 +4,7 @@ import {
   changePasswordSchema,
   updatePaypalSchema,
   updateAboutYouSchema,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Body, Controller, Delete, Get, HttpCode, Ip, Post, Put } from '@nestjs/common';
 import { z } from 'zod';
 

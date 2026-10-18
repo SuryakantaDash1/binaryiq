@@ -1,6 +1,6 @@
 # 09 — DevOps, CI/CD & Infrastructure ⭐
 
-How the **Influencer Platform** is built, tested, shipped, observed, and recovered. This is the
+How the **BinaryIQ** is built, tested, shipped, observed, and recovered. This is the
 operational contract for the monorepo. It complements the data contract in
 [04-database-architecture.md](04-database-architecture.md) and the API contract in
 [05-api-conventions.md](05-api-conventions.md).
@@ -198,8 +198,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @influencer/db prisma migrate deploy
-      - run: pnpm --filter @influencer/db prisma db seed   # deterministic test seed
+      - run: pnpm --filter @binaryiq/db prisma migrate deploy
+      - run: pnpm --filter @binaryiq/db prisma db seed   # deterministic test seed
       - run: pnpm turbo run test:integration
 
   e2e:
@@ -280,7 +280,7 @@ machine already produced is downloaded instead of recomputed.
 ```
 
 Notes:
-- `^build` = build upstream workspace deps first (e.g. `@influencer/db`, `@influencer/ui` before `apps/web`/`apps/api`).
+- `^build` = build upstream workspace deps first (e.g. `@binaryiq/db`, `@binaryiq/ui` before `apps/web`/`apps/api`).
 - `.next/cache` is excluded from outputs; integration/e2e/`dev` are **never cached** (side effects).
 - `env` keys are part of each task's cache hash — changing a declared var invalidates the cache, so
   cached artifacts can't silently carry stale config.

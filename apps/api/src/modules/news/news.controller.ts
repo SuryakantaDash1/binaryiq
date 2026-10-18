@@ -7,7 +7,7 @@ import {
   type UpdateFeedSourceInput,
   adminListFeedSourcesQuerySchema,
   type AdminListFeedSourcesQuery,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Body, Controller, Get, HttpCode, Param, Post, Put, Query } from '@nestjs/common';
 
 import { Roles } from '../../common/decorators/roles.decorator';

@@ -1,4 +1,4 @@
-import type { ApiFailure, ApiErrorCode } from '@influencer/types';
+import type { ApiFailure, ApiErrorCode } from '@binaryiq/types';
 import {
   Catch,
   HttpException,

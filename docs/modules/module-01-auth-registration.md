@@ -20,7 +20,7 @@ This doc describes *what this module builds* and *which* screens, endpoints, and
   [../design-system/13-components-library.md](../design-system/13-components-library.md) ·
   [../design-system/14-patterns.md](../design-system/14-patterns.md).
 - Source spec (§2 flow, §9 security) →
-  [../Influencer_Platform_Full_Breakdown.md](../Influencer_Platform_Full_Breakdown.md).
+  [../BinaryIQ_Full_Breakdown.md](../BinaryIQ_Full_Breakdown.md).
 - Build order / definition-of-done → [../phases/00-roadmap.md](../phases/00-roadmap.md).
 
 ---
@@ -177,7 +177,7 @@ All under `/v1/auth/*`, **public** (`@Public()`), auth-rate-limited **10 req/min
 ([05 §7–§8](../architecture/05-api-conventions.md#7-auth--authorization-patterns)). All requests/responses
 use the standard envelope and canonical error codes
 ([05 §2, §4](../architecture/05-api-conventions.md#2-response-envelope-always)). DTOs are **Zod schemas in
-`packages/types`** (`@influencer/types`), shared verbatim by API and frontend. Auth schemas use **strict**
+`packages/types`** (`@binaryiq/types`), shared verbatim by API and frontend. Auth schemas use **strict**
 parsing (unknown fields rejected, [07 §4.1](../architecture/07-security-compliance.md#41-input-validation-zod)).
 
 ---
@@ -246,10 +246,10 @@ unique constraint at Step 2 (`409 CONFLICT`), so the check is UX, not the securi
 
 Route group `(auth)` (centred card shell) — [06 §1](../architecture/06-frontend-architecture.md#1-app-router-folder-structure).
 All forms are the [canonical form pattern](../design-system/14-patterns.md#1-form-pattern-the-canonical-form)
-(RHF + `zodResolver` over the **same `@influencer/types` schema** the API validates), submitting through
+(RHF + `zodResolver` over the **same `@binaryiq/types` schema** the API validates), submitting through
 the typed API client which unwraps the envelope
 ([06 §3.3](../architecture/06-frontend-architecture.md#33-the-typed-api-client-wrapper-envelope-aware)).
-Feature code lives under `apps/web/features/auth/` and composes **`@influencer/ui` only**.
+Feature code lives under `apps/web/features/auth/` and composes **`@binaryiq/ui` only**.
 
 **Pages**
 

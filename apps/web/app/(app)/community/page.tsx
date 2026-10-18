@@ -1,7 +1,7 @@
 'use client';
 
-import type { AnnouncementView, ArticleView } from '@influencer/types';
-import { EmptyState, Skeleton } from '@influencer/ui';
+import type { AnnouncementView, ArticleView } from '@binaryiq/types';
+import { EmptyState, Skeleton } from '@binaryiq/ui';
 import { FolderClosed, MoreVertical, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 

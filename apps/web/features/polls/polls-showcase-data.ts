@@ -1,7 +1,7 @@
 /**
  * Static demo data for the Sponsored Polls results showcase.
  * The backend results endpoint returns only per-option counts (no gender breakdown),
- * and the seed has no votes — so these Toluna-style infographics are mock demo data.
+ * and the seed has no votes — so these infographics are mock demo data.
  */
 
 export interface ShowcaseOption {

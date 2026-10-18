@@ -1,5 +1,5 @@
-import type { Prisma, PointsAction } from '@influencer/db';
-import type { TransactionQuery } from '@influencer/types';
+import type { Prisma, PointsAction } from '@binaryiq/db';
+import type { TransactionQuery } from '@binaryiq/types';
 import { Injectable } from '@nestjs/common';
 
 import { UnprocessableException } from '../../common/exceptions/domain.exception';

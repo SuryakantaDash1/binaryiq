@@ -1,26 +1,26 @@
 import { Article, Section } from '../_article';
 
-export const metadata = { title: 'Terms of Use and Membership — Influencers' };
+export const metadata = { title: 'Terms of Use and Membership — BinaryIQ' };
 
 export default function TermsPage(): React.JSX.Element {
   return (
     <Article title="Terms of Use and Membership" updated="August 2026">
       <p>
-        Welcome to Influencers (this &quot;Site&quot;). By using this Site, registering as a member,
-        participating in the Influencers points (&quot;Points&quot;) membership program (&quot;Points
-        Program&quot;) or participating in any survey or study provided or hosted by Influencers
+        Welcome to BinaryIQ (this &quot;Site&quot;). By using this Site, registering as a member,
+        participating in the BinaryIQ points (&quot;Points&quot;) membership program (&quot;Points
+        Program&quot;) or participating in any survey or study provided or hosted by BinaryIQ
         (each, a &quot;Survey&quot; and collectively &quot;Surveys&quot;), you agree to these Terms of
         Use and Membership (&quot;Terms&quot;) and confirm that you have read and understood our{' '}
         <a href="/privacy" className="text-brand-800 underline">Privacy Policy</a>, which sets out how
-        Influencers collects, uses and stores your personal information.
+        BinaryIQ collects, uses and stores your personal information.
       </p>
       <p>If you do not agree to the Terms and the Privacy Policy, do not use this Site.</p>
       <p>
-        Influencers reserves the right, in its sole discretion, to change, modify, add or remove
+        BinaryIQ reserves the right, in its sole discretion, to change, modify, add or remove
         portions of these Terms and/or our Privacy Policy at any time. It is your responsibility to
         check these Terms and our Privacy Policy periodically for changes. Your continued use of this
         Site following the posting of such changes will mean that you accept and agree to the changes.
-        Provided you comply with these Terms, Influencers grants you a personal, non-exclusive,
+        Provided you comply with these Terms, BinaryIQ grants you a personal, non-exclusive,
         non-transferable, limited privilege to enter and use this Site.
       </p>
 
@@ -72,7 +72,7 @@ export default function TermsPage(): React.JSX.Element {
 
       <Section heading="Member Code of Conduct">
         <p>
-          Influencers is an online community dedicated to making your voice heard. When you use and
+          BinaryIQ is an online community dedicated to making your voice heard. When you use and
           post content to the Site or community, please be courteous, respect the opinions of others,
           and behave in a manner that supports a safe and comfortable environment for all members. You
           must not post:
@@ -122,7 +122,7 @@ export default function TermsPage(): React.JSX.Element {
 
       <Section heading="Points">
         <p>
-          <strong>What are Points?</strong> To show our appreciation for your opinions, Influencers
+          <strong>What are Points?</strong> To show our appreciation for your opinions, BinaryIQ
           offers incentives in the form of credits called &quot;Points,&quot; credited to your account.
           Points are redeemable for cash or rewards as specified and subject to the terms below.
         </p>
@@ -166,7 +166,7 @@ export default function TermsPage(): React.JSX.Element {
       <Section heading="Intellectual Property">
         <p>
           This Site is protected by intellectual property laws and you agree to respect them. The
-          Influencers name and logos are trademarks of Influencers or its affiliates. All content on
+          BinaryIQ name and logos are trademarks of BinaryIQ or its affiliates. All content on
           this Site — including text, design, graphics, images, sound, video, interfaces, software and
           code — is subject to intellectual property rights owned by us or our licensors. No content
           may be copied, distributed, republished, uploaded, posted or transmitted except as expressly
@@ -177,11 +177,11 @@ export default function TermsPage(): React.JSX.Element {
 
       <Section heading="Disclaimer of Warranties">
         <p>
-          You acknowledge that Influencers is not a bank or financial institution and that Points are
+          You acknowledge that BinaryIQ is not a bank or financial institution and that Points are
           not cash deposits, do not earn interest, and are only account entries redeemable in accordance
           with these Terms. Your use of this Site and the Points Program is at your sole risk. This Site
           and all services are provided &quot;AS IS&quot; and &quot;AS AVAILABLE.&quot; To the fullest
-          extent permitted by law, Influencers disclaims all warranties, express or implied, including
+          extent permitted by law, BinaryIQ disclaims all warranties, express or implied, including
           any implied warranties of merchantability, fitness for a particular purpose, and accuracy or
           completeness.
         </p>
@@ -189,7 +189,7 @@ export default function TermsPage(): React.JSX.Element {
 
       <Section heading="Limitation of Liability">
         <p>
-          To the fullest extent allowed by law, neither Influencers nor any of our affiliates or agents
+          To the fullest extent allowed by law, neither BinaryIQ nor any of our affiliates or agents
           will be liable to you or any other person for any special, incidental, punitive, consequential
           or similar damages, or for lost profits or loss of data, arising out of or related to these
           Terms or this Site. In no event shall our liability exceed the actual retail value of an
@@ -199,7 +199,7 @@ export default function TermsPage(): React.JSX.Element {
 
       <Section heading="Indemnification">
         <p>
-          To the fullest extent allowed by law, you agree to indemnify and hold Influencers and its
+          To the fullest extent allowed by law, you agree to indemnify and hold BinaryIQ and its
           affiliated companies, officers, directors, employees and agents harmless from any and all
           claims, losses, damages, suits, fines and costs (including reasonable legal fees) arising from
           or related to your use of this Site and any content you place on it, including claims made by
@@ -265,7 +265,7 @@ export default function TermsPage(): React.JSX.Element {
 
       <Section heading="Termination of your account">
         <p>
-          Influencers reserves the right, at its sole discretion, to terminate the account of any
+          BinaryIQ reserves the right, at its sole discretion, to terminate the account of any
           individual it finds to be tampering with the Site, violating these Terms, or acting in a
           disruptive manner or with intent to abuse, threaten or harass any other person. If your
           membership or access to the Site is terminated or suspended for any reason, you must not

@@ -1,12 +1,12 @@
 import { Article, Section } from '../_article';
 
-export const metadata = { title: 'About Us — Influencers' };
+export const metadata = { title: 'About Us — BinaryIQ' };
 
 export default function AboutPage(): React.JSX.Element {
   return (
     <Article title="About Us">
       <p>
-        Influencers is a global community where everyday people share their opinions and get rewarded
+        BinaryIQ is a global community where everyday people share their opinions and get rewarded
         for it. Brands want to hear from real people — and we make sure your voice reaches them while
         you earn points redeemable for gift cards, vouchers and more.
       </p>

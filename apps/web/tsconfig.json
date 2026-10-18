@@ -1,5 +1,5 @@
 {
-  "extends": "@influencer/config/tsconfig/nextjs.json",
+  "extends": "@binaryiq/config/tsconfig/nextjs.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {

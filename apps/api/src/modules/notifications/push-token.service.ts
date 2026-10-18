@@ -1,4 +1,4 @@
-import type { RegisterPushTokenInput } from '@influencer/types';
+import type { RegisterPushTokenInput } from '@binaryiq/types';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../prisma/prisma.service';

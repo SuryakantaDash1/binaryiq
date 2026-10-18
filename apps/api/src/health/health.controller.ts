@@ -1,4 +1,4 @@
-import type { HealthReady } from '@influencer/types';
+import type { HealthReady } from '@binaryiq/types';
 import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
 
 import { Public } from '../common/decorators/public.decorator';

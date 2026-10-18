@@ -1,9 +1,9 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { schemaToZod } from '@influencer/types';
-import type { CategorySchema } from '@influencer/types';
-import { FormField, Input, Select, RadioGroup, MultiSelect, Button, Alert } from '@influencer/ui';
+import { schemaToZod } from '@binaryiq/types';
+import type { CategorySchema } from '@binaryiq/types';
+import { FormField, Input, Select, RadioGroup, MultiSelect, Button, Alert } from '@binaryiq/ui';
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 

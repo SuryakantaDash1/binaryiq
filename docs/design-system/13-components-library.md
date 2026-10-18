@@ -140,7 +140,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 - **Never** style with raw hex or one-off Tailwind color classes in feature code — use tokens/components.
 - **Never** create a second modal/button/input implementation. Extend the shared one.
 - New shared components require a Storybook story + a11y pass + an entry in this doc.
-- Feature code imports from `@influencer/ui`; nothing imports Radix/Tailwind color directly except the UI
+- Feature code imports from `@binaryiq/ui`; nothing imports Radix/Tailwind color directly except the UI
   package internals.
 
 See [14-patterns.md](14-patterns.md) for how these assemble into forms, modals, and page states, and

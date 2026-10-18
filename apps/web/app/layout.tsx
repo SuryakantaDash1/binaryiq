@@ -18,7 +18,7 @@ const inter = Inter({ subsets: ['latin', 'latin-ext'], variable: '--font-sans', 
 const RTL_LANGS = new Set(['ar']);
 
 export const metadata: Metadata = {
-  title: 'Influencer Platform',
+  title: 'BinaryIQ',
   description: 'Surveys, polls, games, and rewards community.',
 };
 

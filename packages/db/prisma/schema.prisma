@@ -1,4 +1,4 @@
-// Influencer Platform — Prisma schema.
+// BinaryIQ — Prisma schema.
 // Phase 0 slice: Identity + Points core + reference data (profile categories,
 // spin game, rewards) + staff + audit. Feature tables (surveys, polls, games
 // plays, notifications, support, consent) are added by later phases' migrations.

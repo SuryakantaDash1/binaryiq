@@ -5,7 +5,7 @@ import {
   type AdminLoginInput,
   type AdminSession,
   type AdminTotpInput,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Body, Controller, Get, HttpCode, Ip, Post, Req, Res } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';

@@ -6,7 +6,7 @@ import type {
   FeedSourcePage,
   CreateFeedSourceInput,
   UpdateFeedSourceInput,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Injectable, Logger } from '@nestjs/common';
 import Parser from 'rss-parser';
 

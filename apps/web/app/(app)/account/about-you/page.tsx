@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { accountApi } from '@/lib/api/account';
 
-/* ── Option lists (exact Toluna wording) ─────────────────────────────────── */
+/* ── Option lists (exact wording) ─────────────────────────────────── */
 const EDUCATION = [
   'Lower Elementary School', 'Upper Elementary School', 'Secondary School', 'Technical Education',
   'Vocational Education', 'Graduated 3-year College', 'Graduated 4-year College', 'Master Degrees',

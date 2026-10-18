@@ -1,5 +1,5 @@
 {
-  "name": "@influencer/types",
+  "name": "@binaryiq/types",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -26,7 +26,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@influencer/config": "workspace:*",
+    "@binaryiq/config": "workspace:*",
     "tsup": "^8.5.1",
     "typescript": "^5.6.2",
     "vitest": "^2.1.2"

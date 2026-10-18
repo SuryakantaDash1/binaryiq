@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Button, PollResultBars } from '@influencer/ui';
+import { Alert, Button, PollResultBars } from '@binaryiq/ui';
 import { useEffect, useState } from 'react';
 
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { EmptyState } from '@influencer/ui';
+import { EmptyState } from '@binaryiq/ui';
 import { useState, useEffect, useCallback } from 'react';
 
 

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@influencer/db';
+import { PrismaClient } from '@binaryiq/db';
 import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common';
 
 /**

@@ -1,4 +1,4 @@
-import type { UpdateProfileInput, ChangeEmailInput, ChangePasswordInput, UpdatePaypalInput, UpdateAboutYouInput } from '@influencer/types';
+import type { UpdateProfileInput, ChangeEmailInput, ChangePasswordInput, UpdatePaypalInput, UpdateAboutYouInput } from '@binaryiq/types';
 import { Injectable, Logger } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 

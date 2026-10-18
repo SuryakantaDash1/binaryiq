@@ -1,4 +1,4 @@
-import type { AdminStats, AdminUsersQuery, AdminUsersResult } from '@influencer/types';
+import type { AdminStats, AdminUsersQuery, AdminUsersResult } from '@binaryiq/types';
 import { Injectable } from '@nestjs/common';
 
 import { NotFoundException } from '../../common/exceptions/domain.exception';

@@ -6,7 +6,7 @@ import { ValidationException } from '../exceptions/domain.exception';
 /**
  * Validates a value against a Zod schema, throwing the canonical VALIDATION_ERROR
  * envelope on failure. Used per-handler via `new ZodValidationPipe(schema)` with
- * DTO schemas from `@influencer/types`. See 05-api-conventions §5.
+ * DTO schemas from `@binaryiq/types`. See 05-api-conventions §5.
  */
 @Injectable()
 export class ZodValidationPipe<T> implements PipeTransform<unknown, T> {

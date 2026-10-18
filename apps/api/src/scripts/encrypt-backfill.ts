@@ -13,7 +13,7 @@
  * Usage (from repo root, with apps/api/.env loaded into the environment):
  *   packages/db/node_modules/.bin/tsx apps/api/src/scripts/encrypt-backfill.ts [--dry-run]
  */
-import { Prisma, PrismaClient } from '@influencer/db';
+import { Prisma, PrismaClient } from '@binaryiq/db';
 
 import {
   decryptWithKey,

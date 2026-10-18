@@ -1,7 +1,7 @@
 # Multi-stage build for the Next.js web app in this pnpm/turborepo monorepo.
-# Build from the REPO ROOT so workspace packages (@influencer/types, @influencer/ui)
+# Build from the REPO ROOT so workspace packages (@binaryiq/types, @binaryiq/ui)
 # resolve correctly:
-#   docker build -f apps/web/Dockerfile -t influencer-web .
+#   docker build -f apps/web/Dockerfile -t binaryiq-web .
 #
 # Same shape as apps/api/Dockerfile — see that file's comments for why the final
 # image reuses the build stage's node_modules wholesale instead of a pruned
@@ -33,7 +33,7 @@ ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_USE_MOCK=false
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_USE_MOCK=$NEXT_PUBLIC_USE_MOCK
-RUN pnpm turbo run build --filter=@influencer/web
+RUN pnpm turbo run build --filter=@binaryiq/web
 
 # ---- runtime ----
 FROM base AS runtime

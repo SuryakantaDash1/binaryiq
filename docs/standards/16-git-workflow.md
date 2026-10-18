@@ -1,6 +1,6 @@
 # 16 — Git Workflow ⭐
 
-How the **Influencer Platform** team uses Git, GitHub, and CI/CD. This is the source of truth for
+How the **BinaryIQ** team uses Git, GitHub, and CI/CD. This is the source of truth for
 **branching, commits, pull requests, review, merge, releases, and monorepo hygiene**. It complements
 but does not repeat the coding conventions in
 [15-coding-standards.md](15-coding-standards.md) or the pipeline/deploy mechanics in
@@ -446,42 +446,42 @@ order specific rules **after** broad ones.
 ```gitignore
 # .github/CODEOWNERS
 # Default owners for everything not matched below.
-*                                   @influencer-platform/leads
+*                                   @binaryiq/leads
 
 # ── Apps ────────────────────────────────────────────────
-/apps/web/                          @influencer-platform/frontend
-/apps/api/                          @influencer-platform/backend
+/apps/web/                          @binaryiq/frontend
+/apps/api/                          @binaryiq/backend
 
 # ── Shared packages ─────────────────────────────────────
-/packages/ui/                       @influencer-platform/design-system
-/packages/types/                    @influencer-platform/backend @influencer-platform/frontend
-/packages/config/                   @influencer-platform/platform
-/packages/db/                       @influencer-platform/backend @influencer-platform/data
+/packages/ui/                       @binaryiq/design-system
+/packages/types/                    @binaryiq/backend @binaryiq/frontend
+/packages/config/                   @binaryiq/platform
+/packages/db/                       @binaryiq/backend @binaryiq/data
 
 # ── High-risk domains (require the owning team; 2 approvals) ──
-/apps/api/src/modules/points/       @influencer-platform/payments
-/apps/api/src/modules/rewards/      @influencer-platform/payments
-/packages/db/prisma/                @influencer-platform/data @influencer-platform/backend
-/apps/api/src/modules/auth/         @influencer-platform/security
-/apps/api/src/common/               @influencer-platform/backend
+/apps/api/src/modules/points/       @binaryiq/payments
+/apps/api/src/modules/rewards/      @binaryiq/payments
+/packages/db/prisma/                @binaryiq/data @binaryiq/backend
+/apps/api/src/modules/auth/         @binaryiq/security
+/apps/api/src/common/               @binaryiq/backend
 
 # ── Feature modules ─────────────────────────────────────
-/apps/api/src/modules/surveys/      @influencer-platform/backend
-/apps/api/src/modules/polls/        @influencer-platform/backend
-/apps/api/src/modules/games/        @influencer-platform/backend
-/apps/api/src/modules/notifications/ @influencer-platform/backend @influencer-platform/platform
-/apps/api/src/modules/admin/        @influencer-platform/backend @influencer-platform/security
+/apps/api/src/modules/surveys/      @binaryiq/backend
+/apps/api/src/modules/polls/        @binaryiq/backend
+/apps/api/src/modules/games/        @binaryiq/backend
+/apps/api/src/modules/notifications/ @binaryiq/backend @binaryiq/platform
+/apps/api/src/modules/admin/        @binaryiq/backend @binaryiq/security
 
 # ── Docs, CI, and repo meta ─────────────────────────────
-/docs/                              @influencer-platform/leads
-/docs/architecture/04-database-architecture.md  @influencer-platform/data
-/docs/architecture/05-api-conventions.md        @influencer-platform/backend
-/.github/                           @influencer-platform/platform
-/turbo.json                         @influencer-platform/platform
-/pnpm-workspace.yaml                @influencer-platform/platform
+/docs/                              @binaryiq/leads
+/docs/architecture/04-database-architecture.md  @binaryiq/data
+/docs/architecture/05-api-conventions.md        @binaryiq/backend
+/.github/                           @binaryiq/platform
+/turbo.json                         @binaryiq/platform
+/pnpm-workspace.yaml                @binaryiq/platform
 ```
 
-> Replace `@influencer-platform/*` with the real GitHub team slugs. Every team referenced here must have
+> Replace `@binaryiq/*` with the real GitHub team slugs. Every team referenced here must have
 > **write** access to the repo, or CODEOWNERS review requirements won't be enforced.
 
 ---

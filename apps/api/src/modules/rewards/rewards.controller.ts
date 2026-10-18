@@ -9,7 +9,7 @@ import {
   type UpdateRewardInput,
   updateRedemptionStatusSchema,
   type UpdateRedemptionStatusInput,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import {
   Body,
   Controller,

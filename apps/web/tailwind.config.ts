@@ -1,5 +1,5 @@
 import type { Config } from 'tailwindcss';
-import preset from '@influencer/config/tailwind-preset';
+import preset from '@binaryiq/config/tailwind-preset';
 
 const config: Config = {
   presets: [preset],

@@ -1,6 +1,6 @@
 # 02 — Technology Stack ⭐
 
-The authoritative record of **what** we build the Influencer Platform with and **why**. This document
+The authoritative record of **what** we build the BinaryIQ with and **why**. This document
 is decision-of-record for every technology choice; module and architecture docs reference it rather
 than re-arguing a choice. If a technology is swapped, it is changed here first (with rationale) before
 any code moves.

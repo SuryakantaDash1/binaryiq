@@ -1,6 +1,6 @@
 'use client';
 
-import type { ArticleView } from '@influencer/types';
+import type { ArticleView } from '@binaryiq/types';
 import { ExternalLink, Newspaper } from 'lucide-react';
 
 import { gradientFor } from './gradient';

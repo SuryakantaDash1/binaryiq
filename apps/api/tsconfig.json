@@ -1,5 +1,5 @@
 {
-  "extends": "@influencer/config/tsconfig/nestjs.json",
+  "extends": "@binaryiq/config/tsconfig/nestjs.json",
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "./dist",

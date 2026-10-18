@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-import type { AdminLoginChallenge, AdminSession, AdminTotpInput, AdminRoleType } from '@influencer/types';
+import type { AdminLoginChallenge, AdminSession, AdminTotpInput, AdminRoleType } from '@binaryiq/types';
 import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { authenticator } from 'otplib';

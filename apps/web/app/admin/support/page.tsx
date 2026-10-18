@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge, DataTable, type Column, Heading, Select, Skeleton, Text } from '@influencer/ui';
+import { Badge, DataTable, type Column, Heading, Select, Skeleton, Text } from '@binaryiq/ui';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 

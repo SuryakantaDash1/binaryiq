@@ -1,4 +1,4 @@
-import type { AdminRole } from '@influencer/db';
+import type { AdminRole } from '@binaryiq/db';
 import { Injectable, type CanActivate, type ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';

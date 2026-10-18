@@ -18,7 +18,7 @@ export function Header({ pointsSlot, brand, className }: HeaderProps): React.JSX
         className,
       )}
     >
-      <div className="text-primary flex items-center gap-2 font-bold">{brand ?? 'Influencer'}</div>
+      <div className="text-primary flex items-center gap-2 font-bold">{brand ?? 'BinaryIQ'}</div>
       <div className="flex items-center gap-4">
         {pointsSlot}
         <button aria-label="Notifications" className="text-text-muted hover:text-text">

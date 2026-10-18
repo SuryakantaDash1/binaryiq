@@ -1,11 +1,11 @@
-import { Prisma } from '@influencer/db';
+import { Prisma } from '@binaryiq/db';
 import type {
   CreateSurveyInput,
   UpdateSurveyInput,
   SurveyCardDto,
   SurveyDetailDto,
   StartSurveyResult,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Injectable, Logger } from '@nestjs/common';
 
 import {

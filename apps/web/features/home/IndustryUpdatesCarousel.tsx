@@ -1,7 +1,7 @@
 'use client';
 
-import type { ArticleView } from '@influencer/types';
-import { EmptyState, Skeleton } from '@influencer/ui';
+import type { ArticleView } from '@binaryiq/types';
+import { EmptyState, Skeleton } from '@binaryiq/ui';
 import { ExternalLink, Rss } from 'lucide-react';
 import { useEffect, useState } from 'react';
 

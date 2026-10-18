@@ -1,6 +1,6 @@
 # 08 — Testing Strategy ⭐
 
-How we prove the **Influencer Platform** works and stays working. This is the single source of truth
+How we prove the **BinaryIQ** works and stays working. This is the single source of truth
 for *what* we test, *where* each kind of test lives, *how* we isolate and seed data, and the *gates* a
 change must pass to merge. Module docs list their own acceptance criteria; the mechanics, layering,
 coverage targets, and CI gates live **here** and are not repeated per module.

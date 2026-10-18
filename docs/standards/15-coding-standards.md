@@ -1,6 +1,6 @@
 # 15 — Coding Standards ⭐
 
-The engineering rulebook for the **Influencer Platform**. Every line of TypeScript in this monorepo —
+The engineering rulebook for the **BinaryIQ**. Every line of TypeScript in this monorepo —
 `apps/web`, `apps/api`, and every `packages/*` — follows the conventions below. These rules are
 **enforced by tooling** (tsconfig, ESLint, Prettier, pre-commit hooks, CI) so that "correct" is the
 path of least resistance and review focuses on design, not formatting.
@@ -78,10 +78,10 @@ Each package/app has a thin `tsconfig.json` that extends the base and only adds 
 
 ```jsonc
 // apps/web/tsconfig.json
-{ "extends": "@influencer/config/tsconfig/next.json", "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts"] }
+{ "extends": "@binaryiq/config/tsconfig/next.json", "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts"] }
 
 // apps/api/tsconfig.json
-{ "extends": "@influencer/config/tsconfig/node.json", "compilerOptions": { "emitDecoratorMetadata": true, "experimentalDecorators": true } }
+{ "extends": "@binaryiq/config/tsconfig/node.json", "compilerOptions": { "emitDecoratorMetadata": true, "experimentalDecorators": true } }
 ```
 
 `typecheck` (`tsc --noEmit`) runs in the Turborepo pipeline and is a **CI gate** — a type error fails
@@ -114,7 +114,7 @@ fails compilation on **both sides** (see
 
   // ✅ validate unknown input into a typed shape
   function parse(input: unknown): Vote {
-    return VoteInput.parse(input); // Zod from @influencer/types → typed & safe
+    return VoteInput.parse(input); // Zod from @binaryiq/types → typed & safe
   }
   ```
 
@@ -132,18 +132,18 @@ map to the workspace packages and are resolved by TS, the bundler, and ESLint id
 
 | Alias | Resolves to | Contains |
 |---|---|---|
-| `@influencer/ui` | `packages/ui` | Design-system components + tokens (the only shared UI source) |
-| `@influencer/types` | `packages/types` | Zod DTO/domain schemas + inferred TS types (the API contract) |
-| `@influencer/config` | `packages/config` | ESLint / tsconfig / Tailwind presets |
-| `@influencer/db` | `packages/db` | Prisma schema, generated client, migrations, seed |
+| `@binaryiq/ui` | `packages/ui` | Design-system components + tokens (the only shared UI source) |
+| `@binaryiq/types` | `packages/types` | Zod DTO/domain schemas + inferred TS types (the API contract) |
+| `@binaryiq/config` | `packages/config` | ESLint / tsconfig / Tailwind presets |
+| `@binaryiq/db` | `packages/db` | Prisma schema, generated client, migrations, seed |
 
 Within an app, use a local alias for intra-app imports (`@/` → app root) and reserve relative imports
 (`./`, `../`) for **same-feature, nearby** files only.
 
 ```ts
 // ✅ cross-package via alias
-import { Button } from '@influencer/ui';
-import { VoteInput, type PollResult } from '@influencer/types';
+import { Button } from '@binaryiq/ui';
+import { VoteInput, type PollResult } from '@binaryiq/types';
 
 // ✅ intra-app absolute
 import { apiClient } from '@/lib/api-client';
@@ -202,7 +202,7 @@ export default [
       ],
       'import/order': ['error', {
         groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index']],
-        pathGroups: [{ pattern: '@influencer/**', group: 'internal', position: 'before' }],
+        pathGroups: [{ pattern: '@binaryiq/**', group: 'internal', position: 'before' }],
         'newlines-between': 'always',
         alphabetize: { order: 'asc', caseInsensitive: true },
       }],
@@ -346,7 +346,7 @@ organise **feature-first**: everything a feature needs lives together, and share
 | Shared DTO/domain schemas + types | `packages/types` (Zod, single source of truth) |
 | Shared lint/tsconfig/tailwind presets | `packages/config` |
 | Prisma schema, client, migrations, seed | `packages/db` |
-| App-specific UI compositions | `apps/web/components` (built **from** `@influencer/ui`) |
+| App-specific UI compositions | `apps/web/components` (built **from** `@binaryiq/ui`) |
 | Domain/business logic | `apps/api` only (never in `apps/web`) |
 
 Decision rule: **used by more than one app or feature → it belongs in `packages/*`.** Used by exactly
@@ -373,7 +373,7 @@ apps/api/src/modules/polls/
   polls.controller.ts   # thin HTTP layer, returns plain DTOs
   polls.service.ts      # business logic (one responsibility, §7)
   polls.repository.ts   # (optional) Prisma access if the service gets large
-  dto/                  # re-exports/uses Zod schemas from @influencer/types
+  dto/                  # re-exports/uses Zod schemas from @binaryiq/types
   polls.service.spec.ts
 ```
 
@@ -383,7 +383,7 @@ owning module (e.g. `PointsService`), never by importing another module's intern
 ### 4.4 Barrel exports policy
 
 - **`packages/*` expose a curated public API** via a top-level `index.ts` barrel. Consumers import from
-  the package root (`@influencer/ui`), not deep paths. Internals are not re-exported.
+  the package root (`@binaryiq/ui`), not deep paths. Internals are not re-exported.
 - **Inside an app, avoid barrels** for feature folders — they defeat tree-shaking, encourage import
   cycles, and blur boundaries. Import the specific file you need.
 - `import/no-cycle` is an ESLint error; barrels are the most common source of cycles, hence the
@@ -397,7 +397,7 @@ A feature must not reach into a sibling feature's internals. Shared needs are pr
 ```ts
 // eslint import/no-restricted-paths — a feature may not import another feature directly
 { target: './apps/web/components/polls', from: './apps/web/components/surveys',
-  message: 'No cross-feature imports. Promote shared UI to @influencer/ui.' }
+  message: 'No cross-feature imports. Promote shared UI to @binaryiq/ui.' }
 ```
 
 ```ts
@@ -405,7 +405,7 @@ A feature must not reach into a sibling feature's internals. Shared needs are pr
 import { SurveyProgress } from '@/components/surveys/survey-progress';
 
 // ✅ shared primitive lives in the design system
-import { ProgressBar } from '@influencer/ui';
+import { ProgressBar } from '@binaryiq/ui';
 ```
 
 ---
@@ -533,7 +533,7 @@ listeners, focus management) — not for loading data.
 - **Memoization is intentional, not reflexive.** Reach for `useMemo`/`useCallback`/`memo` only for a
   measured cost (expensive compute, referential stability that a dependency array needs, large lists).
   Premature memoization adds noise and bugs.
-- **No inline hex colors** — ever. Use semantic design tokens / Tailwind classes from `@influencer/ui`
+- **No inline hex colors** — ever. Use semantic design tokens / Tailwind classes from `@binaryiq/ui`
   and the Tailwind preset. See [../design-system/11-color-system.md](../design-system/11-color-system.md).
 
   ```tsx
@@ -544,7 +544,7 @@ listeners, focus management) — not for loading data.
   <span className="text-primary">Points</span>
   ```
 
-- Prefer components from `@influencer/ui` over bespoke markup; compose, don't fork
+- Prefer components from `@binaryiq/ui` over bespoke markup; compose, don't fork
   ([../design-system/13-components-library.md](../design-system/13-components-library.md)).
 
 ---
@@ -577,7 +577,7 @@ export class PollsController {
 
 ### 7.2 DTOs & validation
 
-- Request/response DTOs are **Zod schemas from `@influencer/types`** — the same schemas the web app uses
+- Request/response DTOs are **Zod schemas from `@binaryiq/types`** — the same schemas the web app uses
   ([05 §5](../architecture/05-api-conventions.md)). No hand-written class DTOs duplicating shapes.
 - Validate at the boundary with a global **`ZodValidationPipe`**; services trust their input.
 

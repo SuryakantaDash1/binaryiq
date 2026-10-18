@@ -1,8 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { updatePaypalSchema, type UpdatePaypalInput } from '@influencer/types';
-import { FormField, Input, Button, Alert, Text } from '@influencer/ui';
+import { updatePaypalSchema, type UpdatePaypalInput } from '@binaryiq/types';
+import { FormField, Input, Button, Alert, Text } from '@binaryiq/ui';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -34,7 +34,7 @@ export default function PaypalTab(): React.JSX.Element {
         <Alert variant="info">Current: <strong>{current}</strong></Alert>
       )}
       <Alert variant="warning">
-        To receive payments, please add <strong>payments@influencerplatform.app</strong> to your PayPal account as a trusted sender.
+        To receive payments, please add <strong>payments@binaryiq.app</strong> to your PayPal account as a trusted sender.
       </Alert>
       <Text color="secondary" size="sm">
         Enter the PayPal email address where you want to receive reward payouts.

@@ -67,7 +67,7 @@ does.
 | **Ledger** | `PointsService` skeleton (`award`/`spend`, tx-aware, idempotent) — no callers yet ([03 §4](../architecture/03-backend-architecture.md#4-pointsservice--the-shared-ledger)) |
 | **Backend bootstrap** | NestJS `main.ts` (global pipe/interceptor/filter, request-id middleware), config module + Zod env validation, `PrismaModule`, `RedisModule`, `HealthModule` ([03 §3, §5, §9](../architecture/03-backend-architecture.md)) |
 | **Frontend skeleton** | Next.js App Router structure, root providers, `tokens.css` wiring, `AppShell`/`Header`, base UI kit, Storybook ([06 §1, §7](../architecture/06-frontend-architecture.md)) |
-| **Typed API client** | Envelope-aware `apiFetch` + `ApiError`, server/client variants, typed against `@influencer/types` ([06 §3.3](../architecture/06-frontend-architecture.md)) |
+| **Typed API client** | Envelope-aware `apiFetch` + `ApiError`, server/client variants, typed against `@binaryiq/types` ([06 §3.3](../architecture/06-frontend-architecture.md)) |
 | **Auth scaffold** | RS256 keypair handling, `AuthGuard`/`RolesGuard`/`AdminGuard`, `@CurrentUser()`, `@Public()`, `TokenService` shell — **no login/registration flow** ([03 §3.6](../architecture/03-backend-architecture.md)) |
 | **CI/CD** | GitHub Actions pipeline (install→lint→typecheck→unit→build→integration), Turborepo remote cache, deploy stages ([09 §3](../architecture/09-devops-cicd.md)) |
 | **Local infra** | `docker-compose` for Postgres 15 + Redis 7; `.env.example`; env management ([09 §1–2](../architecture/09-devops-cicd.md)) |
@@ -90,7 +90,7 @@ does.
 
 - [ ] pnpm + Turborepo monorepo initialised with the six workspaces and `turbo.json` pipeline.
 - [ ] `packages/config`: shared `tsconfig` bases, ESLint flat config, Prettier config, Tailwind preset.
-- [ ] Path aliases (`@influencer/ui|types|config|db`, `@/*`) resolve in TS, bundler, and ESLint.
+- [ ] Path aliases (`@binaryiq/ui|types|config|db`, `@/*`) resolve in TS, bundler, and ESLint.
 - [ ] husky + lint-staged + commitlint pre-commit hooks installed.
 - [ ] `packages/db`: Prisma initialised; Identity + Points-core + `admins` + `audit_logs` models.
 - [ ] First migration generated and applied; `PrismaClient` generated and re-exported.
@@ -205,7 +205,7 @@ async function bootstrap() {
   app.setGlobalPrefix('v1');                        // /v1/... (05 §1)
 
   app.use(requestIdMiddleware);                     // x-request-id (03 §3.4)
-  app.useGlobalPipes(new ZodValidationPipe());      // DTOs from @influencer/types (05 §5)
+  app.useGlobalPipes(new ZodValidationPipe());      // DTOs from @binaryiq/types (05 §5)
   app.useGlobalInterceptors(new LoggingInterceptor(), new ResponseInterceptor()); // envelope (05 §2)
   app.useGlobalFilters(new AllExceptionsFilter());  // canonical error envelope (05 §4)
 
@@ -336,7 +336,7 @@ with placeholder pages (real flows land per phase):
 ```text
 apps/web/app/
 ├─ layout.tsx        # root: <html>, providers (Query, Theme, Session), fonts, imports globals.css  — BUILT
-├─ globals.css       # imports @influencer/ui tokens.css + Tailwind layers                           — BUILT
+├─ globals.css       # imports @binaryiq/ui tokens.css + Tailwind layers                           — BUILT
 ├─ not-found.tsx · error.tsx   # global 404 + root error boundary (shared EmptyState/Alert)          — BUILT
 ├─ (marketing)/      # public shell + placeholder landing                                            — SCAFFOLD
 ├─ (auth)/           # centred-card shell, placeholder login/register pages                          — SCAFFOLD (flows: Phase 1)
@@ -365,7 +365,7 @@ Theming is a **config change, not a code change** ([11 §6](../design-system/11-
   `text-muted`, `border-default`, `ring-focus`) and is shared by `apps/web` **and Storybook**, so app and
   component library render identically.
 - `apps/web/tailwind.config.ts` is thin: `presets: [preset]`, `content` pointing at `app/**` +
-  `@influencer/ui`.
+  `@binaryiq/ui`.
 - Dark mode flips semantic tokens via `data-theme="dark"` on `<html>`; components use **semantic tokens
   only**, never raw hex ([11 §4](../design-system/11-color-system.md), [15 §6.3](../standards/15-coding-standards.md)).
 
@@ -400,7 +400,7 @@ semantic tokens, typed with an exported props interface, and built on Radix wher
 
 ### 6.5 Typed API client
 
-One envelope-aware client in `app/lib/api/`, typed against `@influencer/types`
+One envelope-aware client in `app/lib/api/`, typed against `@binaryiq/types`
 ([06 §3.3](../architecture/06-frontend-architecture.md#33-the-typed-api-client-wrapper-envelope-aware)):
 
 - `apiFetch<T>()` reads the `{ data, error, meta }` envelope: on success returns `data`; on error throws
@@ -427,17 +427,17 @@ rules by [15 §1–2](../standards/15-coding-standards.md).
 
 pnpm workspaces over `apps/*` and `packages/*`. The root `package.json` pins the package manager
 (`"packageManager": "pnpm@x"`) so CI and every dev use one version ([09 §3](../architecture/09-devops-cicd.md)).
-Package names use the `@influencer/*` scope ([15 §1.3](../standards/15-coding-standards.md)):
+Package names use the `@binaryiq/*` scope ([15 §1.3](../standards/15-coding-standards.md)):
 
 | Package | Name | Role |
 |---|---|---|
-| `packages/ui` | `@influencer/ui` | design system + base kit ([13](../design-system/13-components-library.md)) |
-| `packages/types` | `@influencer/types` | Zod DTO/domain schemas — the API contract ([01 §6](../architecture/01-system-architecture.md#6-shared-types-flow-frontend--backend-in-sync)) |
-| `packages/config` | `@influencer/config` | eslint/tsconfig/tailwind presets |
-| `packages/db` | `@influencer/db` | Prisma schema/client/migrations/seed ([04](../architecture/04-database-architecture.md)) |
+| `packages/ui` | `@binaryiq/ui` | design system + base kit ([13](../design-system/13-components-library.md)) |
+| `packages/types` | `@binaryiq/types` | Zod DTO/domain schemas — the API contract ([01 §6](../architecture/01-system-architecture.md#6-shared-types-flow-frontend--backend-in-sync)) |
+| `packages/config` | `@binaryiq/config` | eslint/tsconfig/tailwind presets |
+| `packages/db` | `@binaryiq/db` | Prisma schema/client/migrations/seed ([04](../architecture/04-database-architecture.md)) |
 
 > **Naming note:** the canonical package scope per [15 §1.3](../standards/15-coding-standards.md) is
-> `@influencer/*` (e.g. `@influencer/db`). Phase 0 standardises on it, and the CI `--filter` targets in
+> `@binaryiq/*` (e.g. `@binaryiq/db`). Phase 0 standardises on it, and the CI `--filter` targets in
 > [09 §3](../architecture/09-devops-cicd.md) match those names.
 
 ### 7.2 `turbo.json` pipeline
@@ -462,7 +462,7 @@ Per [09 §4](../architecture/09-devops-cicd.md#4-turborepo-caching--task-pipelin
 }
 ```
 
-`^build` builds upstream deps first (`@influencer/db`, `@influencer/types`, `@influencer/ui` before the
+`^build` builds upstream deps first (`@binaryiq/db`, `@binaryiq/types`, `@binaryiq/ui` before the
 apps). Declared `env` keys are part of the cache hash so stale config can't be silently reused.
 `pnpm dev` runs the persistent `dev` task across `apps/web` + `apps/api`.
 
@@ -471,7 +471,7 @@ apps). Declared `env` keys are part of the cache hash so stale config can't be s
 - Shared base at `packages/config/tsconfig/base.json` with **`strict: true`, `noUncheckedIndexedAccess`,
   `verbatimModuleSyntax`, `isolatedModules`** — extended by every package/app, never relaxed per-package
   ([15 §1.1–1.2](../standards/15-coding-standards.md)).
-- Aliases `@influencer/ui|types|config|db` (cross-package) and `@/*` (intra-app), resolved identically by
+- Aliases `@binaryiq/ui|types|config|db` (cross-package) and `@/*` (intra-app), resolved identically by
   TS, the bundler, and ESLint ([15 §1.3](../standards/15-coding-standards.md)). No deep relative traversal
   across package boundaries.
 
@@ -519,7 +519,7 @@ the meaningful gate** (migration applies, seed runs, ledger service passes). Cov
 services:
   postgres:
     image: postgres:15
-    environment: { POSTGRES_USER: app, POSTGRES_PASSWORD: app, POSTGRES_DB: influencer }
+    environment: { POSTGRES_USER: app, POSTGRES_PASSWORD: app, POSTGRES_DB: binaryiq }
     ports: ['5432:5432']
     volumes: ['pgdata:/var/lib/postgresql/data']
   redis:
@@ -563,11 +563,11 @@ it. This is the enforceable contract every subsequent module doc points back to:
 - **One ledger.** All point movement goes through `PointsService.award()/spend()`. No feature ever writes
   `points_transactions` or `points_balances` directly ([03 §4](../architecture/03-backend-architecture.md#4-pointsservice--the-shared-ledger),
   [15 §8](../standards/15-coding-standards.md)). Ledger behaviour is tested **once**, centrally.
-- **One design system.** UI comes from `@influencer/ui` + the tokens/preset. Feature code never ships a
+- **One design system.** UI comes from `@binaryiq/ui` + the tokens/preset. Feature code never ships a
   one-off button/input/modal/table or a raw hex color; new shared components are added to `packages/ui`
   first (story + a11y), then consumed ([13 §10](../design-system/13-components-library.md#10-rules),
   [11 §6](../design-system/11-color-system.md), [06 §6](../architecture/06-frontend-architecture.md#6-component-reuse-strategy)).
-- **One contract.** Every DTO is a Zod schema in `@influencer/types`, consumed by both the API
+- **One contract.** Every DTO is a Zod schema in `@binaryiq/types`, consumed by both the API
   (`ZodValidationPipe`) and the web (RHF resolver + typed client). A breaking change fails compilation on
   both sides ([01 §6](../architecture/01-system-architecture.md#6-shared-types-flow-frontend--backend-in-sync),
   [05 §5](../architecture/05-api-conventions.md)).
@@ -606,7 +606,7 @@ Phase 0 is **done** when all of the following pass (the phase-level DoD in
 6. **Storybook shows the base kit.** `Button`, `Input`, `FormField`, `Modal`, `Card`, `Text`, `Heading`
    render with stories and pass the a11y addon.
 7. **Token-based sample page renders.** `app/(app)/sample/page.tsx` renders inside `AppShell` using only
-   semantic tokens / `@influencer/ui` primitives (no raw hex), light **and** dark theme, and successfully
+   semantic tokens / `@binaryiq/ui` primitives (no raw hex), light **and** dark theme, and successfully
    calls `GET /v1/health/ready` through the typed API client (envelope unwrapped).
 8. **Envelope + errors verified.** A `@Public()` test route returns the success envelope; a forced error
    returns the canonical `{ data: null, error: { code, ... }, meta }` shape with the right status.
@@ -632,7 +632,7 @@ Each is one focused PR (< ~400-line diff where practical), Conventional-Commit t
 4. **`feat(db): prisma init + identity/points/admins/audit models`** — `packages/db` schema (Phase 0
    slice, [§4.1](#41-tables-created-in-phase-0)); generate client.
 5. **`feat(db): first migration + generated client re-export`** — `0000_init_identity_points` with FK +
-   hot-path indexes; `@influencer/db` barrel.
+   hot-path indexes; `@binaryiq/db` barrel.
 6. **`feat(db): idempotent seed scaffold`** — 14 categories, spin game + 8 segments, rewards, super-admin
    ([§4.3](#43-seed-contents-prepared-here-consumed-later)).
 7. **`feat(config): tailwind preset + design tokens`** — `packages/config/tailwind-preset.ts`,
@@ -708,7 +708,7 @@ and additionally verifies **transaction rollback**: if a synthetic domain write 
 - **T1** — `turbo run lint` fails the PR on any ESLint error or warning (`--max-warnings=0`,
   [15 §2.3](../standards/15-coding-standards.md)).
 - **T2** — `turbo run typecheck` fails on any type error, including a deliberate DTO-shape break in
-  `@influencer/types` failing **both** apps ([15 §1.1](../standards/15-coding-standards.md)).
+  `@binaryiq/types` failing **both** apps ([15 §1.1](../standards/15-coding-standards.md)).
 - **T3** — `turbo run build` succeeds for `apps/web`, `apps/api`, and all packages; caches populate.
 - **T4** — the integration job (ephemeral Postgres + Redis) runs migrate + seed + `test:integration`
   green (exercises S5–S7 and the ledger integration test).

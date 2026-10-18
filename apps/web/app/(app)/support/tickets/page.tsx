@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge, EmptyState, Heading, Skeleton, Text } from '@influencer/ui';
+import { Badge, EmptyState, Heading, Skeleton, Text } from '@binaryiq/ui';
 import { useEffect, useState } from 'react';
 
 import { supportApi, type TicketStatus, type TicketSummary } from '@/lib/api/support.js';

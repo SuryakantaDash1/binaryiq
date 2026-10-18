@@ -1,4 +1,4 @@
-import type { AdminRole } from '@influencer/db';
+import type { AdminRole } from '@binaryiq/db';
 import { SetMetadata, type CustomDecorator } from '@nestjs/common';
 
 export const ROLES_KEY = 'roles';

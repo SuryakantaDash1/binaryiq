@@ -1,4 +1,4 @@
-import type { CategorySchema } from '@influencer/types';
+import type { CategorySchema } from '@binaryiq/types';
 
 import { apiFetch } from './client.js';
 

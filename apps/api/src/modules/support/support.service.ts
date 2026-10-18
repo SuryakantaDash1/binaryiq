@@ -1,5 +1,5 @@
 
-import type { TicketIssueType, TicketStatus } from '@influencer/db';
+import type { TicketIssueType, TicketStatus } from '@binaryiq/db';
 import type {
   AdminTicketDetail,
   AdminTicketRow,
@@ -9,7 +9,7 @@ import type {
   SupportTicketMessage,
   SupportTicketSummary,
   UpdateTicketInput,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Injectable, Logger } from '@nestjs/common';
 
 import {

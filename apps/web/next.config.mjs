@@ -37,8 +37,8 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  // @influencer/ui ships TS source; Next transpiles it. types/db are prebuilt.
-  transpilePackages: ['@influencer/ui'],
+  // @binaryiq/ui ships TS source; Next transpiles it. types/db are prebuilt.
+  transpilePackages: ['@binaryiq/ui'],
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },

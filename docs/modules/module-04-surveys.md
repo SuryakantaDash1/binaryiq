@@ -20,7 +20,7 @@ the backbones rather than restating them:
 - Shared UI kit (`SurveyCard`, `Badge`, `Tabs`) → [../design-system/13-components-library.md](../design-system/13-components-library.md);
   patterns (list+card, empty state, feedback) → [../design-system/14-patterns.md](../design-system/14-patterns.md).
 - Product/module map & the "maximize matches" nudge → [../00-project-overview.md](../00-project-overview.md)
-  and [../Influencer_Platform_Full_Breakdown.md §5](../Influencer_Platform_Full_Breakdown.md).
+  and [../BinaryIQ_Full_Breakdown.md §5](../BinaryIQ_Full_Breakdown.md).
 
 ---
 
@@ -32,7 +32,7 @@ has supplied: the more of the 14 profile survey categories they complete, the ri
 the more (and better-paid) surveys surface. A member with **no** profile surveys completed sees only
 **generic** (untargeted) surveys.
 
-The three survey types (from [../Influencer_Platform_Full_Breakdown.md §5.2](../Influencer_Platform_Full_Breakdown.md)):
+The three survey types (from [../BinaryIQ_Full_Breakdown.md §5.2](../BinaryIQ_Full_Breakdown.md)):
 
 | Type | `SurveyType` | Description | Points | Badge tone (see [../design-system/11-color-system.md](../design-system/11-color-system.md)) |
 |---|---|---|---|---|
@@ -131,7 +131,7 @@ attempt returns `422 UNPROCESSABLE` (`survey_expired`).
 If matching returns **no** eligible surveys (common for members with little/no profile data), the page
 renders a shared **`EmptyState`** that nudges profile completion, e.g. *"Complete your profile to unlock
 more surveys"* with a CTA to `/account/about-you`. This is where we surface the "complete all 14
-categories to maximize matches" guidance from [../Influencer_Platform_Full_Breakdown.md §5.3](../Influencer_Platform_Full_Breakdown.md).
+categories to maximize matches" guidance from [../BinaryIQ_Full_Breakdown.md §5.3](../BinaryIQ_Full_Breakdown.md).
 
 ---
 
@@ -335,7 +335,7 @@ For each candidate survey and the member's profile snapshot:
 | Some categories completed | Generic **+** targeted surveys whose groups the known fields satisfy |
 | All 14 categories completed | Widest match set (registration age/gender + About You education/employment/income + region + interests all available) — maximizes matches & earnings |
 
-This directly implements [../Influencer_Platform_Full_Breakdown.md §5.3](../Influencer_Platform_Full_Breakdown.md):
+This directly implements [../BinaryIQ_Full_Breakdown.md §5.3](../BinaryIQ_Full_Breakdown.md):
 age/gender from registration, education/employment/income from About You, location (PIN/city/area) for
 regional, lifestyle/interests from profile surveys; generic-only when no profile surveys exist.
 
@@ -511,7 +511,7 @@ Per [../architecture/04-database-architecture.md §5](../architecture/04-databas
 - **`PointsService`** (shared `PointsModule`) — never write `points_transactions`/`points_balances`
   directly. Same gateway as auth bonus, profile surveys, polls, games, redemptions.
 - **UI kit** — `Tabs`, `SurveyCard`, `Card`, `Badge`, `PointsPill`, `EmptyState`, `Skeleton`, `Alert`,
-  `Modal`, `Toast` from `@influencer/ui`. No bespoke cards/badges/modals.
+  `Modal`, `Toast` from `@binaryiq/ui`. No bespoke cards/badges/modals.
 - **Patterns** — list+card (§6), empty/loading/error (§3), points feedback (§8), and the §1 form pattern
   (admin CRUD + internal renderer) from [../design-system/14-patterns.md](../design-system/14-patterns.md).
 - **API envelope / error codes / auth / webhooks** — [../architecture/05-api-conventions.md](../architecture/05-api-conventions.md);
@@ -616,7 +616,7 @@ Per [../architecture/04-database-architecture.md §5](../architecture/04-databas
 ## Related documents
 
 - [../00-project-overview.md](../00-project-overview.md) — module map, points/INR constant.
-- [../Influencer_Platform_Full_Breakdown.md](../Influencer_Platform_Full_Breakdown.md) — §5.2 types, §5.3 matching.
+- [../BinaryIQ_Full_Breakdown.md](../BinaryIQ_Full_Breakdown.md) — §5.2 types, §5.3 matching.
 - [../architecture/03-backend-architecture.md](../architecture/03-backend-architecture.md) — modules, layering, `PointsService`.
 - [../architecture/04-database-architecture.md](../architecture/04-database-architecture.md) — `Survey`/`SurveyResponse`, ledger rules.
 - [../architecture/05-api-conventions.md](../architecture/05-api-conventions.md) — envelope, errors, auth, webhooks.

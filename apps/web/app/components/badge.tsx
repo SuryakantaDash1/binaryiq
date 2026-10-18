@@ -1,4 +1,4 @@
-import { cn } from '@influencer/ui';
+import { cn } from '@binaryiq/ui';
 import type { ReactNode } from 'react';
 
 type Tone = 'neutral' | 'success' | 'danger' | 'info';

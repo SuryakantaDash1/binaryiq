@@ -1,6 +1,6 @@
 import { Article, Section } from '../_article';
 
-export const metadata = { title: "FAQ's — Influencers" };
+export const metadata = { title: "FAQ's — BinaryIQ" };
 
 export default function FaqsPage(): React.JSX.Element {
   return (

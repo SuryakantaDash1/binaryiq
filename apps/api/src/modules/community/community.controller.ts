@@ -7,7 +7,7 @@ import {
   type UpdateAnnouncementInput,
   adminListAnnouncementsQuerySchema,
   type AdminListAnnouncementsQuery,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query } from '@nestjs/common';
 
 import { Roles } from '../../common/decorators/roles.decorator';

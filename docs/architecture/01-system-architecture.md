@@ -1,6 +1,6 @@
 # 01 — System Architecture ⭐
 
-The bird's-eye view of how the **Influencer Platform** fits together: the runtime topology, the
+The bird's-eye view of how the **BinaryIQ** fits together: the runtime topology, the
 monorepo layout, who owns what, and how a request flows from browser to database and back. This doc is
 the **structural backbone**. The data model lives in
 [04-database-architecture.md](04-database-architecture.md); the wire contract lives in
@@ -90,7 +90,7 @@ BFF layer.
 Turborepo drives build/test/lint pipelines with caching. Two apps, four shared packages.
 
 ```
-influencer_platform_toluna/
+binaryiq/
 ├── apps/
 │   ├── web/                         # Next.js 14 App Router (TypeScript) — deployed to Vercel
 │   │   ├── app/                     #   route segments (RSC by default); (auth), (dashboard) groups

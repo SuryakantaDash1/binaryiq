@@ -3,7 +3,7 @@
 The build order, phase → module mapping, dependencies, and definition-of-done. Each phase ships a
 working, testable increment. One module doc per phase (see `modules/`).
 
-Reference product spec: [Influencer_Platform_Full_Breakdown.md](../Influencer_Platform_Full_Breakdown.md).
+Reference product spec: [BinaryIQ_Full_Breakdown.md](../BinaryIQ_Full_Breakdown.md).
 Architecture backbone: [04-database](../architecture/04-database-architecture.md),
 [05-api](../architecture/05-api-conventions.md). Design backbone:
 [11-color](../design-system/11-color-system.md), [13-components](../design-system/13-components-library.md).

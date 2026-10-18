@@ -1,6 +1,6 @@
 'use client';
 
-import { Heading, Text, Button, Alert } from '@influencer/ui';
+import { Heading, Text, Button, Alert } from '@binaryiq/ui';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 

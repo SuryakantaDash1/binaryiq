@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
-import { type SurveyType, Prisma } from '@influencer/db';
-import type { TargetingCriteria } from '@influencer/types';
+import { type SurveyType, Prisma } from '@binaryiq/db';
+import type { TargetingCriteria } from '@binaryiq/types';
 import { Injectable } from '@nestjs/common';
 
 import { EncryptionService } from '../../common/services/encryption.service';

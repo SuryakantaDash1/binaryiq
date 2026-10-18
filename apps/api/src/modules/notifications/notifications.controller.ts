@@ -5,7 +5,7 @@ import {
   type NotificationListQuery,
   type RegisterPushTokenInput,
   type UpdatePreferenceInput,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 
 import { CurrentUser } from '../../common/decorators/current-user.decorator';

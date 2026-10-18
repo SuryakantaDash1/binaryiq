@@ -1,6 +1,6 @@
 'use client';
 
-import type { AdminSession } from '@influencer/types';
+import type { AdminSession } from '@binaryiq/types';
 import {
   BarChart3,
   ChevronDown,
@@ -130,7 +130,7 @@ export default function AdminLayout({ children }: { children: ReactNode }): Reac
             );
           })}
         </nav>
-        <div className="border-t border-white/10 p-4 text-xs text-white/40">Influencers · Admin</div>
+        <div className="border-t border-white/10 p-4 text-xs text-white/40">BinaryIQ · Admin</div>
       </aside>
 
       {/* Main column */}

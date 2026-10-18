@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Button, Modal, SpinWheel } from '@influencer/ui';
+import { Alert, Button, Modal, SpinWheel } from '@binaryiq/ui';
 import { useCallback, useState } from 'react';
 
 import { ApiError } from '@/lib/api/client';

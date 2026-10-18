@@ -6,8 +6,8 @@ and their flows; the **App Router structure, rendering rules, data-fetching patt
 theming wiring live here** and are not repeated per module.
 
 Stack (confirmed): **Next.js 14 App Router + TypeScript**, Tailwind via a shared preset
-(`packages/config`), the UI kit in `packages/ui` (`@influencer/ui`), shared **Zod schemas + types** in
-`packages/types` (`@influencer/types`), **React Hook Form + Zod**, **TanStack Query** for client
+(`packages/config`), the UI kit in `packages/ui` (`@binaryiq/ui`), shared **Zod schemas + types** in
+`packages/types` (`@binaryiq/types`), **React Hook Form + Zod**, **TanStack Query** for client
 server-state, a **typed API client** hitting the NestJS API, and **NextAuth.js** for session handling.
 
 Read alongside: [00-project-overview](../00-project-overview.md),
@@ -28,7 +28,7 @@ role-gated back office.
 apps/web/
 ├─ app/
 │  ├─ layout.tsx                 # root: <html>, <body>, providers (Query, Theme, Session), fonts, tokens.css
-│  ├─ globals.css                # imports @influencer/ui tokens.css + Tailwind layers
+│  ├─ globals.css                # imports @binaryiq/ui tokens.css + Tailwind layers
 │  ├─ not-found.tsx              # global 404
 │  ├─ error.tsx                  # global error boundary (root)
 │  │
@@ -86,7 +86,7 @@ apps/web/
 │  ├─ (api or route handlers)/
 │  │  └─ api/auth/[...nextauth]/route.ts   # NextAuth handler (see §8)
 │  │
-│  ├─ components/                # app-only feature components (compose @influencer/ui)
+│  ├─ components/                # app-only feature components (compose @binaryiq/ui)
 │  ├─ features/                  # feature modules (see §11)
 │  ├─ lib/                       # api client, query client, auth helpers (see §11)
 │  ├─ hooks/                     # useApi, usePoints, useSession wrappers (see §11)
@@ -110,7 +110,7 @@ apps/web/
 ```tsx
 // app/(app)/error.tsx
 'use client';
-import { EmptyState, Button } from '@influencer/ui';
+import { EmptyState, Button } from '@binaryiq/ui';
 
 export default function AppError({ error, reset }: { error: Error; reset: () => void }) {
   return (
@@ -203,7 +203,7 @@ envelope; they get the resource or a typed error.
 
 ```ts
 // app/lib/api/client.ts
-import type { ApiEnvelope } from '@influencer/types';
+import type { ApiEnvelope } from '@binaryiq/types';
 
 export class ApiError extends Error {
   constructor(
@@ -237,7 +237,7 @@ export async function apiFetch<T>(path: string, init: RequestInit & { token?: st
   runs in the browser.
 - **Client variant** is consumed only through TanStack Query hooks (`useApi`, §11); components never call
   `fetch` directly.
-- **Types** for every request/response come from `@influencer/types`, so the client is end-to-end typed
+- **Types** for every request/response come from `@binaryiq/types`, so the client is end-to-end typed
   against the same DTOs the API validates ([05 §5](./05-api-conventions.md)).
 - Pagination follows [05 §6](./05-api-conventions.md): cursor lists feed `useInfiniteQuery`, offset lists
   feed the `DataTable` server-pagination hook.
@@ -269,9 +269,9 @@ Rules:
 ## 5. Forms (RHF + Zod, one schema everywhere)
 
 Every form uses **React Hook Form + `zodResolver`** with the **same Zod schema imported from
-`@influencer/types`** that the API validates against — so the frontend and backend cannot drift
+`@binaryiq/types`** that the API validates against — so the frontend and backend cannot drift
 ([05 §5](./05-api-conventions.md)). Controls are the shared **`FormField` + `Input`/`Select`/…** from
-`@influencer/ui` ([13 §3](../design-system/13-components-library.md)); no form re-implements validation,
+`@binaryiq/ui` ([13 §3](../design-system/13-components-library.md)); no form re-implements validation,
 layout, or a11y.
 
 Error handling has two levels:
@@ -286,8 +286,8 @@ Error handling has two levels:
 'use client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChangeEmailSchema, type ChangeEmailInput } from '@influencer/types';
-import { FormField, Input, Button, Alert } from '@influencer/ui';
+import { ChangeEmailSchema, type ChangeEmailInput } from '@binaryiq/types';
+import { FormField, Input, Button, Alert } from '@binaryiq/ui';
 import { toast } from 'sonner';
 import { useChangeEmail } from '@/features/account/hooks';
 import { ApiError } from '@/lib/api/client';
@@ -332,7 +332,7 @@ and every admin CRUD form — only the schema and the mutation hook change.
 
 ## 6. Component reuse strategy
 
-Feature code **consumes `@influencer/ui` only**. It **never** ships one-off buttons, inputs, modals,
+Feature code **consumes `@binaryiq/ui` only**. It **never** ships one-off buttons, inputs, modals,
 tables, or hard-coded colors — those are single-implementation in the UI kit
 ([13-components-library](../design-system/13-components-library.md)).
 
@@ -346,7 +346,7 @@ tables, or hard-coded colors — those are single-implementation in the UI kit
 - App-only feature components that are *not* generic enough for the kit live in
   `app/components/` or `app/features/<area>/components/` but still compose kit primitives.
 
-Import boundary: feature code imports from `@influencer/ui`; **nothing** in `apps/web` imports Radix or
+Import boundary: feature code imports from `@binaryiq/ui`; **nothing** in `apps/web` imports Radix or
 raw Tailwind color classes directly (only the UI package internals do).
 
 ---
@@ -361,7 +361,7 @@ Theming is a **config change, not a code change** — see
   `text-muted`, `border-default`, `ring-focus`) only — never raw hex.
 - **Tailwind preset** (`packages/config/tailwind-preset.ts`) maps those CSS variables to utilities and is
   shared by `apps/web` and Storybook, so app and component library render identically. `apps/web`'s
-  `tailwind.config.ts` just `presets: [preset]` and points `content` at `app/**` + `@influencer/ui`.
+  `tailwind.config.ts` just `presets: [preset]` and points `content` at `app/**` + `@binaryiq/ui`.
 - **Dark mode** flips semantic tokens via **`data-theme="dark"`** on `<html>`. A small client
   `ThemeProvider` (in the root layout) reads the user preference + `localStorage`, sets the attribute,
   and avoids the flash-of-wrong-theme with an inline pre-hydration script. Persisted to the user's
@@ -447,7 +447,7 @@ apps/web/
 ├─ app/…                         # routes only (thin pages, layouts, loading/error/not-found)
 ├─ features/                     # one folder per domain area
 │  ├─ polls/
-│  │  ├─ components/             # VotePanel, PollResultBars wrappers (compose @influencer/ui)
+│  │  ├─ components/             # VotePanel, PollResultBars wrappers (compose @binaryiq/ui)
 │  │  ├─ hooks/                  # usePoll, useVote (TanStack Query)
 │  │  └─ index.ts
 │  ├─ points/                    # usePoints (balance), points history hooks
@@ -462,7 +462,7 @@ apps/web/
 │  ├─ api/
 │  │  ├─ client.ts               # apiFetch + ApiError (envelope unwrap) — §3.3
 │  │  ├─ server.ts               # RSC/server-action client (session token)
-│  │  └─ endpoints/              # typed per-resource methods (polls, points, rewards…) using @influencer/types
+│  │  └─ endpoints/              # typed per-resource methods (polls, points, rewards…) using @binaryiq/types
 │  ├─ query/queryClient.ts       # TanStack QueryClient + provider
 │  ├─ auth/                       # NextAuth config, getServerSession helpers
 │  └─ stores/                     # tiny Zustand stores (theme, layout)
@@ -475,7 +475,7 @@ Conventions:
   through typed endpoint methods or the `useApi`/feature hooks.
 - **Hooks**: cross-cutting ones (`useApi`, `usePoints`) live in `app/hooks/`; feature-specific ones
   (`useVote`, `useSpin`, `useRedeem`) live in `features/<area>/hooks/`.
-- **Naming**: components `PascalCase.tsx`, hooks `useX.ts`, schemas/types imported from `@influencer/types`
+- **Naming**: components `PascalCase.tsx`, hooks `useX.ts`, schemas/types imported from `@binaryiq/types`
   (never redefined locally).
 - A feature exposes a small public surface via `features/<area>/index.ts`; pages import from there.
 

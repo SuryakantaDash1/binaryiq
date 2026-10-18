@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import type { ChatbotFlow, TicketIssueType } from '@influencer/types';
+import type { ChatbotFlow, TicketIssueType } from '@binaryiq/types';
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common';
 
 

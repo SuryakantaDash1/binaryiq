@@ -1,6 +1,6 @@
 'use client';
 
-import { PollCard, Skeleton } from '@influencer/ui';
+import { PollCard, Skeleton } from '@binaryiq/ui';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { StatCard, Tabs, DataTable, Badge, EmptyState, Skeleton, RangeFilter, type DateRange } from '@influencer/ui';
+import { StatCard, Tabs, DataTable, Badge, EmptyState, Skeleton, RangeFilter, type DateRange } from '@binaryiq/ui';
 import { useState, useEffect, useCallback } from 'react';
 
 import { pointsApi, rewardsApi, type PointsTransaction, type Redemption } from '@/lib/api/rewards';

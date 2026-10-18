@@ -13,12 +13,11 @@ import type {
   FeedSourceView,
   UpdateAnnouncementInput,
   UpdateFeedSourceInput,
-} from '@influencer/types';
+} from '@binaryiq/types';
 
 import { ApiError, REQUEST_TIMEOUT_MS } from './client.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/v1';
-const LEGACY_ADMIN_TOKEN_KEY = 'influencer_admin_token';
 
 // ─── Admin session ──────────────────────────────────────────────────
 // The short-lived access token lives only in memory, so an XSS bug can't read it
@@ -26,14 +25,6 @@ const LEGACY_ADMIN_TOKEN_KEY = 'influencer_admin_token';
 // the API sets after 2FA; reloading the page re-mints the access token from it.
 let adminAccessToken: string | null = null;
 let refreshInFlight: Promise<boolean> | null = null;
-
-if (typeof window !== 'undefined') {
-  try {
-    window.localStorage.removeItem(LEGACY_ADMIN_TOKEN_KEY); // tokens used to be kept here
-  } catch {
-    /* storage unavailable */
-  }
-}
 
 export function getAdminToken(): string | null {
   return adminAccessToken;

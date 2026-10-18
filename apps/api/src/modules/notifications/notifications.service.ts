@@ -1,5 +1,5 @@
-import type { NotificationChannel, NotificationType } from '@influencer/db';
-import type { NotificationListQuery } from '@influencer/types';
+import type { NotificationChannel, NotificationType } from '@binaryiq/db';
+import type { NotificationListQuery } from '@binaryiq/types';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
 import { Queue } from 'bullmq';

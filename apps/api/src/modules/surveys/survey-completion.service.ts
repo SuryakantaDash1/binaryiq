@@ -1,4 +1,4 @@
-import type { CompleteSurveyResult } from '@influencer/types';
+import type { CompleteSurveyResult } from '@binaryiq/types';
 import { Injectable, Logger } from '@nestjs/common';
 
 import {

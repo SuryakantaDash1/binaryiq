@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardBody, Text, Button, Alert, Modal } from '@influencer/ui';
+import { Card, CardBody, Text, Button, Alert, Modal } from '@binaryiq/ui';
 import { useState } from 'react';
 
 import { ApiError } from '@/lib/api/client';

@@ -43,7 +43,7 @@ form machinery:
   and the extended About You profile (`UserAddress` + `UserDemographics`).
 
 **Why it matters:** profile completeness is the input to survey targeting
-([Full Breakdown §5.3](../Influencer_Platform_Full_Breakdown.md), consumed in
+([Full Breakdown §5.3](../BinaryIQ_Full_Breakdown.md), consumed in
 [module-04](module-04-surveys.md)); PII correctness and encryption are a compliance obligation
 ([07 §3](../architecture/07-security-compliance.md)); the points awards must be exactly-once and
 auditable ([04 §5](../architecture/04-database-architecture.md)).
@@ -361,7 +361,7 @@ Structure per [06-frontend-architecture](../architecture/06-frontend-architectur
   ([06 §3.1](../architecture/06-frontend-architecture.md#31-server-side-fetch-in-rsc-initial-data))
   and mounts a client **form island** for editing.
 - Forms follow the canonical **form pattern** ([14 §1](../design-system/14-patterns.md#1-form-pattern-the-canonical-form)):
-  `useForm(zodResolver(schema))` with the **same Zod schema from `@influencer/types`** the API
+  `useForm(zodResolver(schema))` with the **same Zod schema from `@binaryiq/types`** the API
   validates with; `VALIDATION_ERROR.details[]` mapped onto fields; `CONFLICT`/`UNPROCESSABLE` shown
   as an inline `Alert` ([14 §4](../design-system/14-patterns.md#4-toast-vs-inline-alert-feedback-pattern)).
 - `features/account/` holds `ProfileForm`, `EmailForm`, `PasswordForm`, `PaypalForm`, `AboutYouForm`,
@@ -377,8 +377,8 @@ A single client component renders **any** category from its JSON `schema`:
 'use client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormField, Input, Select, RadioGroup, MultiSelect, Button } from '@influencer/ui';
-import { schemaToZod, type CategorySchema } from '@influencer/types';
+import { Form, FormField, Input, Select, RadioGroup, MultiSelect, Button } from '@binaryiq/ui';
+import { schemaToZod, type CategorySchema } from '@binaryiq/types';
 
 const CONTROL = { text: Input, number: Input, select: Select, radio: RadioGroup,
                   multiselect: MultiSelect } as const;
@@ -407,7 +407,7 @@ export function SurveyForm({ schema, defaults, onSubmit, submitting }: {
 }
 ```
 
-- **`schemaToZod(schema)`** lives in `@influencer/types` so the **same** derivation is available to
+- **`schemaToZod(schema)`** lives in `@binaryiq/types` so the **same** derivation is available to
   the API validator — no client/server drift ([05 §5](../architecture/05-api-conventions.md#5-validation)).
 - Controls are the shared `FormField` + input set only ([13 §3](../design-system/13-components-library.md));
   the renderer never ships bespoke inputs.
@@ -559,7 +559,7 @@ idempotent (`upsert` by `key`) so re-running never duplicates categories.
 - **`SurveyForm` renderer** — the data-driven JSON-schema → `FormField` renderer (§6.2) is the
   centrepiece reuse. [module-04](module-04-surveys.md) reuses the **same concept** to render
   brand-survey questions from their own schema, and the **same `schemaToZod`** helper in
-  `@influencer/types` for client+server validation.
+  `@binaryiq/types` for client+server validation.
 - **`FormField` / `Tabs` / `FileUpload` / `Avatar` / `ProgressRing`** — all from `packages/ui`
   ([13](../design-system/13-components-library.md)); no bespoke inputs, tabs, upload widgets, or
   modals are created here.
@@ -613,7 +613,7 @@ idempotent (`upsert` by `key`) so re-running never duplicates categories.
 1. **Seed** the 14 `ProfileSurveyCategory` rows (keys, names, points 100/200, sort order, JSON
    schemas) via idempotent `upsert` in `seed.ts`; migration reviewed
    ([04 §7](../architecture/04-database-architecture.md#7-migrations--seeding)).
-2. **Types**: add Zod DTOs to `@influencer/types` — `CategorySchema`, `SubmitCategoryResponseInput`,
+2. **Types**: add Zod DTOs to `@binaryiq/types` — `CategorySchema`, `SubmitCategoryResponseInput`,
    `UpdateProfileInput`, `ChangeEmailInput`, `ChangePasswordInput`, `UpdatePaypalInput`,
    `UpdateAboutYouInput`, and the **`schemaToZod`** helper (shared client + server).
 3. **`ProfileSurveysModule`**: controller + service; implement list (join completion), get-schema,
@@ -684,7 +684,7 @@ Coverage targets/tooling per [08-testing-strategy](../architecture/08-testing-st
 ## Related documents
 
 - [00-project-overview](../00-project-overview.md) — module map, points/INR constant, spec gaps.
-- [Influencer_Platform_Full_Breakdown](../Influencer_Platform_Full_Breakdown.md) — §2.3 account tabs,
+- [BinaryIQ_Full_Breakdown](../BinaryIQ_Full_Breakdown.md) — §2.3 account tabs,
   §5.1 the 14 categories, §4.2 points table.
 - [03-backend-architecture](../architecture/03-backend-architecture.md) — modules, `PointsService`, transactions.
 - [04-database-architecture](../architecture/04-database-architecture.md) — models + ledger rules.

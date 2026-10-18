@@ -6,7 +6,7 @@ import type {
   AdminAnnouncementPage,
   CreateAnnouncementInput,
   UpdateAnnouncementInput,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Injectable } from '@nestjs/common';
 
 import { NotFoundException } from '../../common/exceptions/domain.exception';

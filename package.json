@@ -1,5 +1,5 @@
 {
-  "name": "influencer-platform",
+  "name": "binaryiq",
   "version": "0.0.0",
   "private": true,
   "packageManager": "pnpm@9.12.0",
@@ -13,15 +13,15 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:integration": "turbo run test:integration",
-    "db:generate": "pnpm --filter @influencer/db generate",
-    "db:migrate": "pnpm --filter @influencer/db migrate:dev",
-    "db:seed": "pnpm --filter @influencer/db seed",
+    "db:generate": "pnpm --filter @binaryiq/db generate",
+    "db:migrate": "pnpm --filter @binaryiq/db migrate:dev",
+    "db:seed": "pnpm --filter @binaryiq/db seed",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "prepare": "husky || true"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.5.0",
-    "@influencer/config": "workspace:*",
+    "@binaryiq/config": "workspace:*",
     "@commitlint/config-conventional": "^19.5.0",
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10",

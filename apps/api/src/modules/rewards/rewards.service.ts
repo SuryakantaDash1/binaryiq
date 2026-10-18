@@ -1,13 +1,13 @@
 import { randomUUID } from 'node:crypto';
 
-import { Prisma, type RewardType } from '@influencer/db';
+import { Prisma, type RewardType } from '@binaryiq/db';
 import type {
   CreateRewardInput,
   UpdateRewardInput,
   RedeemInput,
   UpdateRedemptionStatusInput,
   RedemptionQuery,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Injectable, Logger } from '@nestjs/common';
 
 import {

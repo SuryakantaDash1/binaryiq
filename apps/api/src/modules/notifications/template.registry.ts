@@ -1,4 +1,4 @@
-import type { NotificationChannel, NotificationType } from '@influencer/db';
+import type { NotificationChannel, NotificationType } from '@binaryiq/db';
 import { Injectable } from '@nestjs/common';
 
 export interface TemplateResult {
@@ -28,7 +28,7 @@ export class TemplateRegistry {
       case 'REWARD_UPDATE':
         return { subject: 'Reward status updated', body: data.message ?? 'Your reward redemption status has been updated.' };
       case 'OFFERS_NEWS':
-        return { subject: 'News from Influencer Platform', body: data.message ?? "Check out what's new on Influencer Platform!" };
+        return { subject: 'News from BinaryIQ', body: data.message ?? "Check out what's new on BinaryIQ!" };
       default:
         return { body: data.message ?? 'You have a new notification.' };
     }

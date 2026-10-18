@@ -1,6 +1,6 @@
 import { Article, Section } from '../_article';
 
-export const metadata = { title: 'Cookies Policy — Influencers' };
+export const metadata = { title: 'Cookies Policy — BinaryIQ' };
 
 export default function CookiesPage(): React.JSX.Element {
   return (

@@ -1,6 +1,6 @@
 # 07 — Security & Compliance ⭐
 
-The security backbone for the **Influencer Platform**. This is the authoritative doc for how we
+The security backbone for the **BinaryIQ**. This is the authoritative doc for how we
 authenticate, authorize, encrypt, validate, rate-limit, audit, and comply. Module docs and the other
 architecture docs **reference** the mechanisms here rather than redefining them. If a module changes a
 security control, it is amended here first.
@@ -10,7 +10,7 @@ Read alongside:
 [04-database-architecture](04-database-architecture.md) (encrypted `_enc` columns, `consent_logs`,
 `audit_logs`) ·
 [05-api-conventions](05-api-conventions.md) (auth, rate limiting, error codes) ·
-[Influencer_Platform_Full_Breakdown §9](../Influencer_Platform_Full_Breakdown.md) (source security spec) ·
+[BinaryIQ_Full_Breakdown §9](../BinaryIQ_Full_Breakdown.md) (source security spec) ·
 [phases/00-roadmap](../phases/00-roadmap.md) (definition-of-done).
 
 Stack context: **Next.js** frontend, **NestJS** API (`apps/api`), **PostgreSQL 15 + Prisma**, **Redis**.
@@ -220,7 +220,7 @@ Notes:
     script-src 'self';
     style-src 'self';
     img-src 'self' data: https:;
-    connect-src 'self' https://api.*.influencerplatform.app;
+    connect-src 'self' https://api.*.binaryiq.app;
     frame-ancestors 'none';
     base-uri 'self';
     form-action 'self';
@@ -505,5 +505,5 @@ the audit/hardening/sign-off pass, not the first consideration.
 
 - Data model, `_enc` columns, `consent_logs`, `audit_logs`: [04-database-architecture](04-database-architecture.md)
 - Auth header, error codes, rate limits, CORS/validation contract: [05-api-conventions](05-api-conventions.md)
-- Source security spec: [Influencer_Platform_Full_Breakdown §9](../Influencer_Platform_Full_Breakdown.md)
+- Source security spec: [BinaryIQ_Full_Breakdown §9](../BinaryIQ_Full_Breakdown.md)
 - Phase gates / definition-of-done: [phases/00-roadmap](../phases/00-roadmap.md)

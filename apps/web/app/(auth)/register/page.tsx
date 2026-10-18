@@ -6,8 +6,8 @@ import {
   registerStep2Schema,
   type RegisterStep1Input,
   type RegisterStep2Input,
-} from '@influencer/types';
-import { Heading, Text } from '@influencer/ui';
+} from '@binaryiq/types';
+import { Heading, Text } from '@binaryiq/ui';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';

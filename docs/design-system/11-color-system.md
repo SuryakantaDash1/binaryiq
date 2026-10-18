@@ -5,7 +5,7 @@ into the Tailwind theme in `packages/config`. Components reference **semantic to
 `bg-primary`, `text-muted`), never raw hex. This keeps the UI consistent and makes theming/dark-mode a
 config change, not a code change.
 
-Brand anchor: the reference platform (Toluna) magenta `#E91E8C`. We build a full, accessible scale
+Brand anchor: the brand magenta `#E91E8C`. We build a full, accessible scale
 around it rather than using one flat pink.
 
 ---

@@ -1,6 +1,6 @@
 'use client';
 
-import { Skeleton } from '@influencer/ui';
+import { Skeleton } from '@binaryiq/ui';
 import { Brain } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@influencer/ui';
+import { Button } from '@binaryiq/ui';
 import { dataRightsApi } from '@/lib/api/data-rights.js';
 
 const STORAGE_KEY = 'cookie_consent_v1';

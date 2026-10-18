@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Switch, Alert, Skeleton, Modal, Heading, Text } from '@influencer/ui';
+import { Button, Switch, Alert, Skeleton, Modal, Heading, Text } from '@binaryiq/ui';
 import { dataRightsApi, type ConsentState, type ConsentType } from '@/lib/api/data-rights.js';
 import { ApiError } from '@/lib/api/client.js';
 

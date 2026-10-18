@@ -1,6 +1,6 @@
 'use client';
 
-import type { AdminAnnouncementView, CreateAnnouncementInput } from '@influencer/types';
+import type { AdminAnnouncementView, CreateAnnouncementInput } from '@binaryiq/types';
 import { useCallback, useEffect, useState } from 'react';
 
 import { adminApi } from '@/lib/api/admin';

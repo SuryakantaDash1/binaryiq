@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "@influencer nestjs",
+  "display": "@binaryiq nestjs",
   "extends": "./base.json",
   "compilerOptions": {
     "module": "CommonJS",

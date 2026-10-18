@@ -1,4 +1,4 @@
-# Influencer Platform — Complete Technical Specification (v2.0)
+# BinaryIQ — Complete Technical Specification (v2.0)
 
 *Full content breakdown — every section of the source document restated in full. Source: 23-page docx, May 2026, Confidential.*
 
@@ -8,7 +8,7 @@
 
 ### 1.1 Introduction
 
-The Influencer Platform is a survey, polls, games, and rewards community web application. Users register, build profiles, participate in surveys/polls/games, earn points, and redeem them for real-world rewards.
+The BinaryIQ is a survey, polls, games, and rewards community web application. Users register, build profiles, participate in surveys/polls/games, earn points, and redeem them for real-world rewards.
 
 ### 1.2 Platform Modules Summary
 
@@ -78,7 +78,7 @@ The registration process has a specific 4-stage flow (the document lists 5 rows 
 | Profile | Profile photo (upload/change/delete), First name, Surname, Date of birth, Gender |
 | Email | Change registered email address with re-verification |
 | Password | Change password — requires current password + new password confirmation |
-| PayPal | Link PayPal account email for reward payout — warning shown to add Toluna email to PayPal |
+| PayPal | Link PayPal account email for reward payout — warning shown to add our payout email to PayPal |
 | About You | Extended profile: address, city, PIN code, education, employment, household details |
 
 ### 2.4 Auth API Endpoints
@@ -510,14 +510,13 @@ Luna is the platform's virtual assistant chatbot. The widget appears as a floati
 
 | Field | Details |
 |---|---|
-| Document Title | Influencer Platform — Complete Technical Specification Document |
+| Document Title | BinaryIQ — Complete Technical Specification Document |
 | Version | 2.0 (Updated — Polls + Games modules added) |
 | Date | May 2026 |
 | Changes from v1.0 | Added: Module 6 (Polls), Module 7 (Games / Spin the Wheel), corrected registration flow (email verification step), updated DB tables, updated timeline |
 | Tech Stack | Next.js 14, Node.js, PostgreSQL 15, Prisma, Redis, SendGrid, Twilio, Firebase FCM, AWS S3 |
 | Compliance | India DPDP Act 2023, CERT-In 2022, GDPR-ready, SSL/TLS, AES-256 |
 | Status | Draft — Confidential |
-| Reference Platform | Toluna Influencers (toluna.com/en-IN) |
 
 *— End of Document —*
 

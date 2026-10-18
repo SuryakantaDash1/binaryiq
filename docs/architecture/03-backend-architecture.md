@@ -1,6 +1,6 @@
 # 03 — Backend Architecture ⭐
 
-The blueprint for `apps/api` — the NestJS 10 service that powers the Influencer Platform. This doc
+The blueprint for `apps/api` — the NestJS 10 service that powers the BinaryIQ. This doc
 owns **how the backend is structured and wired**: modules, layering, cross-cutting concerns, the
 shared points ledger, configuration, background jobs, provider abstractions, error mapping, health,
 and testing seams.

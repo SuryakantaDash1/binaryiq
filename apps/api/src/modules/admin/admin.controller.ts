@@ -5,7 +5,7 @@ import {
   type AdminUpdateUserInput,
   type AdminUsersQuery,
   type AdminUsersResult,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Body, Controller, Get, Ip, Param, Put, Query, UsePipes } from '@nestjs/common';
 
 import { CurrentUser, type AuthenticatedUser } from '../../common/decorators/current-user.decorator';

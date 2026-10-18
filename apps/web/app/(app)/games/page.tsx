@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Skeleton } from '@influencer/ui';
+import { Alert, Skeleton } from '@binaryiq/ui';
 import { Coins, Gamepad2, HelpCircle, Lock } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useState } from 'react';

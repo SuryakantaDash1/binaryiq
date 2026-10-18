@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "@influencer base",
+  "display": "@binaryiq base",
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "composite": false,

@@ -1,7 +1,7 @@
 'use client';
 
 
-import { Alert, Badge, Heading, Skeleton, Text } from '@influencer/ui';
+import { Alert, Badge, Heading, Skeleton, Text } from '@binaryiq/ui';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 

@@ -1,4 +1,4 @@
-import { Button, Heading, Text } from '@influencer/ui';
+import { Button, Heading, Text } from '@binaryiq/ui';
 import Link from 'next/link';
 
 export default function NotFound(): React.JSX.Element {

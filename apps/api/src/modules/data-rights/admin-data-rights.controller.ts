@@ -3,7 +3,7 @@ import {
   adminConsentQuerySchema,
   type AdminAuditLogQuery,
   type AdminConsentQuery,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Controller, Get, Query } from '@nestjs/common';
 
 import { Roles } from '../../common/decorators/roles.decorator';

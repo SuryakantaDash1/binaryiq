@@ -1,5 +1,5 @@
-import type { ConsentInput, ErasureInput } from '@influencer/types';
-import { consentInputSchema, erasureInputSchema } from '@influencer/types';
+import type { ConsentInput, ErasureInput } from '@binaryiq/types';
+import { consentInputSchema, erasureInputSchema } from '@binaryiq/types';
 import { Body, Controller, Delete, Get, HttpCode, Ip, Param, ParseUUIDPipe, Post } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 

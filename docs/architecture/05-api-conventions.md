@@ -3,7 +3,7 @@
 The contract every endpoint follows. Module docs specify *which* endpoints exist and their DTOs; the
 **shape, envelope, errors, auth, and pagination rules live here** and are not repeated per module.
 
-Base URL: `https://api.<env>.influencerplatform.app/v1` — served by the NestJS app (`apps/api`).
+Base URL: `https://api.<env>.binaryiq.app/v1` — served by the NestJS app (`apps/api`).
 The Next.js frontend calls the API via a typed client generated from `packages/types`.
 
 ---

@@ -20,7 +20,7 @@ architecture and design backbones:
 - Security & compliance (DPO/GRO routing, ownership, XSS, audit): [07-security-compliance.md](../architecture/07-security-compliance.md).
 - UI kit & patterns: [13-components-library.md](../design-system/13-components-library.md) (`ChatWidget`,
   `Modal`, `Button`, `DataTable`, `Badge`) · [14-patterns.md](../design-system/14-patterns.md).
-- Product spec source: [Influencer_Platform_Full_Breakdown.md §8](../Influencer_Platform_Full_Breakdown.md).
+- Product spec source: [BinaryIQ_Full_Breakdown.md §8](../BinaryIQ_Full_Breakdown.md).
 - Notifications this module reuses: [module-07-notifications.md](module-07-notifications.md).
 
 ---
@@ -38,7 +38,7 @@ whole conversation captured on the ticket for the admin.
 
 ### 1.1 Rule-based by design (not an LLM)
 
-Per [spec §8.2](../Influencer_Platform_Full_Breakdown.md), Luna is a **rule-based / decision-tree FAQ
+Per [spec §8.2](../BinaryIQ_Full_Breakdown.md), Luna is a **rule-based / decision-tree FAQ
 bot**. Topics are **predefined trees of nodes** (a message plus a set of option buttons); the user
 navigates by clicking options. There is **no LLM / NLP** in this release: the bot never free-text
 generates, never calls a model, and its answers are deterministic and reviewable. This makes Luna:
@@ -418,7 +418,7 @@ Prefixed `/admin/support/*`, protected by `AdminGuard` + `@Roles(SUPPORT, ADMIN,
 
 ## 7. Frontend
 
-Consumes `@influencer/ui` only ([06-frontend §6](../architecture/06-frontend-architecture.md#6-component-reuse-strategy));
+Consumes `@binaryiq/ui` only ([06-frontend §6](../architecture/06-frontend-architecture.md#6-component-reuse-strategy));
 no bespoke modals/buttons/tables.
 
 ### 7.1 `ChatWidget` (member, all authed pages)
@@ -670,4 +670,4 @@ Ties to [07-security-compliance.md §11 (Phase 8 checklist)](../architecture/07-
   `Button`, `DataTable`, `Badge`.
 - [14-patterns.md](../design-system/14-patterns.md) — form / modal / data-table / feedback patterns.
 - [module-07-notifications.md](module-07-notifications.md) — admin + DPO notification transport.
-- [Influencer_Platform_Full_Breakdown.md §8](../Influencer_Platform_Full_Breakdown.md) — source spec.
+- [BinaryIQ_Full_Breakdown.md §8](../BinaryIQ_Full_Breakdown.md) — source spec.

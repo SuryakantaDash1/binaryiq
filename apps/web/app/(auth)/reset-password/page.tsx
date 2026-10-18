@@ -1,8 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { resetPasswordSchema, type ResetPasswordInput } from '@influencer/types';
-import { Button, FormField, Heading, Input, Text } from '@influencer/ui';
+import { resetPasswordSchema, type ResetPasswordInput } from '@binaryiq/types';
+import { Button, FormField, Heading, Input, Text } from '@binaryiq/ui';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';

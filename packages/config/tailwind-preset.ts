@@ -2,7 +2,7 @@ import type { Config } from 'tailwindcss';
 
 /**
  * Shared Tailwind preset. Maps the semantic CSS variables defined in
- * `@influencer/ui/styles/tokens.css` to Tailwind utilities so both the web app
+ * `@binaryiq/ui/styles/tokens.css` to Tailwind utilities so both the web app
  * and Storybook render identically. Components reference semantic tokens
  * (e.g. `bg-primary`, `text-muted`) — never raw hex. See design-system/11.
  */

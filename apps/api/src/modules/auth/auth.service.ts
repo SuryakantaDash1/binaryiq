@@ -11,7 +11,7 @@ import {
   type VerifyEmailResult,
   type ForgotPasswordInput,
   type ResetPasswordInput,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Injectable, Logger } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 

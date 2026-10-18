@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Heading, Text } from '@influencer/ui';
+import { Button, Heading, Text } from '@binaryiq/ui';
 
 export default function GlobalError({
   reset,

@@ -1,7 +1,7 @@
 /**
  * Static mock content for the Community page's Forum tab.
  * No backend exists for forum/contests, so this stands in for a future CMS.
- * Brand-safe: no "Toluna" text — everything is "Influencers"/"our".
+ * Brand-safe: everything is "BinaryIQ"/"our".
  */
 
 export interface ForumCategory {

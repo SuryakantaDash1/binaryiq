@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { TolunaSurvey } from '@/features/profile-surveys/TolunaSurvey';
+import { ProfileSurveyPanel } from '@/features/profile-surveys/ProfileSurveyPanel';
 import { profileSurveysApi } from '@/lib/api/profile-surveys';
 import type { CategoryListResult, CategoryDetail } from '@/lib/api/profile-surveys';
 
@@ -110,7 +110,7 @@ export default function ProfileSurveysPage(): React.JSX.Element {
 
   if (view.kind === 'survey') {
     return (
-      <TolunaSurvey
+      <ProfileSurveyPanel
         categoryKey={view.detail.key}
         name={view.detail.name}
         schema={view.detail.schema}

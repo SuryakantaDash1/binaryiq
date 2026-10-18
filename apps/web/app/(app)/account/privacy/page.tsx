@@ -1,4 +1,4 @@
-import { Heading, Text } from '@influencer/ui';
+import { Heading, Text } from '@binaryiq/ui';
 import { ConsentCentre } from '../../../../features/privacy/ConsentCentre.js';
 
 export default function PrivacyPage(): React.JSX.Element {

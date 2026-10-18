@@ -1,8 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, type LoginInput } from '@influencer/types';
-import { Button, FormField, Heading, Input, Text } from '@influencer/ui';
+import { loginSchema, type LoginInput } from '@binaryiq/types';
+import { Button, FormField, Heading, Input, Text } from '@binaryiq/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';

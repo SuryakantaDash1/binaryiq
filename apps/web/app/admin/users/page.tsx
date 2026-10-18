@@ -1,6 +1,6 @@
 'use client';
 
-import type { AdminUserRow } from '@influencer/types';
+import type { AdminUserRow } from '@binaryiq/types';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 

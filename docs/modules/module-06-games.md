@@ -9,7 +9,7 @@ This doc specifies *what* the Games module builds and *how its flows behave*. It
 the cross-cutting contracts, which live in the backbone docs and are referenced, not duplicated:
 
 - Product scope, module map, points/INR constant → [00-project-overview](../00-project-overview.md)
-- Detailed spec (§7 Games) → [Influencer_Platform_Full_Breakdown](../Influencer_Platform_Full_Breakdown.md)
+- Detailed spec (§7 Games) → [BinaryIQ_Full_Breakdown](../BinaryIQ_Full_Breakdown.md)
 - Backend structure, layering, `PointsService`, jobs → [03-backend-architecture](../architecture/03-backend-architecture.md)
 - Data model (`Game`/`GameSegment`/`GamePlay`), ledger rules, Redis keys → [04-database-architecture](../architecture/04-database-architecture.md)
 - Envelope, error codes, auth, pagination → [05-api-conventions](../architecture/05-api-conventions.md)
@@ -216,7 +216,7 @@ Both the Redis TTL and `playDate` depend on a single, well-defined "day" boundar
 
 All endpoints follow [05-api-conventions](../architecture/05-api-conventions.md): `/v1` prefix,
 `Bearer` JWT auth, the standard success/error **envelope**, and the canonical error codes. DTOs are
-Zod schemas in `@influencer/types`. Base prefix: `/v1/games`, admin under `/v1/admin/games`.
+Zod schemas in `@binaryiq/types`. Base prefix: `/v1/games`, admin under `/v1/admin/games`.
 
 ### 5.1 Member endpoints
 
@@ -399,7 +399,7 @@ const targetAngle =
 // duration 3–4s; requestAnimationFrame for 60fps; deceleration via --ease-emphasis
 ```
 
-- `angle = (360 / 8) * segmentIndex + randomFullRotations`, per spec [§7.8](../Influencer_Platform_Full_Breakdown.md),
+- `angle = (360 / 8) * segmentIndex + randomFullRotations`, per spec [§7.8](../BinaryIQ_Full_Breakdown.md),
   with the half-slice offset so the pointer sits on the slice's center, not its edge.
 - Easing: CSS `cubic-bezier` deceleration (`--ease-emphasis`) — one of the **sanctioned long-motion
   exceptions** ([10 §5](../design-system/10-design-principles.md)). Duration 3–4 s.
@@ -594,7 +594,7 @@ Games builds almost entirely on existing infrastructure — it introduces no new
    conditional `PointsService.award`) → post-commit Redis `SET`; map `P2002` → `409`.
 6. **`spin/status`, `getGames`, `getGame`, `history`** service methods (ownership-scoped; `probability`
    omitted from `GameDetail`).
-7. **`GamesController`** — thin `/games/*` routes, DTOs in `@influencer/types`, Zod validation.
+7. **`GamesController`** — thin `/games/*` routes, DTOs in `@binaryiq/types`, Zod validation.
 8. **Admin** — `GET/POST /admin/games`, `PUT /admin/games/:id/segments` with sum=1.0 validation +
    `audit_logs`.
 9. **Types package** — `SpinResult`, `GameDetail`, `SegmentView`, `SpinStatus`, `SegmentInput` schemas.
@@ -648,7 +648,7 @@ Games builds almost entirely on existing infrastructure — it introduces no new
 ## Related documents
 
 - [00-project-overview](../00-project-overview.md) — module map, points/INR constant, spin range decision (§7.5).
-- [Influencer_Platform_Full_Breakdown §7](../Influencer_Platform_Full_Breakdown.md) — source spec (Redis, server-side outcome, flow).
+- [BinaryIQ_Full_Breakdown §7](../BinaryIQ_Full_Breakdown.md) — source spec (Redis, server-side outcome, flow).
 - [03-backend-architecture](../architecture/03-backend-architecture.md) — modules, `PointsService`, jobs, spin-reset via TTL.
 - [04-database-architecture](../architecture/04-database-architecture.md) — `Game`/`GameSegment`/`GamePlay`, ledger rules, Redis keys.
 - [05-api-conventions](../architecture/05-api-conventions.md) — envelope, error codes, auth, pagination.

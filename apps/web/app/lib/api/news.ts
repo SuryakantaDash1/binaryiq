@@ -1,4 +1,4 @@
-import type { ArticlePage } from '@influencer/types';
+import type { ArticlePage } from '@binaryiq/types';
 
 import { apiFetch } from './client.js';
 

@@ -1,6 +1,6 @@
 # 10 — Design Principles ⭐
 
-The north-star for how the **Influencer Platform** looks, feels, and behaves. Every screen, component,
+The north-star for how the **BinaryIQ** looks, feels, and behaves. Every screen, component,
 and micro-interaction should trace back to the vision and principles here. This document is the
 _"why"_; the [color system](11-color-system.md), [typography](12-typography.md), and
 [components library](13-components-library.md) are the _"what"_ and _"how"_.

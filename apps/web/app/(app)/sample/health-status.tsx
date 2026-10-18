@@ -1,6 +1,6 @@
 'use client';
 
-import type { HealthReady } from '@influencer/types';
+import type { HealthReady } from '@binaryiq/types';
 import { useQuery } from '@tanstack/react-query';
 
 import { Badge } from '@/components/badge';

@@ -30,7 +30,7 @@ export default function InfoLayout({
           <Link href="/terms" className="hover:text-gray-900 hover:underline">Terms</Link>
           <Link href="/privacy" className="hover:text-gray-900 hover:underline">Privacy</Link>
         </div>
-        <p className="mt-4 text-center text-xs text-gray-400">© 2026 Influencers. All rights reserved.</p>
+        <p className="mt-4 text-center text-xs text-gray-400">© 2026 BinaryIQ. All rights reserved.</p>
       </footer>
     </div>
   );

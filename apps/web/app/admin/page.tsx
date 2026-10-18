@@ -1,6 +1,6 @@
 'use client';
 
-import type { AdminStats } from '@influencer/types';
+import type { AdminStats } from '@binaryiq/types';
 import {
   Activity,
   Coins,

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { DataTable, type Column, Skeleton, EmptyState, Heading, Text } from '@influencer/ui';
+import { DataTable, type Column, Skeleton, EmptyState, Heading, Text } from '@binaryiq/ui';
 import { dataRightsApi } from '@/lib/api/data-rights.js';
 
 type AuditRow = {

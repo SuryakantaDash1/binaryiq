@@ -5,7 +5,7 @@ import {
   type CreateSurveyInput,
   updateSurveySchema,
   type UpdateSurveyInput,
-} from '@influencer/types';
+} from '@binaryiq/types';
 import { Body, Controller, Get, HttpCode, Param, Post, Put, Query } from '@nestjs/common';
 import { z } from 'zod';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge, Button, Heading, Select, Skeleton, Text } from '@influencer/ui';
+import { Badge, Button, Heading, Select, Skeleton, Text } from '@binaryiq/ui';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 

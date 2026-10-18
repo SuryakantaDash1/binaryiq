@@ -1,6 +1,6 @@
 'use client';
 
-import { Switch, Skeleton, Alert, Heading, Text } from '@influencer/ui';
+import { Switch, Skeleton, Alert, Heading, Text } from '@binaryiq/ui';
 import { useState, useEffect, useCallback } from 'react';
 
 

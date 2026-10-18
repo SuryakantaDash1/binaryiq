@@ -1,6 +1,6 @@
 'use client';
 
-import type { AdminLoginChallenge } from '@influencer/types';
+import type { AdminLoginChallenge } from '@binaryiq/types';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 

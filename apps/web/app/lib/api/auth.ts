@@ -8,7 +8,7 @@ import type {
   VerifyEmailResult,
   ForgotPasswordInput,
   ResetPasswordInput,
-} from '@influencer/types';
+} from '@binaryiq/types';
 
 import { apiFetch } from './client';
 import { clearToken, setToken } from './session.js';

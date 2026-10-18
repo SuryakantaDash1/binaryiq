@@ -9,7 +9,7 @@ API contracts, frontend, backend, points rules, tasks, acceptance criteria, and 
 It **references** the backbone docs rather than restating them:
 
 - Product context & module map → [../00-project-overview.md](../00-project-overview.md)
-- Source spec (§6 Polls, endpoints + vote flow) → [../Influencer_Platform_Full_Breakdown.md](../Influencer_Platform_Full_Breakdown.md)
+- Source spec (§6 Polls, endpoints + vote flow) → [../BinaryIQ_Full_Breakdown.md](../BinaryIQ_Full_Breakdown.md)
 - Backend structure, layering, `PointsService` → [../architecture/03-backend-architecture.md](../architecture/03-backend-architecture.md)
 - Data model (`Poll`, `PollOption`, `PollVote`) + ledger rules → [../architecture/04-database-architecture.md](../architecture/04-database-architecture.md)
 - Envelope, error codes, endpoint-spec template → [../architecture/05-api-conventions.md](../architecture/05-api-conventions.md)
@@ -141,7 +141,7 @@ teaser then reads *"0 polls are eager for your input"* and its CTA is de-emphasi
 
 Record vote → award 15 via `PointsService` (same tx) → increment `poll.totalVotes` + each
 `option.voteCount` → return results → homepage unvoted count decrements. See
-[../Influencer_Platform_Full_Breakdown.md](../Influencer_Platform_Full_Breakdown.md) §6.6.
+[../BinaryIQ_Full_Breakdown.md](../BinaryIQ_Full_Breakdown.md) §6.6.
 
 ---
 
@@ -203,7 +203,7 @@ guarantee, not application-level bookkeeping.
 All endpoints live under `/v1/polls/*` (member) and `/v1/admin/polls/*` (admin) and follow the global
 **envelope, status codes, and error codes** in
 [05-api-conventions §2–§4](../architecture/05-api-conventions.md#2-response-envelope-always). DTOs are
-Zod schemas in `@influencer/types` shared by API and frontend. Responses shown are the **unwrapped
+Zod schemas in `@binaryiq/types` shared by API and frontend. Responses shown are the **unwrapped
 `data`** (the interceptor wraps it in `{ data, error, meta }`).
 
 ### 5.1 Member endpoints
@@ -339,7 +339,7 @@ Structure, RSC/client rules, and the typed API client are defined in
 | `app/(app)/polls/[id]/page.tsx` | **RSC** shell + `VotePanel` island | fetches `GET /polls/:id` server-side; the vote/results interactivity is the client island |
 
 Feature code lives in `apps/web/features/polls/` (`components/`, `hooks/`, `index.ts`) and **composes
-`@influencer/ui` only** — no bespoke buttons/cards/bars
+`@binaryiq/ui` only** — no bespoke buttons/cards/bars
 ([06 §6](../architecture/06-frontend-architecture.md#6-component-reuse-strategy)).
 
 ### 6.2 Components (from the shared kit)
@@ -588,7 +588,7 @@ This module **adds almost no new primitives** — it wires existing ones:
   supplies the `POLL_VOTE` action + idempotency key.
 - **UI kit:** `PollCard`, `PollResultBars`, `ModuleTeaserCard`, `RadioGroup`, `CheckboxGroup`/
   `MultiSelect`, `Button`, `PointsPill`, `Modal`, `EmptyState`, `Skeleton`, `Alert`, `ProgressBar` —
-  all pre-existing in `@influencer/ui` ([13](../design-system/13-components-library.md)).
+  all pre-existing in `@binaryiq/ui` ([13](../design-system/13-components-library.md)).
 - **Patterns:** form ([14 §1](../design-system/14-patterns.md#1-form-pattern-the-canonical-form)),
   list+card ([14 §6](../design-system/14-patterns.md#6-list--card-pattern)),
   empty/loading/error ([14 §3](../design-system/14-patterns.md#3-empty--loading--error-state-pattern)),
@@ -598,7 +598,7 @@ This module **adds almost no new primitives** — it wires existing ones:
 - **Admin:** `AdminGuard`, `DataTable`, `Modal` form, `audit_logs` — reused from the admin shell.
 
 New Polls-only code: `PollsModule`/`PollsController`/`PollsService`, the `VoteInput`/`PollResult` Zod
-DTOs in `@influencer/types`, and the `features/polls/*` hooks/components that compose the kit.
+DTOs in `@binaryiq/types`, and the `features/polls/*` hooks/components that compose the kit.
 
 ---
 
@@ -634,7 +634,7 @@ DTOs in `@influencer/types`, and the `features/polls/*` hooks/components that co
 ## 11. Tasks (ordered)
 
 1. **DTOs & types** — add `VoteInput`, `PollSummary`, `PollDetail`, `PollResult`, `CreatePollInput`,
-   `UpdatePollInput` Zod schemas to `@influencer/types` (shared by API + web).
+   `UpdatePollInput` Zod schemas to `@binaryiq/types` (shared by API + web).
 2. **Prisma** — confirm `Poll`/`PollOption`/`PollVote` migration (models already in
    [04-database §4](../architecture/04-database-architecture.md#4-prisma-schema-authoritative));
    ensure `@@unique([pollId, userId])`, `@@index([isActive])`, `@@index([pollId])`, `@@index([userId])`.
@@ -717,7 +717,7 @@ admin mutation writes an `audit_logs` row; non-admin token → `403 FORBIDDEN`.
 ## Related documents
 
 - [../00-project-overview.md](../00-project-overview.md) — vision, module map, points/INR constant.
-- [../Influencer_Platform_Full_Breakdown.md](../Influencer_Platform_Full_Breakdown.md) — source spec §6 (Polls).
+- [../BinaryIQ_Full_Breakdown.md](../BinaryIQ_Full_Breakdown.md) — source spec §6 (Polls).
 - [../architecture/03-backend-architecture.md](../architecture/03-backend-architecture.md) — modules, layering, `PointsService`.
 - [../architecture/04-database-architecture.md](../architecture/04-database-architecture.md) — `Poll`/`PollOption`/`PollVote`, ledger rules.
 - [../architecture/05-api-conventions.md](../architecture/05-api-conventions.md) — envelope, error codes, endpoint template.

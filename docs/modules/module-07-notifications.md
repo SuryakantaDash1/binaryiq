@@ -19,7 +19,7 @@ than restating it:
 - Shared components (`Switch`, `NotificationBell`, `DataTable`, `EmptyState`, `Tabs`) →
   [design-system/13-components-library.md](../design-system/13-components-library.md);
   patterns → [design-system/14-patterns.md](../design-system/14-patterns.md).
-- Product spec facts → [Influencer_Platform_Full_Breakdown.md §3](../Influencer_Platform_Full_Breakdown.md).
+- Product spec facts → [BinaryIQ_Full_Breakdown.md §3](../BinaryIQ_Full_Breakdown.md).
 
 ---
 
@@ -495,7 +495,7 @@ verified by provider signature, processed idempotently (§5.6). Handlers live in
 
 ## 7. Frontend
 
-Consumes `@influencer/ui` only ([13-components](../design-system/13-components-library.md)) and the
+Consumes `@binaryiq/ui` only ([13-components](../design-system/13-components-library.md)) and the
 patterns in [14-patterns](../design-system/14-patterns.md). Nothing here ships a one-off toggle, table,
 or empty state.
 
@@ -767,7 +767,7 @@ provider tokens (noop doubles), and a fake `Queue`.
 
 ## Related documents
 
-- [Influencer_Platform_Full_Breakdown.md §3](../Influencer_Platform_Full_Breakdown.md) — notification spec.
+- [BinaryIQ_Full_Breakdown.md §3](../BinaryIQ_Full_Breakdown.md) — notification spec.
 - [architecture/03-backend-architecture.md](../architecture/03-backend-architecture.md) — providers, queues, processor.
 - [architecture/04-database-architecture.md](../architecture/04-database-architecture.md) — Notification / preference / token schema.
 - [architecture/05-api-conventions.md](../architecture/05-api-conventions.md) — envelope, errors, pagination, webhooks.

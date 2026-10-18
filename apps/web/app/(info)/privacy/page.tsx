@@ -1,13 +1,13 @@
 import { Article, Section } from '../_article';
 
-export const metadata = { title: 'Privacy Policy — Influencers' };
+export const metadata = { title: 'Privacy Policy — BinaryIQ' };
 
 export default function PrivacyPage(): React.JSX.Element {
   return (
     <Article title="Privacy Policy" updated="August 2026">
       <p>
         Your privacy matters to us. This policy explains what personal data we collect when you use
-        Influencers, why we collect it, and the choices you have. By creating an account you agree to
+        BinaryIQ, why we collect it, and the choices you have. By creating an account you agree to
         the practices described here.
       </p>
 
@@ -39,8 +39,8 @@ export default function PrivacyPage(): React.JSX.Element {
         <p>
           You can access, correct, export or delete your personal data at any time from your account
           settings. To exercise any of these rights or ask a question, contact us at{' '}
-          <a href="mailto:privacy@influencers.example" className="text-brand-800 underline">
-            privacy@influencers.example
+          <a href="mailto:privacy@binaryiq.app" className="text-brand-800 underline">
+            privacy@binaryiq.app
           </a>
           .
         </p>

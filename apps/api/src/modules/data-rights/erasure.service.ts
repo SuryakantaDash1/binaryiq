@@ -1,4 +1,4 @@
-import type { ErasureInput } from '@influencer/types';
+import type { ErasureInput } from '@binaryiq/types';
 import { Injectable, Logger } from '@nestjs/common';
 
 import { PrismaService } from '../../prisma/prisma.service';

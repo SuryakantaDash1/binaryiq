@@ -1,4 +1,4 @@
-import type { ApiResponse, ApiErrorCode } from '@influencer/types';
+import type { ApiResponse, ApiErrorCode } from '@binaryiq/types';
 
 import { clearToken, getToken, setToken } from './session.js';
 
