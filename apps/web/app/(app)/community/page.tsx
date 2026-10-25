@@ -9,11 +9,9 @@ import { AnnouncementCard } from '@/features/community/AnnouncementCard';
 import { CommunityNotificationSettings } from '@/features/community/CommunityNotificationSettings';
 import { FORUM_CATEGORIES } from '@/features/community/community-data';
 import { IndustryUpdateCard } from '@/features/community/IndustryUpdateCard';
+import { useSiteImage } from '@/features/site-images/SiteImages';
 import { communityApi } from '@/lib/api/community';
 import { newsApi } from '@/lib/api/news';
-
-const HERO_IMG =
-  '/images/community-hero.jpg';
 
 type Tab = 'news' | 'updates' | 'contests' | 'forum' | 'settings';
 const TABS: { key: Tab; label: string }[] = [
@@ -25,13 +23,14 @@ const TABS: { key: Tab; label: string }[] = [
 ];
 
 export default function CommunityPage(): React.JSX.Element {
+  const heroImg = useSiteImage('community-hero');
   const [tab, setTab] = useState<Tab>('news');
 
   return (
     <div className="mx-auto max-w-5xl">
       {/* Hero */}
       <div className="relative overflow-hidden rounded-2xl shadow-md">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMG})` }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroImg})` }} />
         <div className="absolute inset-0 bg-gradient-to-r from-ink via-brand-950/85 to-brand-800/20" />
         <div className="relative px-8 py-14 md:py-20">
           <h1 className="max-w-sm text-2xl font-black leading-snug text-white md:text-3xl">

@@ -2,10 +2,9 @@
 
 import { createContext, useContext, useState } from 'react';
 
-export type PanelVariant = 'default' | 'male' | 'female';
+import { useSiteImage } from '@/features/site-images/SiteImages';
 
-const AUTH_IMAGE =
-  '/images/people-hero.jpg';
+export type PanelVariant = 'default' | 'male' | 'female';
 
 const TEXTS: Record<PanelVariant, { top: string; big: string }> = {
   default: { top: "Let's", big: 'START' },
@@ -31,10 +30,11 @@ export function AuthPanelProvider({ children }: { children: React.ReactNode }): 
 /** Right-side image panel — its headline reacts to the selected gender. */
 export function AuthRightPanel(): React.JSX.Element {
   const { variant } = useAuthPanel();
+  const image = useSiteImage('auth');
   const text = TEXTS[variant];
   return (
     <div className="relative hidden h-screen overflow-hidden md:block md:w-1/2">
-      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${AUTH_IMAGE})` }} />
+      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})` }} />
       <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/15 to-black/5" />
       <div className="absolute inset-0 flex flex-col items-center justify-center px-10 text-center">
         <p className="text-5xl font-semibold text-white/90 drop-shadow transition-all duration-300">

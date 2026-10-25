@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 
 import { ActivityCard } from '@/features/home/ActivityCard';
 import { IndustryUpdatesCarousel } from '@/features/home/IndustryUpdatesCarousel';
+import { useSiteImage } from '@/features/site-images/SiteImages';
 import { accountApi } from '@/lib/api/account';
 import type { GameListItem } from '@/lib/api/games';
 import { gamesApi } from '@/lib/api/games';
@@ -24,15 +25,13 @@ import type { RewardItem } from '@/lib/api/rewards';
 import { rewardsApi } from '@/lib/api/rewards';
 import { surveysApi } from '@/lib/api/surveys';
 
-const HERO_IMG =
-  '/images/people-hero.jpg';
-
 const PARTNER_IMAGES = [
   '/images/partner-1.jpg',
   '/images/partner-2.jpg',
 ];
 
 export default function HomePage(): React.JSX.Element {
+  const heroImg = useSiteImage('home-hero');
   const [name, setName] = useState('');
   const [balance, setBalance] = useState(0);
   const [surveyCount, setSurveyCount] = useState(0);
@@ -151,7 +150,7 @@ export default function HomePage(): React.JSX.Element {
     <div className="mx-auto max-w-7xl">
       {/* Hero */}
       <div className="relative overflow-hidden rounded-2xl shadow-md">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMG})` }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroImg})` }} />
         <div className="absolute inset-0 bg-gradient-to-r from-ink via-brand-950/85 to-brand-800/20" />
         <div className="relative px-8 py-14 md:py-20">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white/80">

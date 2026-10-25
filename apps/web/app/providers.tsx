@@ -1,13 +1,21 @@
 'use client';
 
+import type { SiteImageMap } from '@binaryiq/types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from 'next-themes';
 import { useEffect, useState, type ReactNode } from 'react';
 
+import { SiteImagesProvider } from '@/features/site-images/SiteImages';
 import { warmUpApi } from '@/lib/api/client';
 
-/** Root client providers: server-state (TanStack Query) + theming (dark mode). */
-export function Providers({ children }: { children: ReactNode }): React.JSX.Element {
+/** Root client providers: server-state (TanStack Query), theming (dark mode) and admin-managed page images. */
+export function Providers({
+  siteImages,
+  children,
+}: {
+  siteImages: SiteImageMap | null;
+  children: ReactNode;
+}): React.JSX.Element {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -19,7 +27,9 @@ export function Providers({ children }: { children: ReactNode }): React.JSX.Elem
 
   return (
     <ThemeProvider attribute="data-theme" defaultTheme="light" enableSystem={false}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <SiteImagesProvider initial={siteImages}>{children}</SiteImagesProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

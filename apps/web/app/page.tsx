@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { LunaBubble } from '@/features/landing/LunaBubble.js';
+import { useSiteImage } from '@/features/site-images/SiteImages';
 
 // ─── Language list ────────────────────────────────────────────────────────────
 const LANGUAGES = [
@@ -65,14 +66,6 @@ const BENEFITS = [
 // "How it works" quick steps
 const STEPS = ['step1', 'step2', 'step3'] as const;
 
-// Real lifestyle/community photos (Unsplash CDN) that cross-fade like a video.
-// If offline, the panel's base gradient shows instead — no broken images.
-const HERO_IMAGES = [
-  '/images/people-hero.jpg',
-  '/images/landing-2.jpg',
-  '/images/landing-3.jpg',
-];
-
 function getStoredLocale(): string {
   if (typeof document === 'undefined') return 'en-IN';
   const m = document.cookie.match(/NEXT_LOCALE=([^;]+)/);
@@ -89,6 +82,8 @@ const FOOTER_LINKS = [
 ] as const;
 
 export default function LandingPage(): React.JSX.Element {
+  // Admin-managed photos (Site Images) that cross-fade like a looping video.
+  const heroImages = [useSiteImage('landing-1'), useSiteImage('landing-2'), useSiteImage('landing-3')];
   const t = useTranslations('landing');
   const tf = useTranslations('footer');
   const [lang, setLang] = useState('en-IN');
@@ -222,9 +217,9 @@ export default function LandingPage(): React.JSX.Element {
       {/* ── Right Panel (50%) — cross-fading real photos ───────────── */}
       <div className="relative hidden w-1/2 overflow-hidden bg-gradient-to-br from-ink to-brand-950 md:flex">
         {/* Real lifestyle photos cross-fade to feel like a looping video */}
-        <div className="photo-scene ps-1 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMAGES[0]})` }} />
-        <div className="photo-scene ps-2 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMAGES[1]})` }} />
-        <div className="photo-scene ps-3 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMAGES[2]})` }} />
+        <div className="photo-scene ps-1 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroImages[0]})` }} />
+        <div className="photo-scene ps-2 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroImages[1]})` }} />
+        <div className="photo-scene ps-3 absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroImages[2]})` }} />
 
         {/* Neutral scrim so the photos show naturally — just enough for text contrast */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/15 to-black/5" />

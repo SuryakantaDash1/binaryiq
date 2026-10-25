@@ -23,6 +23,7 @@ import { PointsModule } from './modules/points/points.module';
 import { PollsModule } from './modules/polls/polls.module';
 import { ProfileSurveysModule } from './modules/profile-surveys/profile-surveys.module';
 import { RewardsModule } from './modules/rewards/rewards.module';
+import { SiteImagesModule } from './modules/site-images/site-images.module';
 import { SupportModule } from './modules/support/support.module';
 import { SurveysModule } from './modules/surveys/surveys.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -36,7 +37,7 @@ import { RedisModule } from './redis/redis.module';
     QueueModule,
     AuthModule, PointsModule, HealthModule,
     AccountModule, ProfileSurveysModule, RewardsModule, SurveysModule, PollsModule, GamesModule,
-    NotificationsModule, SupportModule, DataRightsModule, AdminModule, NewsModule, CommunityModule, GeoModule,
+    NotificationsModule, SupportModule, DataRightsModule, AdminModule, NewsModule, CommunityModule, GeoModule, SiteImagesModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },

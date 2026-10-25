@@ -696,3 +696,18 @@ model Announcement {
   @@index([isActive, publishedAt])
   @@map("announcements")
 }
+
+// ─────────────────────────────────────────────────────────────
+// Admin-uploaded replacements for the public pages' photos
+// (slot names live in @binaryiq/types SITE_IMAGE_SLOTS)
+// ─────────────────────────────────────────────────────────────
+model SiteImage {
+  slot        String   @id
+  data        Bytes
+  contentType String   @map("content_type")
+  byteSize    Int      @map("byte_size")
+  updatedBy   String?  @map("updated_by") @db.Uuid
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("site_images")
+}

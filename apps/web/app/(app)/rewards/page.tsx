@@ -7,14 +7,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { RewardCatalogCard } from '@/features/rewards/RewardCatalogCard';
+import { useSiteImage } from '@/features/site-images/SiteImages';
 import { accountApi } from '@/lib/api/account';
 import { ApiError } from '@/lib/api/client';
 import { pointsApi, rewardsApi, type RewardItem } from '@/lib/api/rewards';
 
-const HERO_IMG =
-  '/images/rewards-hero.jpg';
-
 export default function RewardsPage(): React.JSX.Element {
+  const heroImg = useSiteImage('rewards-hero');
   const [rewards, setRewards] = useState<RewardItem[]>([]);
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -38,7 +37,7 @@ export default function RewardsPage(): React.JSX.Element {
     <div className="mx-auto max-w-6xl">
       {/* Hero */}
       <div className="relative overflow-hidden rounded-2xl shadow-md">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMG})` }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroImg})` }} />
         <div className="absolute inset-0 bg-gradient-to-r from-ink via-brand-950/85 to-brand-800/20" />
         <div className="relative px-8 py-14 md:py-20">
           <h1 className="max-w-md text-2xl font-black leading-snug text-white md:text-3xl">

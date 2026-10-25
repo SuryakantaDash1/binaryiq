@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google';
 import dynamic from 'next/dynamic';
 import type { ReactNode } from 'react';
 
+import { fetchSiteImages } from './lib/api/site-images';
 import { Providers } from './providers';
 import './globals.css';
 
@@ -26,12 +27,15 @@ export default async function RootLayout({ children }: { children: ReactNode }):
   const locale = await getLocale();
   const messages = await getMessages();
   const dir = RTL_LANGS.has(locale) ? 'rtl' : 'ltr';
+  // Cached for a minute, so an admin's new upload shows up within ~60s. The short
+  // timeout keeps a sleeping API from stalling the page; defaults render instead.
+  const siteImages = await fetchSiteImages({ next: { revalidate: 60 }, signal: AbortSignal.timeout(1000) });
 
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning className={inter.variable}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <Providers>{children}</Providers>
+          <Providers siteImages={siteImages}>{children}</Providers>
         </NextIntlClientProvider>
         <CookieBanner />
       </body>

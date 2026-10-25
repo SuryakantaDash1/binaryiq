@@ -7,12 +7,13 @@ const apiOrigin = new URL(process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4
 
 // script-src keeps 'unsafe-inline' for Next's inline bootstrap scripts; moving to a
 // nonce-based policy (via middleware) is the next step. img-src allows any https
-// host because Industry Updates thumbnails come from the publishers' feeds.
+// host because Industry Updates thumbnails come from the publishers' feeds; the API
+// origin is listed too so admin-uploaded Site Images load over http in local dev.
 const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https:",
+  `img-src 'self' data: blob: https: ${apiOrigin}`,
   "font-src 'self' data:",
   `connect-src 'self' ${apiOrigin}${isDev ? ' ws: wss:' : ''}`,
   "frame-src 'none'",

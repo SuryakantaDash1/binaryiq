@@ -3,6 +3,7 @@ import type {
   AdminAnnouncementView,
   AdminLoginChallenge,
   AdminSession,
+  AdminSiteImageView,
   AdminStats,
   AdminUserRow,
   AdminUsersResult,
@@ -11,6 +12,7 @@ import type {
   CreateFeedSourceInput,
   FeedSourcePage,
   FeedSourceView,
+  SiteImageSlot,
   UpdateAnnouncementInput,
   UpdateFeedSourceInput,
 } from '@binaryiq/types';
@@ -52,7 +54,8 @@ export function refreshAdminSession(): Promise<boolean> {
 }
 
 interface AdminFetchOptions extends Omit<RequestInit, 'body'> {
-  body?: Record<string, unknown> | null;
+  /** JSON payload, or a Blob (e.g. an image) sent as-is with its own content type. */
+  body?: Record<string, unknown> | Blob | null;
   /** Return the full { data, meta } envelope instead of unwrapping to `data`. */
   raw?: boolean;
 }
@@ -75,10 +78,10 @@ export async function adminFetch<T>(path: string, options: AdminFetchOptions = {
     res = await fetch(`${BASE_URL}${path}`, {
       ...rest,
       credentials: isAuthPath ? 'include' : 'omit',
-      body: body != null ? JSON.stringify(body) : undefined,
+      body: body instanceof Blob ? body : body != null ? JSON.stringify(body) : undefined,
       signal: rest.signal ?? controller.signal,
       headers: {
-        'content-type': 'application/json',
+        'content-type': body instanceof Blob ? body.type || 'application/octet-stream' : 'application/json',
         ...(token ? { authorization: `Bearer ${token}` } : {}),
         ...headers,
       },
@@ -187,6 +190,16 @@ export const adminApi = {
   },
   deleteAnnouncement(id: string): Promise<{ id: string }> {
     return adminFetch(`/admin/announcements/${id}`, { method: 'DELETE' });
+  },
+  // Site images (photos on the landing, auth and section pages)
+  listSiteImages(): Promise<AdminSiteImageView[]> {
+    return adminFetch('/admin/site-images');
+  },
+  uploadSiteImage(slot: SiteImageSlot, image: Blob): Promise<AdminSiteImageView> {
+    return adminFetch(`/admin/site-images/${slot}`, { method: 'PUT', body: image });
+  },
+  resetSiteImage(slot: SiteImageSlot): Promise<AdminSiteImageView> {
+    return adminFetch(`/admin/site-images/${slot}`, { method: 'DELETE' });
   },
   // Read-only resource lists (existing admin endpoints), for the linked sections.
   listSurveys(): Promise<unknown[]> {

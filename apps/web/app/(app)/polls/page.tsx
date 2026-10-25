@@ -6,14 +6,13 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { PollResultCard } from '@/features/polls/PollResultCard';
 import { SHOWCASE_POLLS } from '@/features/polls/polls-showcase-data';
+import { useSiteImage } from '@/features/site-images/SiteImages';
 import { pollsApi, type PollSummary } from '@/lib/api/polls';
-
-const HERO_IMG =
-  '/images/polls-hero.jpg';
 
 const PAGE_SIZE = 6;
 
 export default function PollsPage(): React.JSX.Element {
+  const heroImg = useSiteImage('polls-hero');
   const [live, setLive] = useState<PollSummary[]>([]);
   const [liveLoading, setLiveLoading] = useState(true);
   const [visible, setVisible] = useState(PAGE_SIZE);
@@ -34,7 +33,7 @@ export default function PollsPage(): React.JSX.Element {
     <div className="mx-auto max-w-5xl">
       {/* Hero */}
       <div className="relative overflow-hidden rounded-2xl shadow-md">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMG})` }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroImg})` }} />
         <div className="absolute inset-0 bg-gradient-to-r from-ink via-brand-950/85 to-brand-800/20" />
         <div className="relative px-8 py-14 md:py-20">
           <h1 className="text-3xl font-black text-white md:text-4xl">My Sponsored polls</h1>

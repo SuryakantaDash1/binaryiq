@@ -14,3 +14,4 @@ export * from './data-rights.js';
 export * from './admin.js';
 export * from './news.js';
 export * from './community.js';
+export * from './site-images.js';

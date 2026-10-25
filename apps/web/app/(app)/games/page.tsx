@@ -5,6 +5,7 @@ import { Coins, Gamepad2, HelpCircle, Lock } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useState } from 'react';
 
+import { useSiteImage } from '@/features/site-images/SiteImages';
 import { gamesApi, type GameDetail } from '@/lib/api/games';
 
 const SpinWheelIsland = dynamic(
@@ -15,12 +16,10 @@ const SpinWheelIsland = dynamic(
   },
 );
 
-const HERO_IMG =
-  '/images/games-hero.jpg';
-
 type Selected = 'wheel' | 'trivia';
 
 export default function GamesPage(): React.JSX.Element {
+  const heroImg = useSiteImage('games-hero');
   const [game, setGame] = useState<GameDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +52,7 @@ export default function GamesPage(): React.JSX.Element {
     <div className="mx-auto max-w-6xl">
       {/* Hero banner */}
       <div className="relative overflow-hidden rounded-2xl shadow-md">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${HERO_IMG})` }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroImg})` }} />
         <div className="absolute inset-0 bg-gradient-to-r from-ink via-brand-950/85 to-brand-800/10" />
         <div className="relative px-8 py-14 md:py-20">
           <h1 className="max-w-xs text-2xl font-black leading-snug text-white md:text-3xl">
