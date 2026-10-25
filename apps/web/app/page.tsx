@@ -73,34 +73,6 @@ const HERO_IMAGES = [
   '/images/landing-3.jpg',
 ];
 
-// Map full locale codes to base language codes (must match i18n/request.ts)
-const LOCALE_TO_LANG: Record<string, string> = {
-  'en-IN': 'en', 'en-GB': 'en', 'en-US': 'en', 'en-AU': 'en', 'en-CA': 'en',
-  'en-AE': 'en', 'en-IE': 'en', 'en-EG': 'en', 'en-SG': 'en', 'en-MY': 'en',
-  'en-PH': 'en', 'en-ZA': 'en', 'en-PK': 'en',
-  'hi-IN': 'hi',
-  'ar-AE': 'ar', 'ar-EG': 'ar', 'ar-MA': 'ar', 'ar-SA': 'ar',
-  'de-DE': 'de', 'de-AT': 'de', 'de-CH': 'de',
-  'fr-FR': 'fr', 'fr-BE': 'fr', 'fr-CA': 'fr',
-  'es-ES': 'es', 'es-MX': 'es',
-  'pt-BR': 'pt', 'pt-PT': 'pt',
-  'it-IT': 'it',
-  'nl-NL': 'nl', 'nl-BE': 'nl',
-  'pl-PL': 'pl',
-  'ru-RU': 'ru',
-  'tr-TR': 'tr',
-  'zh-CN': 'zh-CN',
-  'zh-TW': 'zh-TW',
-  'ja-JP': 'ja',
-  'ko-KR': 'ko',
-  'id-ID': 'id',
-  'ms-MY': 'ms',
-  'da-DK': 'da',
-  'sv-SE': 'sv',
-  'cs-CZ': 'cs',
-  'el-GR': 'el',
-};
-
 function getStoredLocale(): string {
   if (typeof document === 'undefined') return 'en-IN';
   const m = document.cookie.match(/NEXT_LOCALE=([^;]+)/);
@@ -146,7 +118,6 @@ export default function LandingPage(): React.JSX.Element {
       }, 400);
     }, 3000);
     return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleLangChange(e: React.ChangeEvent<HTMLSelectElement>): void {

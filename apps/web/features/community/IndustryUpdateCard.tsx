@@ -16,7 +16,6 @@ export function IndustryUpdateCard({ article }: { article: ArticleView }): React
       {/* Banner */}
       <div className="relative flex h-32 items-center justify-center overflow-hidden">
         {article.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={safeHttpUrl(article.imageUrl)}
             alt=""

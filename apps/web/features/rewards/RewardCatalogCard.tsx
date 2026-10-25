@@ -58,7 +58,6 @@ export function RewardCatalogCard({ reward, balance, onRedeemed }: RewardCatalog
         {/* Thumbnail */}
         <div className="mb-4 flex h-36 items-center justify-center overflow-hidden rounded-xl bg-gray-50 ring-1 ring-gray-100">
           {showLogo ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={safeHttpUrl(reward.imageUrl)}
               alt={reward.name}

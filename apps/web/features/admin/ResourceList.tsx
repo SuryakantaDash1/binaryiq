@@ -21,7 +21,6 @@ export function ResourceList({
       .then((r) => setRows((Array.isArray(r) ? r : []) as Record<string, unknown>[]))
       .catch(() => setError('Failed to load.'))
       .finally(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Choose columns: primitive-valued keys from the first few rows.

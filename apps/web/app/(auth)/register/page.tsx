@@ -173,7 +173,6 @@ function Step1Form({
   useEffect(() => {
     if (defaults.gender === 'MALE') setVariant('male');
     else if (defaults.gender === 'FEMALE') setVariant('female');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function isAtLeast18(dob: string): boolean {

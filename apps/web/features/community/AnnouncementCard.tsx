@@ -16,7 +16,6 @@ export function AnnouncementCard({ item }: { item: AnnouncementView }): React.JS
       {/* Banner */}
       <div className="relative flex h-40 items-center justify-center overflow-hidden">
         {item.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img src={safeHttpUrl(item.imageUrl)} alt="" className="h-full w-full object-cover" />
         ) : (
           <div className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${gradientFor(item.id)} px-4 text-center`}>

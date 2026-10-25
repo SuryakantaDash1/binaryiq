@@ -6,7 +6,6 @@ import {
   Coins,
   Gift,
   LifeBuoy,
-  ShieldCheck,
   UserCheck,
   UserPlus,
   Users,
