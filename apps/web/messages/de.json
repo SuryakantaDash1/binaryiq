@@ -98,7 +98,6 @@
     "stepAboutYou": "Über dich",
     "accountStep": "Dein Konto",
     "joinBonus": "Kostenlos und in wenigen Minuten erledigt.",
-    "signInNow": "Du kannst dich jetzt anmelden. Falls die Aktivierungs-E-Mail nicht ankommt, wende dich bitte an den Support.",
     "secureNote": "SSL-gesichert · DPDP-2023-konform",
     "backToHome": "Zur Startseite",
     "capsLock": "Feststelltaste ist aktiv",
@@ -111,7 +110,15 @@
     "ruleLength": "Mind. 8 Zeichen",
     "ruleLower": "Kleinbuchstabe",
     "ruleUpper": "Großbuchstabe",
-    "ruleNumber": "Eine Zahl"
+    "ruleNumber": "Eine Zahl",
+    "acceptToContinue": "Setze oben das Häkchen bei AGB und Datenschutz, um fortzufahren.",
+    "verifyToFinish": "Ein letzter Schritt: Bestätige {email}, um dein Konto zu aktivieren.",
+    "sendActivation": "Aktivierungs-E-Mail senden",
+    "resendPrompt": "Keine E-Mail erhalten?",
+    "resendLink": "Erneut senden",
+    "resendIn": "Erneut senden in {seconds} s",
+    "resendDone": "Gesendet! Sieh in deinem Posteingang und Spam-Ordner nach.",
+    "wakingServer": "Einen Moment noch – das kann bis zu einer Minute dauern. Bitte schließe diese Seite nicht."
   },
   "nav": {
     "surveys": "Umfragen",

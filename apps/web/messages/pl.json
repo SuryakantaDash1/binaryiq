@@ -75,7 +75,6 @@
     "stepAboutYou": "O Tobie",
     "accountStep": "Twoje konto",
     "joinBonus": "To nic nie kosztuje i zajmuje tylko kilka minut.",
-    "signInNow": "Możesz się już zalogować. Jeśli e-mail aktywacyjny nie dotrze, skontaktuj się z pomocą.",
     "secureNote": "Zabezpieczone SSL · Zgodne z DPDP 2023",
     "backToHome": "Wróć na stronę główną",
     "capsLock": "Caps Lock jest włączony",
@@ -88,7 +87,15 @@
     "ruleLength": "8+ znaków",
     "ruleLower": "Mała litera",
     "ruleUpper": "Wielka litera",
-    "ruleNumber": "Cyfra"
+    "ruleNumber": "Cyfra",
+    "acceptToContinue": "Zaznacz powyżej pole Regulaminu i Prywatności, aby kontynuować.",
+    "verifyToFinish": "Ostatni krok: potwierdź {email}, aby aktywować konto.",
+    "sendActivation": "Wyślij e-mail aktywacyjny",
+    "resendPrompt": "Nie dostałeś e-maila?",
+    "resendLink": "Wyślij ponownie",
+    "resendIn": "Wyślij ponownie za {seconds} s",
+    "resendDone": "Wysłano! Sprawdź skrzynkę odbiorczą i folder spam.",
+    "wakingServer": "Jeszcze chwila — to może potrwać do minuty. Nie zamykaj tej strony."
   },
   "nav": {
     "surveys": "Ankiety",

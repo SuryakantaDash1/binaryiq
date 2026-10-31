@@ -7,6 +7,7 @@ import type {
   AuthSession,
   VerifyEmailResult,
   ForgotPasswordInput,
+  ResendVerificationInput,
   ResetPasswordInput,
 } from '@binaryiq/types';
 
@@ -22,6 +23,13 @@ export const authApi = {
 
   registerStep2: (body: RegisterStep2Input) =>
     apiFetch<RegisterStep2Result>('/auth/register/step2', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  /** Always succeeds — the API never reveals whether the address has an account. */
+  resendVerification: (body: ResendVerificationInput) =>
+    apiFetch<{ success: true }>('/auth/resend-verification', {
       method: 'POST',
       body: JSON.stringify(body),
     }),

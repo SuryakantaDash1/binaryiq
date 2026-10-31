@@ -10,6 +10,7 @@ import {
   type AuthSession,
   type VerifyEmailResult,
   type ForgotPasswordInput,
+  type ResendVerificationInput,
   type ResetPasswordInput,
 } from '@binaryiq/types';
 import { Injectable, Logger } from '@nestjs/common';
@@ -167,6 +168,40 @@ export class AuthService {
         ? `We have sent you an activation email on ${input.email}`
         : 'Your account is ready, but we could not send the activation email right now.',
     };
+  }
+
+  /**
+   * Sends a fresh activation link to an unverified account. Always resolves the
+   * same way so the response never reveals whether an address is registered.
+   */
+  async resendVerification(input: ResendVerificationInput): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: input.email.toLowerCase() },
+      include: { profile: true },
+    });
+    if (!user || !user.isActive || user.deletedAt || user.isVerified) return;
+
+    const { raw: token, hash: tokenHash } = newOneTimeToken();
+    await this.prisma.$transaction([
+      // Only the newest activation link works.
+      this.prisma.authToken.deleteMany({ where: { userId: user.id, tokenType: 'EMAIL_VERIFICATION', usedAt: null } }),
+      this.prisma.authToken.create({
+        data: {
+          userId: user.id,
+          tokenHash,
+          tokenType: 'EMAIL_VERIFICATION',
+          expiresAt: new Date(Date.now() + VERIFY_TTL_MS),
+        },
+      }),
+    ]);
+    const { subject, html } = verificationEmail({
+      link: `${this.config.get('WEB_URL')}/verify?token=${token}`,
+      firstName: user.profile?.firstName ?? user.username,
+      webUrl: this.config.get('WEB_URL'),
+    });
+    await this.email.send({ to: user.email, subject, html }).catch((e: unknown) => {
+      this.logger.error(`Verification email (resend) not delivered: ${(e as Error).message}`);
+    });
   }
 
   /** Verify the email token, mark verified, award the welcome bonus (idempotent). */

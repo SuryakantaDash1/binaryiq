@@ -98,7 +98,6 @@
     "stepAboutYou": "Over jou",
     "accountStep": "Je account",
     "joinBonus": "Het is gratis en duurt maar een paar minuten.",
-    "signInNow": "Je kunt nu inloggen. Komt de activatiemail niet aan? Neem dan contact op met support.",
     "secureNote": "SSL-beveiligd · DPDP 2023-conform",
     "backToHome": "Terug naar home",
     "capsLock": "Caps Lock staat aan",
@@ -111,7 +110,15 @@
     "ruleLength": "8+ tekens",
     "ruleLower": "Kleine letter",
     "ruleUpper": "Hoofdletter",
-    "ruleNumber": "Een cijfer"
+    "ruleNumber": "Een cijfer",
+    "acceptToContinue": "Vink hierboven het vakje Voorwaarden en Privacy aan om door te gaan.",
+    "verifyToFinish": "Nog één stap: bevestig {email} om je account te activeren.",
+    "sendActivation": "Activatiemail versturen",
+    "resendPrompt": "Geen e-mail ontvangen?",
+    "resendLink": "Opnieuw versturen",
+    "resendIn": "Opnieuw versturen over {seconds} s",
+    "resendDone": "Verstuurd! Kijk in je inbox en spammap.",
+    "wakingServer": "We zijn ermee bezig — dit kan tot een minuut duren. Sluit deze pagina niet."
   },
   "nav": {
     "surveys": "Enquêtes",

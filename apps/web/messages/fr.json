@@ -98,7 +98,6 @@
     "stepAboutYou": "À propos de vous",
     "accountStep": "Votre compte",
     "joinBonus": "C’est gratuit et ça ne prend que quelques minutes.",
-    "signInNow": "Vous pouvez vous connecter dès maintenant. Si l’e-mail d’activation n’arrive pas, contactez le support.",
     "secureNote": "Sécurisé par SSL · Conforme au DPDP 2023",
     "backToHome": "Retour à l’accueil",
     "capsLock": "Verr. Maj est activé",
@@ -111,7 +110,15 @@
     "ruleLength": "8 caractères min.",
     "ruleLower": "Une minuscule",
     "ruleUpper": "Une majuscule",
-    "ruleNumber": "Un chiffre"
+    "ruleNumber": "Un chiffre",
+    "acceptToContinue": "Cochez la case Conditions et Confidentialité ci-dessus pour continuer.",
+    "verifyToFinish": "Dernière étape : confirmez {email} pour activer votre compte.",
+    "sendActivation": "Envoyer l’e-mail d’activation",
+    "resendPrompt": "Vous n’avez pas reçu l’e-mail ?",
+    "resendLink": "Renvoyer",
+    "resendIn": "Renvoyer dans {seconds} s",
+    "resendDone": "Envoyé ! Vérifiez votre boîte de réception et vos spams.",
+    "wakingServer": "Encore un instant — cela peut prendre jusqu’à une minute. Ne fermez pas cette page."
   },
   "nav": {
     "surveys": "Sondages",

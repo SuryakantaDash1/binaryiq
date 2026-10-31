@@ -98,7 +98,6 @@
     "stepAboutYou": "Sobre você",
     "accountStep": "Sua conta",
     "joinBonus": "É grátis e leva só alguns minutos.",
-    "signInNow": "Você já pode entrar. Se o e-mail de ativação não chegar, fale com o suporte.",
     "secureNote": "Protegido por SSL · Em conformidade com a DPDP 2023",
     "backToHome": "Voltar ao início",
     "capsLock": "Caps Lock está ativado",
@@ -111,7 +110,15 @@
     "ruleLength": "8+ caracteres",
     "ruleLower": "Letra minúscula",
     "ruleUpper": "Letra maiúscula",
-    "ruleNumber": "Um número"
+    "ruleNumber": "Um número",
+    "acceptToContinue": "Marque a caixa de Termos e Privacidade acima para continuar.",
+    "verifyToFinish": "Último passo: confirme {email} para ativar sua conta.",
+    "sendActivation": "Enviar e-mail de ativação",
+    "resendPrompt": "Não recebeu o e-mail?",
+    "resendLink": "Reenviar",
+    "resendIn": "Reenviar em {seconds} s",
+    "resendDone": "Enviado! Confira sua caixa de entrada e o spam.",
+    "wakingServer": "Ainda trabalhando nisso — pode levar até um minuto. Não feche esta página."
   },
   "nav": {
     "surveys": "Pesquisas",

@@ -75,7 +75,6 @@
     "stepAboutYou": "关于你",
     "accountStep": "你的账户",
     "joinBonus": "免费注册，只需几分钟。",
-    "signInNow": "你现在可以登录。如果没有收到激活邮件，请联系客服。",
     "secureNote": "SSL 安全保护 · 符合 DPDP 2023",
     "backToHome": "返回首页",
     "capsLock": "大写锁定已开启",
@@ -88,7 +87,15 @@
     "ruleLength": "至少 8 个字符",
     "ruleLower": "小写字母",
     "ruleUpper": "大写字母",
-    "ruleNumber": "数字"
+    "ruleNumber": "数字",
+    "acceptToContinue": "请勾选上方的条款和隐私政策复选框以继续。",
+    "verifyToFinish": "最后一步：验证 {email} 以激活你的账户。",
+    "sendActivation": "发送激活邮件",
+    "resendPrompt": "没有收到邮件？",
+    "resendLink": "重新发送",
+    "resendIn": "{seconds} 秒后可重新发送",
+    "resendDone": "已发送！请查看收件箱和垃圾邮件文件夹。",
+    "wakingServer": "正在处理，最多可能需要一分钟。请不要关闭此页面。"
   },
   "nav": {
     "surveys": "调查",

@@ -23,6 +23,9 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/v1';
  */
 export const REQUEST_TIMEOUT_MS = 70_000;
 
+const GENERIC_ERROR = 'Something went wrong on our side. Please try again in a moment.';
+const TOO_MANY = 'Too many attempts. Please wait a few minutes and try again.';
+
 let warmedUp = false;
 /** Fire-and-forget ping so a sleeping API starts waking while the user fills in a form. */
 export function warmUpApi(): void {
@@ -90,8 +93,8 @@ async function doFetch<T>(
     throw new ApiError(
       'INTERNAL_ERROR',
       aborted
-        ? 'The request timed out. Please try again.'
-        : 'Unable to reach the server. Please check your connection and try again.',
+        ? 'This is taking longer than usual. Please try again.'
+        : "We couldn't connect. Please check your internet connection and try again.",
       0,
     );
   } finally {
@@ -108,14 +111,16 @@ async function doFetch<T>(
   try {
     body = (await res.json()) as ApiResponse<T>;
   } catch {
-    throw new ApiError('INTERNAL_ERROR', `Malformed response (${res.status})`, res.status);
+    throw new ApiError('INTERNAL_ERROR', GENERIC_ERROR, res.status);
   }
 
   if (!res.ok || body.error) {
     const err = body.error;
+    // 4xx messages are written for people (validation, "email already exists"…);
+    // server faults are not, so members get a plain message instead.
     throw new ApiError(
       err?.code ?? 'INTERNAL_ERROR',
-      err?.message ?? `Request failed (${res.status})`,
+      res.status >= 500 || !err?.message ? GENERIC_ERROR : res.status === 429 ? TOO_MANY : err.message,
       res.status,
       err?.details,
     );

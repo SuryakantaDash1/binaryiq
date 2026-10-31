@@ -75,7 +75,6 @@
     "stepAboutYou": "あなたについて",
     "accountStep": "アカウント",
     "joinBonus": "無料で、数分で完了します。",
-    "signInNow": "今すぐログインできます。認証メールが届かない場合はサポートにお問い合わせください。",
     "secureNote": "SSLで保護 · DPDP 2023に準拠",
     "backToHome": "ホームに戻る",
     "capsLock": "Caps Lockがオンです",
@@ -88,7 +87,15 @@
     "ruleLength": "8文字以上",
     "ruleLower": "小文字",
     "ruleUpper": "大文字",
-    "ruleNumber": "数字"
+    "ruleNumber": "数字",
+    "acceptToContinue": "続行するには、上の利用規約とプライバシーポリシーのボックスにチェックしてください。",
+    "verifyToFinish": "あと少し：{email} を確認してアカウントを有効にしてください。",
+    "sendActivation": "確認メールを送信",
+    "resendPrompt": "メールが届きませんか？",
+    "resendLink": "再送信",
+    "resendIn": "{seconds}秒後に再送信",
+    "resendDone": "送信しました！受信トレイと迷惑メールフォルダを確認してください。",
+    "wakingServer": "処理中です。最大1分ほどかかる場合があります。このページを閉じないでください。"
   },
   "nav": {
     "surveys": "調査",

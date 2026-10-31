@@ -28,7 +28,7 @@ export const registerStep1Schema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   surname: z.string().min(1, 'Surname is required'),
   dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD'),
-  gender: genderEnum,
+  gender: z.enum(genderEnum.options, { errorMap: () => ({ message: 'Please select an option' }) }),
 });
 export type RegisterStep1Input = z.infer<typeof registerStep1Schema>;
 
@@ -83,6 +83,9 @@ export type VerifyEmailResult = z.infer<typeof verifyEmailResultSchema>;
 
 export const forgotPasswordSchema = z.object({ email: z.string().email() });
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+
+export const resendVerificationSchema = z.object({ email: z.string().email() });
+export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>;
 
 export const resetPasswordSchema = z.object({
   token: z.string().min(1),

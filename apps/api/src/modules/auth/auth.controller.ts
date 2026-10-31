@@ -3,11 +3,13 @@ import {
   registerStep2Schema,
   loginSchema,
   forgotPasswordSchema,
+  resendVerificationSchema,
   resetPasswordSchema,
   type RegisterStep1Input,
   type RegisterStep2Input,
   type LoginInput,
   type ForgotPasswordInput,
+  type ResendVerificationInput,
   type ResetPasswordInput,
   type AuthSession,
   type RegisterStep1Result,
@@ -96,6 +98,18 @@ export class AuthController {
     @Body(new ZodValidationPipe(forgotPasswordSchema)) body: ForgotPasswordInput,
   ): Promise<{ success: true }> {
     await this.auth.forgotPassword(body);
+    return { success: true };
+  }
+
+  /** Re-sends the activation link. Same response whether or not the address exists. */
+  @Public()
+  @Throttle({ default: { limit: 3, ttl: 15 * MINUTE } })
+  @Post('resend-verification')
+  @HttpCode(200)
+  async resendVerification(
+    @Body(new ZodValidationPipe(resendVerificationSchema)) body: ResendVerificationInput,
+  ): Promise<{ success: true }> {
+    await this.auth.resendVerification(body);
     return { success: true };
   }
 

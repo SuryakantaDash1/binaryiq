@@ -8,7 +8,7 @@ import {
   type RegisterStep2Input,
 } from '@binaryiq/types';
 import { Heading, Text } from '@binaryiq/ui';
-import { AtSign, Check, Lock, Mail, MapPin, MailCheck, User } from 'lucide-react';
+import { AlertCircle, AtSign, Check, Loader2, Lock, Mail, MapPin, MailCheck, User, X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -45,23 +45,7 @@ export default function RegisterPage(): React.JSX.Element {
   const [banners, setBanners] = useState<string[]>([]);
   const [step1Data, setStep1Data] = useState<Partial<RegisterStep1Input>>({});
 
-  if (step === 'done') {
-    return (
-      <div className="flex flex-col items-center gap-3 text-center motion-safe:animate-fade-up">
-        <span className="mb-2 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-900 text-white shadow-lg shadow-brand-700/25">
-          <MailCheck className="h-8 w-8" />
-        </span>
-        <Heading level={3}>{emailSent ? t('checkInbox') : t('accountReady')}</Heading>
-        <Text color="secondary">{emailSent ? t('sentTo', { email: sentTo }) : t('emailNotSent')}</Text>
-        <Text color="muted" size="sm">
-          {emailSent ? t('clickConfirm') : t('signInNow')}
-        </Text>
-        <Link href="/login" className={`${BTN_PRIMARY} mt-4 w-full`}>
-          {t('backToSignIn')}
-        </Link>
-      </div>
-    );
-  }
+  if (step === 'done') return <RegistrationDone email={sentTo} emailSent={emailSent} />;
 
   return (
     <div className="flex flex-col gap-5">
@@ -72,27 +56,25 @@ export default function RegisterPage(): React.JSX.Element {
 
       <Stepper step={step} labels={[t('stepAboutYou'), t('accountStep')]} ariaLabel={t('stepOf', { step, total: 2 })} />
 
-      {/* Error banners */}
-      {banners.map((b, i) => (
-        <div
-          key={i}
-          role="alert"
-          className="flex items-center justify-between gap-3 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-100"
-        >
-          <span className="flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs text-white">!</span>
-            Error: {b}
-          </span>
-          <button
-            type="button"
-            onClick={() => setBanners((bs) => bs.filter((_, j) => j !== i))}
-            className="text-red-400 hover:text-red-600"
-            aria-label="Dismiss"
-          >
-            ✕
+      {/* One error box: a headline plus what to fix */}
+      {banners.length > 0 && (
+        <div role="alert" className="flex items-start gap-3 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-100">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <div className="flex-1">
+            <p className="font-semibold">{banners[0]}</p>
+            {banners.length > 1 && (
+              <ul className="mt-1 space-y-0.5">
+                {banners.slice(1).map((b, i) => (
+                  <li key={i}>{b}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <button type="button" onClick={() => setBanners([])} className="text-red-400 hover:text-red-600" aria-label="Dismiss">
+            <X className="h-4 w-4" />
           </button>
         </div>
-      ))}
+      )}
 
       {step === 1 ? (
         <Step1Form
@@ -125,6 +107,92 @@ export default function RegisterPage(): React.JSX.Element {
           {t('signIn')}
         </Link>
       </Text>
+    </div>
+  );
+}
+
+/* ── Done ───────────────────────────────────────────────────────────────── */
+const RESEND_COOLDOWN_S = 30;
+
+/**
+ * After sign-up. If the activation email went out we say so; if it didn't, we simply
+ * offer to send it — no talk of failures. Resending is rate-limited by the API and
+ * has a short cooldown here.
+ */
+function RegistrationDone({ email, emailSent }: { email: string; emailSent: boolean }): React.JSX.Element {
+  const t = useTranslations('auth');
+  const [sent, setSent] = useState(emailSent);
+  const [sending, setSending] = useState(false);
+  const [cooldown, setCooldown] = useState(emailSent ? RESEND_COOLDOWN_S : 0);
+  const [note, setNote] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
+
+  async function send(): Promise<void> {
+    setSending(true);
+    setNote(null);
+    try {
+      await authApi.resendVerification({ email });
+      setSent(true);
+      setNote(t('resendDone'));
+    } catch (err) {
+      setNote(err instanceof ApiError ? err.message : t('somethingWrong'));
+    } finally {
+      setSending(false);
+      setCooldown(RESEND_COOLDOWN_S);
+    }
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-3 text-center motion-safe:animate-fade-up">
+      <span className="mb-2 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-900 text-white shadow-lg shadow-brand-700/25">
+        <MailCheck className="h-8 w-8" />
+      </span>
+      <Heading level={3}>{sent ? t('checkInbox') : t('accountReady')}</Heading>
+      <Text color="secondary">{sent ? t('sentTo', { email }) : t('verifyToFinish', { email })}</Text>
+      {sent && (
+        <Text color="muted" size="sm">
+          {t('clickConfirm')}
+        </Text>
+      )}
+
+      {sent ? (
+        <>
+          <Link href="/login" className={`${BTN_PRIMARY} mt-4 w-full`}>
+            {t('backToSignIn')}
+          </Link>
+          <p className="text-sm text-gray-500">
+            {t('resendPrompt')}{' '}
+            <button
+              type="button"
+              onClick={() => void send()}
+              disabled={sending || cooldown > 0}
+              className="font-semibold text-brand-700 hover:text-brand-900 disabled:cursor-not-allowed disabled:text-gray-400"
+            >
+              {cooldown > 0 ? t('resendIn', { seconds: cooldown }) : t('resendLink')}
+            </button>
+          </p>
+        </>
+      ) : (
+        <>
+          <button type="button" onClick={() => void send()} disabled={sending} className={`${BTN_PRIMARY} mt-4 w-full`}>
+            {sending && <Loader2 className="h-4 w-4 animate-spin" />}
+            {t('sendActivation')}
+          </button>
+          <Link href="/login" className={`${BTN_SECONDARY} w-full`}>
+            {t('backToSignIn')}
+          </Link>
+        </>
+      )}
+      {note && (
+        <p className="text-xs text-gray-500" role="status">
+          {note}
+        </p>
+      )}
     </div>
   );
 }
@@ -169,25 +237,30 @@ function Step1Form({
     setValue('gender', g, { shouldValidate: true });
   }
 
-  const onSubmit = handleSubmit(async (values) => {
-    onBanners([]);
-    if (!isAtLeast18(values.dob)) {
-      setError('dob', { message: t('ageError') });
-      return;
-    }
-    try {
-      const { draftId } = await authApi.registerStep1(values);
-      onNext(draftId, values);
-    } catch (err) {
-      applyApiError(err, setError);
-      onBanners(buildBanners(t('registrationFailed'), t('somethingWrong'), err));
-    }
-  });
+  const onSubmit = handleSubmit(
+    async (values) => {
+      onBanners([]);
+      if (!isAtLeast18(values.dob)) {
+        setError('dob', { message: t('ageError') });
+        revealFirstError();
+        return;
+      }
+      try {
+        const { draftId } = await authApi.registerStep1(values);
+        onNext(draftId, values);
+      } catch (err) {
+        applyApiError(err, setError);
+        onBanners(buildBanners(t('registrationFailed'), t('somethingWrong'), err));
+        revealFirstError();
+      }
+    },
+    () => revealFirstError(),
+  );
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
       <Field label={t('country')} required error={errors.country?.message}>
-        <select className={INPUT} {...register('country')}>
+        <select className={INPUT} aria-invalid={!!errors.country} {...register('country')}>
           <option value="">{t('selectCountry')}</option>
           {COUNTRIES.map(([code, name]) => (
             <option key={code} value={code}>
@@ -207,7 +280,7 @@ function Step1Form({
       </div>
 
       <Field label={t('dateOfBirth')} required error={errors.dob?.message}>
-        <input type="date" className={INPUT} {...register('dob')} />
+        <input type="date" className={INPUT} aria-invalid={!!errors.dob} {...register('dob')} />
       </Field>
 
       <Field label={t('gender')} required error={errors.gender?.message}>
@@ -308,19 +381,30 @@ function Step2Form({
     setPinOpen(false);
   }
 
-  const onSubmit = handleSubmit(async (values) => {
-    onBanners([]);
-    try {
-      const res = await authApi.registerStep2({ ...values, draftId });
-      await new Promise((r) => setTimeout(r, 1200)); // brief "getting ready" moment
-      onDone(res.email, res.emailSent);
-    } catch (err) {
-      applyApiError(err, setError);
-      onBanners(buildBanners(t('registrationFailed'), t('somethingWrong'), err));
-    }
-  });
+  // Registration can't be submitted until the Terms box is ticked (the API enforces it too).
+  const acceptedTerms = watch('acceptTerms') === true;
+  // Only after a successful registration do we swap the form for the "getting ready" screen —
+  // on any error the form stays put with everything the person typed.
+  const [finishing, setFinishing] = useState(false);
 
-  if (isSubmitting) {
+  const onSubmit = handleSubmit(
+    async (values) => {
+      onBanners([]);
+      try {
+        const res = await authApi.registerStep2({ ...values, draftId });
+        setFinishing(true);
+        await new Promise((r) => setTimeout(r, 1200)); // brief "getting ready" moment
+        onDone(res.email, res.emailSent);
+      } catch (err) {
+        applyApiError(err, setError);
+        onBanners(buildBanners(t('registrationFailed'), t('somethingWrong'), err));
+        revealFirstError();
+      }
+    },
+    () => revealFirstError(),
+  );
+
+  if (finishing) {
     return (
       <div className="flex flex-col items-center justify-center gap-6 py-16">
         <div className="flex gap-2">
@@ -421,6 +505,7 @@ function Step2Form({
         <label className="flex items-start gap-2 text-sm text-gray-600">
           <input
             type="checkbox"
+            aria-invalid={!!errors.acceptTerms}
             {...register('acceptTerms')}
             className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 accent-brand-700"
           />
@@ -450,13 +535,25 @@ function Step2Form({
       </label>
 
       <div className="flex gap-3">
-        <button type="button" onClick={onBack} className={BTN_SECONDARY}>
+        <button type="button" onClick={onBack} disabled={isSubmitting} className={`${BTN_SECONDARY} disabled:opacity-50`}>
           {t('previous')}
         </button>
-        <button type="submit" disabled={isSubmitting} className={`${BTN_PRIMARY} flex-1`}>
-          {t('register')}
+        <button
+          type="submit"
+          disabled={isSubmitting || !acceptedTerms}
+          aria-describedby={acceptedTerms ? undefined : 'terms-hint'}
+          className={`${BTN_PRIMARY} flex-1`}
+        >
+          {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+          {isSubmitting ? t('pleaseWait') : t('register')}
         </button>
       </div>
+      {!acceptedTerms && (
+        <p id="terms-hint" className="-mt-2 text-center text-xs text-gray-500">
+          {t('acceptToContinue')}
+        </p>
+      )}
+      {slow && <p className="-mt-2 text-center text-sm text-gray-500">{t('wakingServer')}</p>}
     </form>
   );
 }
@@ -542,6 +639,15 @@ function GenderCard({
       <span className="text-[11px] font-medium leading-tight text-gray-700">{label}</span>
     </button>
   );
+}
+
+/** After a failed submit, bring the first problem (error banner or invalid field) into view. */
+function revealFirstError(): void {
+  requestAnimationFrame(() => {
+    const target = document.querySelector<HTMLElement>('[role="alert"], [aria-invalid="true"]');
+    target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (target instanceof HTMLInputElement) target.focus({ preventScroll: true });
+  });
 }
 
 /** Map API VALIDATION_ERROR details back onto form fields. */

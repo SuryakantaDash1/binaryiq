@@ -102,10 +102,8 @@
     "previous": "Previous",
     "gettingReady": "Getting everything ready for you…",
     "pleaseWait": "Please wait…",
-    "wakingServer": "Waking up the server — the first request can take up to a minute. Please don't click again.",
+    "wakingServer": "Still working on it — this can take up to a minute. Please don't close this page.",
     "accountReady": "Your account is ready",
-    "emailNotSent": "We couldn't send the activation email right now.",
-    "signInNow": "You can sign in now. If the activation email doesn't arrive, please contact support.",
     "registrationFailed": "Your registration has failed.",
     "somethingWrong": "Something went wrong. Please check your connection and try again.",
     "ageError": "You must be at least 18 years old to register.",
@@ -143,7 +141,14 @@
     "ruleLength": "8+ characters",
     "ruleLower": "Lowercase letter",
     "ruleUpper": "Uppercase letter",
-    "ruleNumber": "A number"
+    "ruleNumber": "A number",
+    "acceptToContinue": "Tick the Terms and Privacy box above to continue.",
+    "verifyToFinish": "One last step: verify {email} to activate your account.",
+    "sendActivation": "Send activation email",
+    "resendPrompt": "Didn't get the email?",
+    "resendLink": "Resend",
+    "resendIn": "Resend in {seconds}s",
+    "resendDone": "Sent! Check your inbox and spam folder."
   },
   "nav": {
     "surveys": "Surveys",

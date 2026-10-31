@@ -75,7 +75,6 @@
     "stepAboutYou": "Tentang anda",
     "accountStep": "Akaun anda",
     "joinBonus": "Percuma dan hanya mengambil beberapa minit.",
-    "signInNow": "Anda boleh log masuk sekarang. Jika e-mel pengaktifan tidak tiba, sila hubungi sokongan.",
     "secureNote": "Dilindungi SSL · Mematuhi DPDP 2023",
     "backToHome": "Kembali ke laman utama",
     "capsLock": "Caps Lock dihidupkan",
@@ -88,7 +87,15 @@
     "ruleLength": "8+ aksara",
     "ruleLower": "Huruf kecil",
     "ruleUpper": "Huruf besar",
-    "ruleNumber": "Nombor"
+    "ruleNumber": "Nombor",
+    "acceptToContinue": "Tandakan kotak Terma dan Privasi di atas untuk meneruskan.",
+    "verifyToFinish": "Satu langkah terakhir: sahkan {email} untuk mengaktifkan akaun anda.",
+    "sendActivation": "Hantar e-mel pengaktifan",
+    "resendPrompt": "Tidak menerima e-mel?",
+    "resendLink": "Hantar semula",
+    "resendIn": "Hantar semula dalam {seconds} s",
+    "resendDone": "Dihantar! Semak peti masuk dan folder spam anda.",
+    "wakingServer": "Masih diproses — ini mungkin mengambil masa sehingga seminit. Jangan tutup halaman ini."
   },
   "nav": {
     "surveys": "Tinjauan",

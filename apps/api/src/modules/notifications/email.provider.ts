@@ -11,6 +11,15 @@ export abstract class EmailProvider {
 }
 
 /** "jane.doe@example.com" → "j***@example.com" — safe to put in logs. */
+/** The provider's short error text (e.g. "domain is not verified"), capped — useful in logs, never contains our key. */
+async function providerReason(res: Response): Promise<string> {
+  try {
+    return (await res.text()).replace(/\s+/g, ' ').slice(0, 300);
+  } catch {
+    return '(no details)';
+  }
+}
+
 export function maskEmail(email: string): string {
   const [local, domain] = email.split('@');
   if (!local || !domain) return '***';
@@ -63,7 +72,7 @@ export class SendGridEmailProvider extends EmailProvider {
       }),
     });
     if (!res.ok) {
-      this.logger.error(`SendGrid rejected mail to ${maskEmail(message.to)} (HTTP ${res.status})`);
+      this.logger.error(`SendGrid rejected mail to ${maskEmail(message.to)} (HTTP ${res.status}): ${await providerReason(res)}`);
       throw new Error(`Email delivery failed (${res.status})`);
     }
   }
@@ -92,7 +101,7 @@ export class ResendEmailProvider extends EmailProvider {
       }),
     });
     if (!res.ok) {
-      this.logger.error(`Resend rejected mail to ${maskEmail(message.to)} (HTTP ${res.status})`);
+      this.logger.error(`Resend rejected mail to ${maskEmail(message.to)} (HTTP ${res.status}): ${await providerReason(res)}`);
       throw new Error(`Email delivery failed (${res.status})`);
     }
   }

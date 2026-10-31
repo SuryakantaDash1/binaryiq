@@ -75,7 +75,6 @@
     "stepAboutYou": "O vás",
     "accountStep": "Váš účet",
     "joinBonus": "Je to zdarma a zabere jen pár minut.",
-    "signInNow": "Nyní se můžete přihlásit. Pokud aktivační e-mail nedorazí, kontaktujte podporu.",
     "secureNote": "Zabezpečeno SSL · V souladu s DPDP 2023",
     "backToHome": "Zpět na úvod",
     "capsLock": "Caps Lock je zapnutý",
@@ -88,7 +87,15 @@
     "ruleLength": "8+ znaků",
     "ruleLower": "Malé písmeno",
     "ruleUpper": "Velké písmeno",
-    "ruleNumber": "Číslice"
+    "ruleNumber": "Číslice",
+    "acceptToContinue": "Pro pokračování zaškrtněte výše políčko s podmínkami a ochranou soukromí.",
+    "verifyToFinish": "Poslední krok: potvrďte {email} a aktivujte svůj účet.",
+    "sendActivation": "Odeslat aktivační e-mail",
+    "resendPrompt": "Nepřišel vám e-mail?",
+    "resendLink": "Odeslat znovu",
+    "resendIn": "Odeslat znovu za {seconds} s",
+    "resendDone": "Odesláno! Zkontrolujte doručenou poštu i spam.",
+    "wakingServer": "Pracujeme na tom — může to trvat až minutu. Nezavírejte prosím tuto stránku."
   },
   "nav": {
     "surveys": "Průzkumy",

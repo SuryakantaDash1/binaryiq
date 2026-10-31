@@ -75,7 +75,6 @@
     "stepAboutYou": "Hakkında",
     "accountStep": "Hesabın",
     "joinBonus": "Ücretsizdir ve sadece birkaç dakika sürer.",
-    "signInNow": "Şimdi giriş yapabilirsin. Etkinleştirme e-postası gelmezse lütfen destekle iletişime geç.",
     "secureNote": "SSL ile korunur · DPDP 2023 uyumlu",
     "backToHome": "Ana sayfaya dön",
     "capsLock": "Caps Lock açık",
@@ -88,7 +87,15 @@
     "ruleLength": "8+ karakter",
     "ruleLower": "Küçük harf",
     "ruleUpper": "Büyük harf",
-    "ruleNumber": "Bir rakam"
+    "ruleNumber": "Bir rakam",
+    "acceptToContinue": "Devam etmek için yukarıdaki Şartlar ve Gizlilik kutusunu işaretle.",
+    "verifyToFinish": "Son bir adım: hesabını etkinleştirmek için {email} adresini doğrula.",
+    "sendActivation": "Etkinleştirme e-postası gönder",
+    "resendPrompt": "E-posta gelmedi mi?",
+    "resendLink": "Tekrar gönder",
+    "resendIn": "{seconds} sn sonra tekrar gönder",
+    "resendDone": "Gönderildi! Gelen kutunu ve spam klasörünü kontrol et.",
+    "wakingServer": "Hâlâ üzerinde çalışıyoruz — bu bir dakikaya kadar sürebilir. Lütfen bu sayfayı kapatma."
   },
   "nav": {
     "surveys": "Anketler",

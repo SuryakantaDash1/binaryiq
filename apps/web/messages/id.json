@@ -75,7 +75,6 @@
     "stepAboutYou": "Tentang kamu",
     "accountStep": "Akun kamu",
     "joinBonus": "Gratis dan hanya butuh beberapa menit.",
-    "signInNow": "Kamu sudah bisa masuk. Jika email aktivasi tidak datang, silakan hubungi dukungan.",
     "secureNote": "Diamankan SSL · Sesuai DPDP 2023",
     "backToHome": "Kembali ke beranda",
     "capsLock": "Caps Lock aktif",
@@ -88,7 +87,15 @@
     "ruleLength": "8+ karakter",
     "ruleLower": "Huruf kecil",
     "ruleUpper": "Huruf besar",
-    "ruleNumber": "Angka"
+    "ruleNumber": "Angka",
+    "acceptToContinue": "Centang kotak Ketentuan dan Privasi di atas untuk melanjutkan.",
+    "verifyToFinish": "Satu langkah lagi: verifikasi {email} untuk mengaktifkan akunmu.",
+    "sendActivation": "Kirim email aktivasi",
+    "resendPrompt": "Tidak menerima email?",
+    "resendLink": "Kirim ulang",
+    "resendIn": "Kirim ulang dalam {seconds} dtk",
+    "resendDone": "Terkirim! Cek kotak masuk dan folder spam.",
+    "wakingServer": "Masih diproses — ini bisa memakan waktu hingga satu menit. Jangan tutup halaman ini."
   },
   "nav": {
     "surveys": "Survei",

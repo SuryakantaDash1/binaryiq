@@ -98,7 +98,6 @@
     "stepAboutYou": "Su di te",
     "accountStep": "Il tuo account",
     "joinBonus": "È gratis e richiede solo pochi minuti.",
-    "signInNow": "Ora puoi accedere. Se l’email di attivazione non arriva, contatta l’assistenza.",
     "secureNote": "Protetto da SSL · Conforme al DPDP 2023",
     "backToHome": "Torna alla home",
     "capsLock": "Bloc Maiusc attivo",
@@ -111,7 +110,15 @@
     "ruleLength": "Almeno 8 caratteri",
     "ruleLower": "Lettera minuscola",
     "ruleUpper": "Lettera maiuscola",
-    "ruleNumber": "Un numero"
+    "ruleNumber": "Un numero",
+    "acceptToContinue": "Spunta la casella Termini e Privacy qui sopra per continuare.",
+    "verifyToFinish": "Ultimo passo: verifica {email} per attivare il tuo account.",
+    "sendActivation": "Invia email di attivazione",
+    "resendPrompt": "Non hai ricevuto l’email?",
+    "resendLink": "Invia di nuovo",
+    "resendIn": "Invia di nuovo tra {seconds} s",
+    "resendDone": "Inviata! Controlla la posta in arrivo e lo spam.",
+    "wakingServer": "Ci stiamo lavorando: può richiedere fino a un minuto. Non chiudere questa pagina."
   },
   "nav": {
     "surveys": "Sondaggi",

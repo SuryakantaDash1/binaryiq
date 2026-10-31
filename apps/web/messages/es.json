@@ -98,7 +98,6 @@
     "stepAboutYou": "Sobre ti",
     "accountStep": "Tu cuenta",
     "joinBonus": "Es gratis y solo lleva un par de minutos.",
-    "signInNow": "Ya puedes iniciar sesión. Si no te llega el correo de activación, contacta con soporte.",
     "secureNote": "Protegido con SSL · Conforme a la DPDP 2023",
     "backToHome": "Volver al inicio",
     "capsLock": "Bloq Mayús activado",
@@ -111,7 +110,15 @@
     "ruleLength": "8+ caracteres",
     "ruleLower": "Una minúscula",
     "ruleUpper": "Una mayúscula",
-    "ruleNumber": "Un número"
+    "ruleNumber": "Un número",
+    "acceptToContinue": "Marca la casilla de Términos y Privacidad para continuar.",
+    "verifyToFinish": "Un último paso: verifica {email} para activar tu cuenta.",
+    "sendActivation": "Enviar correo de activación",
+    "resendPrompt": "¿No te llegó el correo?",
+    "resendLink": "Reenviar",
+    "resendIn": "Reenviar en {seconds} s",
+    "resendDone": "¡Enviado! Revisa tu bandeja de entrada y la carpeta de spam.",
+    "wakingServer": "Seguimos en ello: puede tardar hasta un minuto. No cierres esta página."
   },
   "nav": {
     "surveys": "Encuestas",

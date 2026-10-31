@@ -75,7 +75,6 @@
     "stepAboutYou": "Om dig",
     "accountStep": "Ditt konto",
     "joinBonus": "Det är gratis och tar bara några minuter.",
-    "signInNow": "Du kan logga in nu. Om aktiveringsmejlet inte kommer, kontakta supporten.",
     "secureNote": "SSL-skyddat · DPDP 2023-kompatibelt",
     "backToHome": "Tillbaka till startsidan",
     "capsLock": "Caps Lock är på",
@@ -88,7 +87,15 @@
     "ruleLength": "8+ tecken",
     "ruleLower": "Liten bokstav",
     "ruleUpper": "Stor bokstav",
-    "ruleNumber": "En siffra"
+    "ruleNumber": "En siffra",
+    "acceptToContinue": "Kryssa i rutan för villkor och integritet ovan för att fortsätta.",
+    "verifyToFinish": "Ett sista steg: bekräfta {email} för att aktivera ditt konto.",
+    "sendActivation": "Skicka aktiveringsmejl",
+    "resendPrompt": "Fick du inget mejl?",
+    "resendLink": "Skicka igen",
+    "resendIn": "Skicka igen om {seconds} s",
+    "resendDone": "Skickat! Kolla inkorgen och skräpposten.",
+    "wakingServer": "Vi jobbar på det — det kan ta upp till en minut. Stäng inte sidan."
   },
   "nav": {
     "surveys": "Undersökningar",

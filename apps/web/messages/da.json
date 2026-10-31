@@ -75,7 +75,6 @@
     "stepAboutYou": "Om dig",
     "accountStep": "Din konto",
     "joinBonus": "Det er gratis og tager kun et par minutter.",
-    "signInNow": "Du kan logge ind nu. Hvis aktiveringsmailen ikke kommer, så kontakt support.",
     "secureNote": "SSL-sikret · DPDP 2023-kompatibel",
     "backToHome": "Tilbage til forsiden",
     "capsLock": "Caps Lock er slået til",
@@ -88,7 +87,15 @@
     "ruleLength": "8+ tegn",
     "ruleLower": "Lille bogstav",
     "ruleUpper": "Stort bogstav",
-    "ruleNumber": "Et tal"
+    "ruleNumber": "Et tal",
+    "acceptToContinue": "Sæt flueben i boksen om vilkår og privatliv ovenfor for at fortsætte.",
+    "verifyToFinish": "Et sidste trin: bekræft {email} for at aktivere din konto.",
+    "sendActivation": "Send aktiveringsmail",
+    "resendPrompt": "Har du ikke fået mailen?",
+    "resendLink": "Send igen",
+    "resendIn": "Send igen om {seconds} s",
+    "resendDone": "Sendt! Tjek din indbakke og spam-mappe.",
+    "wakingServer": "Vi arbejder på det — det kan tage op til et minut. Luk ikke denne side."
   },
   "nav": {
     "surveys": "Undersøgelser",

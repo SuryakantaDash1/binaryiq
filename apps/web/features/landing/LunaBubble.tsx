@@ -54,7 +54,14 @@ function nowTime(): string {
  * to the contact form. When `authenticated`, it instead loads the real chatbot
  * flows from the backend and "raise a ticket" actually creates a SupportTicket.
  */
-export function LunaBubble({ authenticated = false }: { authenticated?: boolean }): React.JSX.Element {
+export function LunaBubble({
+  authenticated = false,
+  showTeaser = true,
+}: {
+  authenticated?: boolean;
+  /** The intro bubble; off on pages where it would cover a form. */
+  showTeaser?: boolean;
+}): React.JSX.Element {
   const t = useTranslations('chat');
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -85,6 +92,7 @@ export function LunaBubble({ authenticated = false }: { authenticated?: boolean 
   // Introduce Byte by name once per browser session, shortly after the page settles.
   const [teaser, setTeaser] = useState(false);
   useEffect(() => {
+    if (!showTeaser) return;
     try {
       if (sessionStorage.getItem(TEASER_KEY) === '1') return;
     } catch {

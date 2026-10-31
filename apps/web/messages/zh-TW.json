@@ -75,7 +75,6 @@
     "stepAboutYou": "關於你",
     "accountStep": "你的帳戶",
     "joinBonus": "免費註冊，只需幾分鐘。",
-    "signInNow": "你現在可以登入。如果沒有收到啟用郵件，請聯絡客服。",
     "secureNote": "SSL 安全保護 · 符合 DPDP 2023",
     "backToHome": "返回首頁",
     "capsLock": "大寫鎖定已開啟",
@@ -88,7 +87,15 @@
     "ruleLength": "至少 8 個字元",
     "ruleLower": "小寫字母",
     "ruleUpper": "大寫字母",
-    "ruleNumber": "數字"
+    "ruleNumber": "數字",
+    "acceptToContinue": "請勾選上方的條款與隱私權政策核取方塊以繼續。",
+    "verifyToFinish": "最後一步：驗證 {email} 以啟用你的帳戶。",
+    "sendActivation": "傳送啟用郵件",
+    "resendPrompt": "沒有收到郵件？",
+    "resendLink": "重新傳送",
+    "resendIn": "{seconds} 秒後可重新傳送",
+    "resendDone": "已傳送！請查看收件匣和垃圾郵件資料夾。",
+    "wakingServer": "正在處理，最多可能需要一分鐘。請不要關閉此頁面。"
   },
   "nav": {
     "surveys": "調查",

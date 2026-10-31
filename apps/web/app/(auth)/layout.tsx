@@ -66,7 +66,7 @@ export default async function AuthLayout({ children }: { children: ReactNode }):
         ))}
       </footer>
 
-      <LunaBubble />
+      <LunaBubble showTeaser={false} />
     </div>
   );
 }
