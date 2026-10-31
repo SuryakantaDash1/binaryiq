@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { type ReactNode } from 'react';
 
+import { POINTS_ENABLED } from '@/features/flags';
+
 const TOP_TABS = [
   { key: 'details', label: 'Details', href: '/account/profile', match: ['profile', 'email', 'password', 'paypal', 'about-you'] },
-  { key: 'points', label: 'Points', href: '/account/points', match: ['points'] },
+  ...(POINTS_ENABLED ? [{ key: 'points', label: 'Points', href: '/account/points', match: ['points'] }] : []),
   { key: 'profile-surveys', label: 'Profile Surveys', href: '/account/profile-surveys', match: ['profile-surveys'] },
   { key: 'notifications', label: 'Notifications', href: '/account/notifications', match: ['notifications'] },
   { key: 'unsubscribe', label: 'Unsubscribe', href: '/account/unsubscribe', match: ['unsubscribe', 'privacy'] },
@@ -16,7 +18,7 @@ const SUB_TABS = [
   { key: 'profile', label: 'Profile' },
   { key: 'email', label: 'Email' },
   { key: 'password', label: 'Password' },
-  { key: 'paypal', label: 'PayPal' },
+  ...(POINTS_ENABLED ? [{ key: 'paypal', label: 'PayPal' }] : []),
   { key: 'about-you', label: 'About You' },
 ];
 
@@ -31,7 +33,9 @@ export default function AccountLayout({ children }: { children: ReactNode }): Re
       {/* Hero */}
       <div className="overflow-hidden rounded-2xl bg-gradient-to-r from-ink via-brand-950 to-brand-800 px-6 py-12 md:px-10">
         <h1 className="max-w-md text-2xl font-black leading-snug text-white md:text-3xl">
-          Need to update your personal details or track your rewards history? This is the place!
+          {POINTS_ENABLED
+            ? 'Need to update your personal details or track your rewards history? This is the place!'
+            : 'Need to update your personal details or preferences? This is the place!'}
         </h1>
       </div>
 

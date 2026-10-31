@@ -7,6 +7,7 @@ import { FormField, Input, Select, RadioGroup, MultiSelect, Button, Alert } from
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 
+import { POINTS_ENABLED } from '@/features/flags';
 import { ApiError } from '@/lib/api/client';
 
 interface SurveyFormProps {
@@ -129,7 +130,7 @@ export function SurveyForm({ schema, defaults, onSubmit, readOnly = false }: Sur
         );
       })}
       <Button type="submit" loading={isSubmitting} fullWidth>
-        Submit &amp; earn {schema.questions.length > 0 ? 'points' : ''}
+        {POINTS_ENABLED ? <>Submit &amp; earn {schema.questions.length > 0 ? 'points' : ''}</> : 'Submit'}
       </Button>
     </form>
   );

@@ -18,8 +18,8 @@ import { apiImageUrl } from '@/lib/api/site-images';
 const MAX_EDGE = 2400;
 
 const SHAPE_HINT: Record<'tall' | 'wide', string> = {
-  tall: 'Fills half the screen — use a photo with the subject near the centre.',
-  wide: 'Short, wide banner — the top and bottom get cropped.',
+  tall: 'Tall tile — the sides get cropped, so keep the subject near the centre.',
+  wide: 'Wide tile — the top and bottom get cropped.',
 };
 
 function formatBytes(n: number): string {

@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
 import { PollResultCard } from '@/features/polls/PollResultCard';
-import { SHOWCASE_POLLS } from '@/features/polls/polls-showcase-data';
+import { POINTS_ENABLED } from '@/features/flags';
 import { useSiteImage } from '@/features/site-images/SiteImages';
-import { pollsApi, type PollSummary } from '@/lib/api/polls';
+import { pollsApi, type PollSummary, type VotedPollResult } from '@/lib/api/polls';
 
 const PAGE_SIZE = 6;
 
@@ -15,14 +15,19 @@ export default function PollsPage(): React.JSX.Element {
   const heroImg = useSiteImage('polls-hero');
   const [live, setLive] = useState<PollSummary[]>([]);
   const [liveLoading, setLiveLoading] = useState(true);
+  const [results, setResults] = useState<VotedPollResult[]>([]);
   const [visible, setVisible] = useState(PAGE_SIZE);
 
   const loadLive = useCallback(() => {
     pollsApi
       .list()
       .then(setLive)
-      .catch(() => setLive([])) // non-fatal — showcase still renders
+      .catch(() => setLive([])) // non-fatal — results still render
       .finally(() => setLiveLoading(false));
+    pollsApi
+      .voted()
+      .then(setResults)
+      .catch(() => setResults([]));
   }, []);
 
   useEffect(() => {
@@ -38,7 +43,9 @@ export default function PollsPage(): React.JSX.Element {
         <div className="relative px-8 py-14 md:py-20">
           <h1 className="text-3xl font-black text-white md:text-4xl">My Sponsored polls</h1>
           <p className="mt-3 max-w-xs text-lg font-medium text-white/90">
-            Welcome to your centre of sponsored polls where you can vote and earn points!
+            {POINTS_ENABLED
+              ? 'Welcome to your centre of sponsored polls where you can vote and earn points!'
+              : 'Welcome to your centre of sponsored polls — vote and see how everyone answered.'}
           </p>
         </div>
       </div>
@@ -52,14 +59,19 @@ export default function PollsPage(): React.JSX.Element {
       ) : (
         live.length > 0 && (
           <section className="mt-8">
-            <h2 className="text-2xl font-black text-brand-800">Vote &amp; earn points</h2>
+            <h2 className="text-2xl font-black text-brand-800">
+              {POINTS_ENABLED ? <>Vote &amp; earn points</> : <>Vote now</>}
+            </h2>
             <p className="mt-1 text-sm text-gray-500">
-              Cast your vote on these live polls to earn points instantly.
+              {POINTS_ENABLED
+                ? 'Cast your vote on these live polls to earn points instantly.'
+                : 'Cast your vote on these live polls and see the results straight away.'}
             </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {live.map((p) => (
                 <Link key={p.id} href={`/polls/${p.id}`} className="block">
                   <PollCard
+                    showPoints={POINTS_ENABLED}
                     poll={{
                       id: p.id,
                       question: p.question,
@@ -76,28 +88,36 @@ export default function PollsPage(): React.JSX.Element {
         )
       )}
 
-      {/* Results showcase */}
-      <section className="mt-10">
-        <h2 className="text-2xl font-black text-brand-800">Poll results</h2>
-        <p className="mt-1 text-sm text-gray-500">See how the community voted.</p>
-        <div className="mt-6 flex flex-col gap-6">
-          {SHOWCASE_POLLS.slice(0, visible).map((poll) => (
-            <PollResultCard key={poll.id} poll={poll} />
-          ))}
-        </div>
+      {!liveLoading && live.length === 0 && results.length === 0 && (
+        <p className="mt-10 rounded-2xl bg-white p-8 text-center text-sm text-gray-500 shadow-sm">
+          There are no polls right now — check back soon.
+        </p>
+      )}
 
-        {visible < SHOWCASE_POLLS.length && (
-          <div className="mt-8 flex justify-center">
-            <button
-              type="button"
-              onClick={() => setVisible((v) => v + PAGE_SIZE)}
-              className="rounded-full bg-brand-800 px-10 py-3 text-sm font-bold tracking-wide text-white transition hover:bg-brand-900"
-            >
-              See More
-            </button>
+      {/* Results of the polls this member voted on */}
+      {results.length > 0 && (
+        <section className="mt-10">
+          <h2 className="text-2xl font-black text-brand-800">Your poll results</h2>
+          <p className="mt-1 text-sm text-gray-500">How everyone voted on the polls you took part in.</p>
+          <div className="mt-6 flex flex-col gap-6">
+            {results.slice(0, visible).map((poll) => (
+              <PollResultCard key={poll.pollId} poll={poll} />
+            ))}
           </div>
-        )}
-      </section>
+
+          {visible < results.length && (
+            <div className="mt-8 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setVisible((v) => v + PAGE_SIZE)}
+                className="rounded-full bg-brand-800 px-10 py-3 text-sm font-bold tracking-wide text-white transition hover:bg-brand-900"
+              >
+                See More
+              </button>
+            </div>
+          )}
+        </section>
+      )}
     </div>
   );
 }

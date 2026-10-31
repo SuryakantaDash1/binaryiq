@@ -43,6 +43,12 @@ export class PollsController {
     return this.service.unvotedCount(user.id);
   }
 
+  // Declared before 'polls/:id' so "voted" isn't read as a poll id.
+  @Get('polls/voted')
+  voted(@CurrentUser() user: AuthUser) {
+    return this.service.listVotedResults(user.id);
+  }
+
   @Get('polls/:id')
   detail(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     return this.service.getDetail(user.id, id);

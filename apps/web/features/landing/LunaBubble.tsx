@@ -9,6 +9,8 @@ import { useEffect, useRef, useState } from 'react';
 import { ApiError } from '@/lib/api/client.js';
 import { supportApi } from '@/lib/api/support.js';
 
+import { POINTS_ENABLED } from '../flags';
+
 import { LUNA_FLOWS } from './luna-flows.js';
 
 type Line = { from: 'bot' | 'user'; text: string; time?: string };
@@ -34,6 +36,12 @@ interface ChatFlow {
   nodes: Record<string, ChatFlowNode>;
 }
 
+/** Help topics about points and payouts, hidden while reward points are switched off. */
+const POINTS_TOPICS = new Set(['SURVEY_PAYMENT', 'REWARDS']);
+function visibleFlows<T extends { topic: string }>(all: T[]): T[] {
+  return POINTS_ENABLED ? all : all.filter((f) => !POINTS_TOPICS.has(f.topic));
+}
+
 function nowTime(): string {
   const d = new Date();
   return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
@@ -54,7 +62,7 @@ export function LunaBubble({ authenticated = false }: { authenticated?: boolean 
   const [transcript, setTranscript] = useState<Line[]>([]);
   const [flow, setFlow] = useState<ChatFlow | null>(null);
   const [options, setOptions] = useState<Option[]>([]);
-  const [flows, setFlows] = useState<ChatFlow[]>(authenticated ? [] : LUNA_FLOWS);
+  const [flows, setFlows] = useState<ChatFlow[]>(authenticated ? [] : visibleFlows(LUNA_FLOWS));
   const [flowsLoading, setFlowsLoading] = useState(authenticated);
   const [ticketMessage, setTicketMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -66,7 +74,7 @@ export function LunaBubble({ authenticated = false }: { authenticated?: boolean 
     if (!authenticated) return;
     supportApi
       .listFlows()
-      .then(setFlows)
+      .then((all) => setFlows(visibleFlows(all)))
       .catch(() => void 0)
       .finally(() => setFlowsLoading(false));
   }, [authenticated]);

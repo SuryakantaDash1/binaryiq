@@ -4,14 +4,14 @@ import {
   BarChart3,
   ClipboardList,
   Gamepad2,
-  Globe,
+  MessagesSquare,
   Sparkles,
-  Trophy,
   User,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { POINTS_ENABLED } from '@/features/flags';
 import { ActivityCard } from '@/features/home/ActivityCard';
 import { IndustryUpdatesCarousel } from '@/features/home/IndustryUpdatesCarousel';
 import { useSiteImage } from '@/features/site-images/SiteImages';
@@ -25,11 +25,6 @@ import type { RewardItem } from '@/lib/api/rewards';
 import { rewardsApi } from '@/lib/api/rewards';
 import { surveysApi } from '@/lib/api/surveys';
 
-const PARTNER_IMAGES = [
-  '/images/partner-1.jpg',
-  '/images/partner-2.jpg',
-];
-
 export default function HomePage(): React.JSX.Element {
   const heroImg = useSiteImage('home-hero');
   const [name, setName] = useState('');
@@ -42,15 +37,17 @@ export default function HomePage(): React.JSX.Element {
 
   useEffect(() => {
     accountApi.getProfile().then((p) => setName(p.firstName)).catch(() => void 0);
-    accountApi.getBalance().then((b) => setBalance(b.balance)).catch(() => void 0);
     surveysApi
       .list()
       .then((d) => setSurveyCount((d.priority?.length ?? 0) + (d.quick?.length ?? 0) + (d.premium?.length ?? 0)))
       .catch(() => void 0);
     pollsApi.list().then((d) => setPollCount(Array.isArray(d) ? d.length : 0)).catch(() => void 0);
-    gamesApi.list().then(setGames).catch(() => void 0);
     profileSurveysApi.list().then(setProfileSurveys).catch(() => void 0);
-    rewardsApi.list().then(setRewards).catch(() => void 0);
+    if (POINTS_ENABLED) {
+      accountApi.getBalance().then((b) => setBalance(b.balance)).catch(() => void 0);
+      gamesApi.list().then(setGames).catch(() => void 0);
+      rewardsApi.list().then(setRewards).catch(() => void 0);
+    }
   }, []);
 
   const gamesPlayedToday = games.filter((g) => g.playedToday).length;
@@ -73,7 +70,9 @@ export default function HomePage(): React.JSX.Element {
       eyebrow: "Today's pick",
       title: 'Surveys',
       badge: surveyCount > 0 ? `${surveyCount} ready` : '',
-      description: 'A few good questions. A little more in your reward jar.',
+      description: POINTS_ENABLED
+        ? 'A few good questions. A little more in your reward jar.'
+        : 'A few good questions, picked to match your profile.',
       ctaLabel: 'Find a survey',
       secondary: '4-8 min each',
       href: '/surveys',
@@ -106,20 +105,21 @@ export default function HomePage(): React.JSX.Element {
       progress: 0,
     },
     {
-      key: 'social',
-      icon: Globe,
-      grad: 'from-gray-400 to-gray-500',
+      key: 'community',
+      icon: MessagesSquare,
+      grad: 'from-gray-500 to-gray-700',
       eyebrow: 'In good company',
-      title: 'Social Activities',
-      badge: 'More soon',
-      description: 'The community is taking a breather. New conversations are on the way.',
+      title: 'Community',
+      badge: '',
+      description: 'Our latest news and industry updates, all in one place.',
       ctaLabel: 'See community',
-      secondary: 'Check back soon',
-      href: null,
+      secondary: 'News & updates',
+      href: '/community',
       progress: 0,
     },
     {
       key: 'games',
+      pointsOnly: true,
       icon: Gamepad2,
       grad: 'from-emerald-500 to-green-600',
       eyebrow: 'A playful pause',
@@ -131,20 +131,7 @@ export default function HomePage(): React.JSX.Element {
       href: '/games',
       progress: games.length > 0 ? (gamesPlayedToday / games.length) * 100 : 0,
     },
-    {
-      key: 'contests',
-      icon: Trophy,
-      grad: 'from-orange-500 to-amber-600',
-      eyebrow: 'Weekly goodies',
-      title: 'Contests',
-      badge: 'New this week',
-      description: "A little friendly luck never hurt. See what's on the board.",
-      ctaLabel: 'View contests',
-      secondary: 'Join the fun',
-      href: null,
-      progress: 0,
-    },
-  ];
+  ].filter((c) => POINTS_ENABLED || !('pointsOnly' in c && c.pointsOnly));
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -169,6 +156,7 @@ export default function HomePage(): React.JSX.Element {
         </div>
 
         {/* Floating reward journey card */}
+        {POINTS_ENABLED && (
         <div className="absolute bottom-5 right-5 hidden w-72 rounded-2xl bg-white/95 p-5 shadow-xl backdrop-blur sm:block">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold uppercase tracking-wide text-gray-500">Your reward journey</span>
@@ -189,6 +177,7 @@ export default function HomePage(): React.JSX.Element {
               : 'You qualify for every reward — nice!'}
           </p>
         </div>
+        )}
       </div>
 
       {/* Main + sidebar */}
@@ -197,8 +186,14 @@ export default function HomePage(): React.JSX.Element {
         <div className="lg:col-span-2">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-black text-gray-900">Let&apos;s earn some points</h2>
-              <p className="mt-1 text-sm text-gray-500">Good questions, quick games, and a say in what comes next.</p>
+              <h2 className="text-2xl font-black text-gray-900">
+                {POINTS_ENABLED ? <>Let&apos;s earn some points</> : <>What would you like to do?</>}
+              </h2>
+              <p className="mt-1 text-sm text-gray-500">
+                {POINTS_ENABLED
+                  ? 'Good questions, quick games, and a say in what comes next.'
+                  : 'Good questions, quick polls, and a say in what comes next.'}
+              </p>
             </div>
             <Link href="/surveys" className="shrink-0 text-sm font-semibold text-brand-800 hover:underline">
               All activities →
@@ -250,16 +245,6 @@ export default function HomePage(): React.JSX.Element {
           </div>
 
           <IndustryUpdatesCarousel />
-
-          <div className="flex flex-col gap-3">
-            {PARTNER_IMAGES.map((src) => (
-              <div
-                key={src}
-                className="aspect-video rounded-2xl bg-cover bg-center opacity-80"
-                style={{ backgroundImage: `url(${src})` }}
-              />
-            ))}
-          </div>
         </aside>
       </div>
     </div>

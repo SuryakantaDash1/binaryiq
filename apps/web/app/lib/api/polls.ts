@@ -1,4 +1,8 @@
+import type { VotedPollResult } from '@binaryiq/types';
+
 import { apiFetch } from './client.js';
+
+export type { VotedPollResult };
 
 export interface PollSummary {
   id: string;
@@ -47,6 +51,8 @@ export const pollsApi = {
   count(): Promise<PollCount> { return apiFetch('/polls/count'); },
   get(id: string): Promise<PollDetail> { return apiFetch(`/polls/${id}`); },
   results(id: string): Promise<PollResult> { return apiFetch(`/polls/${id}/results`); },
+  /** Polls the member has voted on, newest first, with current results. */
+  voted(): Promise<VotedPollResult[]> { return apiFetch('/polls/voted'); },
   vote(id: string, optionIds: string[]): Promise<PollResult> {
     return apiFetch(`/polls/${id}/vote`, { method: 'POST', body: { optionIds } });
   },

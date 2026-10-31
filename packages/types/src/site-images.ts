@@ -31,10 +31,10 @@ export interface SiteImageSlotInfo {
 }
 
 export const SITE_IMAGE_SLOT_INFO: Record<SiteImageSlot, SiteImageSlotInfo> = {
-  'landing-1': { label: 'Landing photo 1', usedOn: 'Landing page slideshow', defaultUrl: '/images/people-hero.jpg', shape: 'tall' },
-  'landing-2': { label: 'Landing photo 2', usedOn: 'Landing page slideshow', defaultUrl: '/images/landing-2.jpg', shape: 'tall' },
-  'landing-3': { label: 'Landing photo 3', usedOn: 'Landing page slideshow', defaultUrl: '/images/landing-3.jpg', shape: 'tall' },
-  auth: { label: 'Sign-in & register', usedOn: 'Login, register and password pages', defaultUrl: '/images/people-hero.jpg', shape: 'tall' },
+  'landing-1': { label: 'Landing photo 1', usedOn: 'Landing page photo grid (large tile)', defaultUrl: '/images/people-hero.jpg', shape: 'tall' },
+  'landing-2': { label: 'Landing photo 2', usedOn: 'Landing page photo grid (top right)', defaultUrl: '/images/landing-2.jpg', shape: 'wide' },
+  'landing-3': { label: 'Landing photo 3', usedOn: 'Landing page photo grid (bottom right)', defaultUrl: '/images/landing-3.jpg', shape: 'wide' },
+  auth: { label: 'Sign-in & register', usedOn: 'Login, register and password pages (dimmed full-screen background)', defaultUrl: '/images/people-hero.jpg', shape: 'wide' },
   'home-hero': { label: 'Home banner', usedOn: 'Member home page', defaultUrl: '/images/people-hero.jpg', shape: 'wide' },
   'community-hero': { label: 'Community banner', usedOn: 'Community page', defaultUrl: '/images/community-hero.jpg', shape: 'wide' },
   'games-hero': { label: 'Games banner', usedOn: 'Games page', defaultUrl: '/images/games-hero.jpg', shape: 'wide' },

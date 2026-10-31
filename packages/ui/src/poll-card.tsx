@@ -15,9 +15,11 @@ interface PollCardData {
 interface PollCardProps {
   poll: PollCardData;
   className?: string;
+  /** Show the points reward (off while reward points are hidden). */
+  showPoints?: boolean;
 }
 
-export function PollCard({ poll, className }: PollCardProps): React.JSX.Element {
+export function PollCard({ poll, className, showPoints = true }: PollCardProps): React.JSX.Element {
   return (
     <Card className={cn('cursor-pointer', className)}>
       <CardBody>
@@ -30,7 +32,7 @@ export function PollCard({ poll, className }: PollCardProps): React.JSX.Element 
         )}
         <div className="text-secondary flex items-center justify-between text-sm">
           <span>{poll.totalVotes.toLocaleString()} voted</span>
-          <span className="text-primary font-semibold">+{poll.pointsReward} pts</span>
+          {showPoints && <span className="text-primary font-semibold">+{poll.pointsReward} pts</span>}
         </div>
       </CardBody>
     </Card>

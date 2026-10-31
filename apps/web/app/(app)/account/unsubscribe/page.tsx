@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { POINTS_ENABLED } from '@/features/flags';
 
 export default function UnsubscribePage(): React.JSX.Element {
   return (
@@ -21,7 +22,7 @@ export default function UnsubscribePage(): React.JSX.Element {
       <div className="mt-6 rounded-xl border border-red-100 bg-red-50 p-5">
         <p className="text-sm font-semibold text-red-700">Delete my account</p>
         <p className="mt-1 text-sm text-red-600">
-          This permanently removes your account and forfeits any unredeemed points. This action
+          This permanently removes your account{POINTS_ENABLED ? ' and forfeits any unredeemed points' : ''}. This action
           cannot be undone.
         </p>
         <button

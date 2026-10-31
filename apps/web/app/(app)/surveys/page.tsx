@@ -4,6 +4,7 @@ import { Tabs, SurveyCard, EmptyState, Skeleton, Button, Alert, Heading, Text } 
 import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 
+import { POINTS_ENABLED } from '@/features/flags';
 import { surveysApi, type MatchedSurveys } from '@/lib/api/surveys';
 
 export default function SurveysPage(): React.JSX.Element {
@@ -40,7 +41,7 @@ export default function SurveysPage(): React.JSX.Element {
       <div className="mb-6">
         <Heading level={2}>Surveys</Heading>
         <Text color="secondary" size="sm">
-          Complete surveys to earn points.
+          {POINTS_ENABLED ? 'Complete surveys to earn points.' : 'Surveys picked to match your profile.'}
         </Text>
       </div>
 
@@ -67,7 +68,11 @@ export default function SurveysPage(): React.JSX.Element {
         ) : current.surveys.length === 0 ? (
           <EmptyState
             title="No surveys available right now"
-            description="Complete your profile to unlock more surveys and earn more points."
+            description={
+              POINTS_ENABLED
+                ? 'Complete your profile to unlock more surveys and earn more points.'
+                : 'Complete your profile to unlock more surveys.'
+            }
             action={
               <Link href="/account/about-you">
                 <Button variant="outline">Complete profile</Button>
@@ -78,7 +83,7 @@ export default function SurveysPage(): React.JSX.Element {
           <div className="grid gap-4 sm:grid-cols-2">
             {current.surveys.map((s) => (
               <Link key={s.id} href={`/surveys/${s.id}`} className="block">
-                <SurveyCard survey={s} className="hover:border-primary transition-colors" />
+                <SurveyCard survey={s} showPoints={POINTS_ENABLED} className="hover:border-primary transition-colors" />
               </Link>
             ))}
           </div>

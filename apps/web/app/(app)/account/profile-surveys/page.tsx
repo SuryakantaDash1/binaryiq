@@ -22,6 +22,7 @@ import {
 import { useEffect, useState } from 'react';
 
 import { ProfileSurveyPanel } from '@/features/profile-surveys/ProfileSurveyPanel';
+import { POINTS_ENABLED } from '@/features/flags';
 import { profileSurveysApi } from '@/lib/api/profile-surveys';
 import type { CategoryListResult, CategoryDetail } from '@/lib/api/profile-surveys';
 
@@ -175,7 +176,7 @@ export default function ProfileSurveysPage(): React.JSX.Element {
                   )}
                 </span>
                 <span className="mt-3 text-lg font-bold leading-tight text-gray-800">{cat.name}</span>
-                <span className="mt-1 text-[15px] text-gray-700">{cat.pointsValue} points</span>
+                {POINTS_ENABLED && <span className="mt-1 text-[15px] text-gray-700">{cat.pointsValue} points</span>}
               </button>
             );
           })}

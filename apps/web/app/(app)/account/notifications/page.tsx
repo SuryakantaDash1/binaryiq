@@ -3,7 +3,7 @@
 import { Switch, Skeleton, Alert, Heading, Text } from '@binaryiq/ui';
 import { useState, useEffect, useCallback } from 'react';
 
-
+import { POINTS_ENABLED } from '@/features/flags';
 import { notificationsApi, type NotificationPreferenceDTO, type NotificationTypeEnum } from '@/lib/api/notifications';
 
 const ALWAYS_ON_TYPES: NotificationTypeEnum[] = ['REGISTRATION', 'PASSWORD_RESET'];
@@ -18,6 +18,9 @@ const TYPE_LABELS: Record<NotificationTypeEnum, string> = {
   REWARD_UPDATE: 'Reward Status Updates',
   OFFERS_NEWS: 'Offers & News',
 };
+
+/** Preference rows hidden while reward points are switched off. */
+const POINTS_TYPES: NotificationTypeEnum[] = ['POINTS_UPDATE', 'GAME_REMINDER', 'REWARD_UPDATE'];
 
 const CHANNEL_LABELS = ['email', 'push', 'sms', 'whatsapp'] as const;
 type Channel = (typeof CHANNEL_LABELS)[number];
@@ -84,7 +87,7 @@ export default function NotificationsPage(): React.JSX.Element {
               </tr>
             </thead>
             <tbody>
-              {prefs.map((pref) => {
+              {prefs.filter((pref) => POINTS_ENABLED || !POINTS_TYPES.includes(pref.type)).map((pref) => {
                 const isAlwaysOn = ALWAYS_ON_TYPES.includes(pref.type);
                 return (
                   <tr key={pref.type} className="border-t border-border">

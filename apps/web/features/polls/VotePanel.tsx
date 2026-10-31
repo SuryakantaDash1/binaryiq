@@ -4,6 +4,7 @@ import { Alert, Button, PollResultBars } from '@binaryiq/ui';
 import { useEffect, useState } from 'react';
 
 
+import { POINTS_ENABLED } from '@/features/flags';
 import { ApiError } from '@/lib/api/client';
 import { pollsApi, type PollDetail, type PollResult } from '@/lib/api/polls';
 
@@ -55,7 +56,7 @@ export function VotePanel({ poll }: VotePanelProps): React.JSX.Element {
         {isClosed && (
           <Alert variant="info">This poll has closed &mdash; here&apos;s how people voted.</Alert>
         )}
-        {result.pointsAwarded > 0 && !poll.hasVoted && (
+        {POINTS_ENABLED && result.pointsAwarded > 0 && !poll.hasVoted && (
           <div className="bg-primary/10 border-primary rounded-lg border p-3 text-center">
             <span className="text-primary font-bold">+{result.pointsAwarded} pts earned!</span>
           </div>
@@ -126,7 +127,7 @@ export function VotePanel({ poll }: VotePanelProps): React.JSX.Element {
         disabled={selected.length === 0}
         onClick={handleVote}
       >
-        Vote ({poll.pointsReward} Points)
+        {POINTS_ENABLED ? `Vote (${poll.pointsReward} Points)` : 'Vote'}
       </Button>
     </div>
   );

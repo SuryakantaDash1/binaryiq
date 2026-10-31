@@ -38,6 +38,13 @@ export interface PollResult {
   options: PollResultOption[];
 }
 
+/** A poll the member has voted on, with the live community breakdown. */
+export interface VotedPollResult extends PollResult {
+  question: string;
+  sponsorName: string | null;
+  votedAt: string;
+}
+
 export interface PollCount {
   unvotedCount: number;
   totalActive: number;

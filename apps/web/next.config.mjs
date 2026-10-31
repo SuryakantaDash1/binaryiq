@@ -43,6 +43,18 @@ const nextConfig = {
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },
+  // Reward points are hidden for now (see features/flags.ts) — send their pages somewhere useful.
+  async redirects() {
+    if (process.env.NEXT_PUBLIC_FEATURE_POINTS === 'true') return [];
+    return [
+      { source: '/rewards/:path*', destination: '/home', permanent: false },
+      { source: '/rewards', destination: '/home', permanent: false },
+      { source: '/games/:path*', destination: '/home', permanent: false },
+      { source: '/games', destination: '/home', permanent: false },
+      { source: '/account/points', destination: '/account/profile', permanent: false },
+      { source: '/account/paypal', destination: '/account/profile', permanent: false },
+    ];
+  },
   webpack: (config) => {
     // Resolve `.js` import specifiers to TS source in transpiled workspace packages.
     config.resolve.extensionAlias = {

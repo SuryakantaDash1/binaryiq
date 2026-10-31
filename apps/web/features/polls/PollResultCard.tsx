@@ -1,100 +1,54 @@
 'use client';
 
-import { Check, HelpCircle } from 'lucide-react';
+import { Check } from 'lucide-react';
 
-import type { ShowcasePoll } from './polls-showcase-data';
+import type { VotedPollResult } from '@/lib/api/polls';
 
-/** Rotating soft palette for the option bars (bar tint + % pill), matching the reference look. */
-const PALETTE: { bar: string; pill: string }[] = [
-  { bar: 'bg-violet-100', pill: 'bg-violet-100 text-violet-700' },
-  { bar: 'bg-emerald-100', pill: 'bg-emerald-100 text-emerald-700' },
-  { bar: 'bg-sky-100', pill: 'bg-sky-100 text-sky-700' },
-  { bar: 'bg-amber-100', pill: 'bg-amber-100 text-amber-700' },
-  { bar: 'bg-orange-100', pill: 'bg-orange-100 text-orange-700' },
-  { bar: 'bg-rose-100', pill: 'bg-rose-100 text-rose-700' },
-  { bar: 'bg-pink-100', pill: 'bg-pink-100 text-pink-700' },
-  { bar: 'bg-cyan-100', pill: 'bg-cyan-100 text-cyan-700' },
-  { bar: 'bg-teal-100', pill: 'bg-teal-100 text-teal-700' },
-  { bar: 'bg-slate-100', pill: 'bg-slate-200 text-slate-700' },
-];
+/** Live results for a poll the member voted on; their own choice is highlighted. */
+export function PollResultCard({ poll }: { poll: VotedPollResult }): React.JSX.Element {
+  const chosen = new Set(poll.userOptionIds);
+  const top = Math.max(0, ...poll.options.map((o) => o.voteCount));
 
-export function PollResultCard({ poll }: { poll: ShowcasePoll }): React.JSX.Element {
   return (
     <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
-      {/* Voted header */}
-      <div className="flex items-center gap-2 border-b border-gray-100 px-6 py-4">
-        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-800 text-white">
-          <Check className="h-3 w-3" strokeWidth={3} />
-        </span>
-        <span className="text-sm text-gray-500">
-          {poll.totalVotes.toLocaleString()} users have already voted
-        </span>
+      <div className="border-b border-gray-100 px-6 py-4">
+        {poll.sponsorName && (
+          <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">{poll.sponsorName}</p>
+        )}
+        <h3 className="mt-0.5 text-base font-bold text-gray-900">{poll.question}</h3>
+        <p className="mt-1 text-xs text-gray-500">
+          {poll.totalVotes.toLocaleString()} vote{poll.totalVotes === 1 ? '' : 's'} · you voted{' '}
+          {new Date(poll.votedAt).toLocaleDateString()}
+        </p>
       </div>
 
-      {/* Infographics row */}
-      <div className="grid grid-cols-2 divide-gray-100 border-b border-gray-100 bg-gray-50/60 md:grid-cols-4 md:divide-x">
-        <div className="p-5">
-          <p className="text-lg font-black text-gray-900">Infographics</p>
-          <button type="button" className="text-sm font-medium text-brand-800 hover:underline">
-            Click to show more options
-          </button>
-        </div>
-        <div className="flex flex-col items-center justify-center p-5">
-          <p className="text-2xl font-bold text-brand-700">
-            <span className="align-middle">♀</span> {poll.femalePct}%
-          </p>
-          <p className="text-sm text-gray-600">{poll.femaleCount.toLocaleString()} female</p>
-        </div>
-        <div className="flex flex-col items-center justify-center p-5">
-          <p className="text-2xl font-bold text-brand-700">
-            <span className="align-middle">♂</span> {poll.malePct}%
-          </p>
-          <p className="text-sm text-gray-600">{poll.maleCount.toLocaleString()} male</p>
-        </div>
-        <div className="flex flex-col items-center justify-center p-5">
-          <p className="text-3xl font-bold text-brand-700">{poll.totalVotes.toLocaleString()}</p>
-          <p className="text-sm text-gray-600">People voted</p>
-        </div>
-      </div>
-
-      {/* Question + bars */}
-      <div className="p-6">
-        <div className="mb-6 flex items-start gap-4">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-800 text-white">
-            <HelpCircle className="h-6 w-6" />
-          </span>
-          <h3 className="text-lg font-bold leading-snug text-brand-900 md:text-xl">{poll.question}</h3>
-        </div>
-
-        <div className="flex flex-col gap-3">
-          {poll.options.map((o, i) => {
-            const c = PALETTE[i % PALETTE.length] ?? PALETTE[0]!;
-            return (
-              <div key={o.label} className="flex items-center gap-3">
-                {/* Bar with label + votes overlaid */}
-                <div className="relative h-12 flex-1 overflow-hidden rounded-lg bg-gray-50 ring-1 ring-gray-100">
-                  <div
-                    className={`absolute inset-y-0 left-0 ${c.bar}`}
-                    style={{ width: `${Math.max(o.percent, 3)}%` }}
-                  />
-                  <div className="relative flex h-full items-center justify-between gap-3 px-4">
-                    <span className="line-clamp-2 text-sm text-gray-700">{o.label}</span>
-                    <span className="shrink-0 text-sm font-semibold text-gray-700">
-                      {o.votes.toLocaleString()} Votes
+      <ul className="flex flex-col gap-2.5 px-6 py-5">
+        {poll.options.map((o) => {
+          const mine = chosen.has(o.id);
+          const leading = o.voteCount > 0 && o.voteCount === top;
+          return (
+            <li key={o.id} className="relative overflow-hidden rounded-xl bg-gray-50">
+              <div
+                className={`absolute inset-y-0 left-0 rounded-xl transition-all duration-500 ${
+                  mine ? 'bg-brand-100' : leading ? 'bg-gray-200/80' : 'bg-gray-100'
+                }`}
+                style={{ width: `${o.percentage}%` }}
+              />
+              <div className="relative flex items-center justify-between gap-3 px-4 py-2.5 text-sm">
+                <span className={`flex items-center gap-2 ${mine ? 'font-semibold text-brand-900' : 'text-gray-700'}`}>
+                  {mine && (
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-brand-700 text-white">
+                      <Check className="h-2.5 w-2.5" strokeWidth={3} />
                     </span>
-                  </div>
-                </div>
-                {/* % pill */}
-                <span
-                  className={`flex h-12 w-16 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${c.pill}`}
-                >
-                  {o.percent}%
+                  )}
+                  {o.optionText}
                 </span>
+                <span className="shrink-0 font-semibold tabular-nums text-gray-900">{o.percentage}%</span>
               </div>
-            );
-          })}
-        </div>
-      </div>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { Heading, Text, Button, Alert } from '@binaryiq/ui';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
+import { POINTS_ENABLED } from '@/features/flags';
 import { surveysApi } from '@/lib/api/surveys';
 
 export default function SurveyCompletePage(): React.JSX.Element {
@@ -75,14 +76,24 @@ export default function SurveyCompletePage(): React.JSX.Element {
       <Heading level={3} className="mb-2">
         Survey Complete!
       </Heading>
-      <p className="mb-6 text-3xl font-bold text-primary">+{pointsAwarded.toLocaleString()} pts</p>
-      <Text color="secondary" className="mb-8">
-        Points have been added to your balance.
-      </Text>
+      {POINTS_ENABLED ? (
+        <>
+          <p className="mb-6 text-3xl font-bold text-primary">+{pointsAwarded.toLocaleString()} pts</p>
+          <Text color="secondary" className="mb-8">
+            Points have been added to your balance.
+          </Text>
+        </>
+      ) : (
+        <Text color="secondary" className="mb-8">
+          Thanks for sharing your opinion — your answers have been recorded.
+        </Text>
+      )}
       <div className="flex gap-3">
-        <Button variant="outline" onClick={() => router.push('/rewards/history')} fullWidth>
-          View balance
-        </Button>
+        {POINTS_ENABLED && (
+          <Button variant="outline" onClick={() => router.push('/rewards/history')} fullWidth>
+            View balance
+          </Button>
+        )}
         <Button onClick={() => router.push('/surveys')} fullWidth>
           More surveys
         </Button>

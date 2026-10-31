@@ -23,9 +23,11 @@ export interface SurveyCardProps {
   survey: SurveyCardData;
   action?: ReactNode;
   className?: string;
+  /** Show the points value (off while reward points are hidden). */
+  showPoints?: boolean;
 }
 
-export function SurveyCard({ survey, action, className }: SurveyCardProps): React.JSX.Element {
+export function SurveyCard({ survey, action, className, showPoints = true }: SurveyCardProps): React.JSX.Element {
   const badge = TYPE_BADGE[survey.type] ?? { variant: 'default' as const, label: survey.type };
   return (
     <Card className={className}>
@@ -35,7 +37,7 @@ export function SurveyCard({ survey, action, className }: SurveyCardProps): Reac
           <Badge variant={badge.variant}>{badge.label}</Badge>
         </div>
         <div className="flex items-center gap-3 text-sm text-text-secondary">
-          <span className="font-bold text-primary">{survey.pointsValue.toLocaleString()} pts</span>
+          {showPoints && <span className="font-bold text-primary">{survey.pointsValue.toLocaleString()} pts</span>}
           {survey.estimatedMins && <span>~{survey.estimatedMins} min</span>}
           {survey.isExternal && <span className="italic">External</span>}
         </div>

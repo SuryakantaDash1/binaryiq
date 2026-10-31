@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
+import { POINTS_ENABLED } from '@/features/flags';
 import { authApi } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/client';
 
@@ -52,7 +53,7 @@ function VerifyInner(): React.JSX.Element {
       <Heading level={3}>You&apos;re all set! 🎉</Heading>
       <Text color="secondary">
         Your email is verified
-        {points > 0 ? ` and ${points} welcome points are in your account` : ''}.
+        {POINTS_ENABLED && points > 0 ? ` and ${points} welcome points are in your account` : ''}.
       </Text>
       <Link href="/login">
         <Button fullWidth>Continue to sign in</Button>

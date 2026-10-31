@@ -4,6 +4,7 @@ import { Heading, Text, Button, Alert, Badge, Skeleton, Card, CardBody } from '@
 import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
+import { POINTS_ENABLED } from '@/features/flags';
 import { ApiError } from '@/lib/api/client';
 import { surveysApi, type SurveyDetail, type StartResult } from '@/lib/api/surveys';
 import { safeHttpUrl } from '@/lib/safe-url';
@@ -95,10 +96,12 @@ export default function SurveyDetailPage(): React.JSX.Element {
       <Card className="mb-6">
         <CardBody>
           <div className="flex justify-around text-center">
-            <div>
-              <p className="text-2xl font-bold text-primary">{survey.pointsValue.toLocaleString()}</p>
-              <p className="text-xs text-text-secondary">points</p>
-            </div>
+            {POINTS_ENABLED && (
+              <div>
+                <p className="text-2xl font-bold text-primary">{survey.pointsValue.toLocaleString()}</p>
+                <p className="text-xs text-text-secondary">points</p>
+              </div>
+            )}
             {survey.estimatedMins && (
               <div>
                 <p className="text-2xl font-bold text-text">{survey.estimatedMins}</p>
@@ -120,7 +123,7 @@ export default function SurveyDetailPage(): React.JSX.Element {
       )}
 
       <Button fullWidth loading={starting} onClick={handleStart}>
-        Start Survey — Earn {survey.pointsValue.toLocaleString()} pts
+        {POINTS_ENABLED ? `Start Survey — Earn ${survey.pointsValue.toLocaleString()} pts` : 'Start survey'}
       </Button>
     </div>
   );

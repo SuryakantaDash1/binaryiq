@@ -2,23 +2,19 @@
 
 import type { AnnouncementView, ArticleView } from '@binaryiq/types';
 import { EmptyState, Skeleton } from '@binaryiq/ui';
-import { FolderClosed, MoreVertical, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { AnnouncementCard } from '@/features/community/AnnouncementCard';
 import { CommunityNotificationSettings } from '@/features/community/CommunityNotificationSettings';
-import { FORUM_CATEGORIES } from '@/features/community/community-data';
 import { IndustryUpdateCard } from '@/features/community/IndustryUpdateCard';
 import { useSiteImage } from '@/features/site-images/SiteImages';
 import { communityApi } from '@/lib/api/community';
 import { newsApi } from '@/lib/api/news';
 
-type Tab = 'news' | 'updates' | 'contests' | 'forum' | 'settings';
+type Tab = 'news' | 'updates' | 'settings';
 const TABS: { key: Tab; label: string }[] = [
   { key: 'news', label: 'News' },
   { key: 'updates', label: 'Industry Updates' },
-  { key: 'contests', label: 'Contests' },
-  { key: 'forum', label: 'Forum' },
   { key: 'settings', label: 'Settings' },
 ];
 
@@ -34,7 +30,7 @@ export default function CommunityPage(): React.JSX.Element {
         <div className="absolute inset-0 bg-gradient-to-r from-ink via-brand-950/85 to-brand-800/20" />
         <div className="relative px-8 py-14 md:py-20">
           <h1 className="max-w-sm text-2xl font-black leading-snug text-white md:text-3xl">
-            Welcome to your activities centre, where you will find content, contests and our latest news.
+            Welcome to your activities centre — our latest news and industry updates.
           </h1>
         </div>
       </div>
@@ -59,8 +55,6 @@ export default function CommunityPage(): React.JSX.Element {
         <div className="mt-6">
           {tab === 'news' && <NewsTab />}
           {tab === 'updates' && <IndustryUpdatesTab />}
-          {tab === 'contests' && <ContestsTab />}
-          {tab === 'forum' && <ForumTab />}
           {tab === 'settings' && <CommunityNotificationSettings />}
         </div>
       </div>
@@ -238,93 +232,3 @@ function IndustryUpdatesTab(): React.JSX.Element {
   );
 }
 
-function ContestsTab(): React.JSX.Element {
-  return (
-    <div>
-      <h2 className="text-2xl font-black text-brand-800">Latest Contests</h2>
-      <p className="mt-3 text-gray-600">
-        Participate in our contests to have some much needed fun, while earning some bonus points!
-      </p>
-      <EmptyState
-        title="There are no contests at the moment"
-        description="Please check again at a later date. Thank you for your patience."
-      />
-    </div>
-  );
-}
-
-type ForumSub = 'categories' | 'recent' | 'mine';
-
-function ForumTab(): React.JSX.Element {
-  const [sub, setSub] = useState<ForumSub>('categories');
-  const subs: { key: ForumSub; label: string }[] = [
-    { key: 'categories', label: 'Categories' },
-    { key: 'recent', label: 'Recent Posts' },
-    { key: 'mine', label: 'My Posts' },
-  ];
-
-  return (
-    <div>
-      <h2 className="text-2xl font-black text-brand-800">Community Discussions</h2>
-      <p className="mt-3 text-gray-600">Join in to share your thoughts and debate the topics that matter to you!</p>
-
-      {/* Search */}
-      <div className="mt-6 flex justify-end">
-        <div className="relative w-full max-w-sm">
-          <input
-            type="search"
-            placeholder="Search"
-            className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 pr-10 text-sm text-gray-700 outline-none focus:border-brand-700"
-          />
-          <Search className="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-        </div>
-      </div>
-
-      {/* Sub-tabs */}
-      <div className="mt-4 flex gap-6 border-b border-gray-200">
-        {subs.map((s) => (
-          <button
-            key={s.key}
-            type="button"
-            onClick={() => setSub(s.key)}
-            className={`-mb-px border-b-2 pb-3 text-sm font-semibold transition ${
-              sub === s.key ? 'border-brand-800 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            {s.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-6">
-        {sub === 'categories' && (
-          <div>
-            <p className="mb-3 text-gray-500">Categories</p>
-            <div className="flex flex-col gap-3">
-              {FORUM_CATEGORIES.map((c) => (
-                <div
-                  key={c.id}
-                  className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
-                >
-                  <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-700 to-brand-900 text-white">
-                    <FolderClosed className="h-6 w-6" />
-                  </span>
-                  <div className="flex-1">
-                    <p className="font-bold text-gray-900">{c.title}</p>
-                    <p className="text-sm text-gray-600">{c.description}</p>
-                    <p className="mt-1 text-xs text-gray-400">
-                      {c.categories} Categories · {c.threads} Thread
-                    </p>
-                  </div>
-                  <MoreVertical className="h-5 w-5 shrink-0 text-gray-400" />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        {sub === 'recent' && <EmptyState title="There are no recent posts." />}
-        {sub === 'mine' && <EmptyState title="You do not have any posts." />}
-      </div>
-    </div>
-  );
-}

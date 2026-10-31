@@ -4,6 +4,7 @@ import { Heading, Text, Badge, Card, CardBody } from '@binaryiq/ui';
 import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 
+import { POINTS_ENABLED } from '@/features/flags';
 import { SurveyForm } from '@/features/profile-surveys/SurveyForm';
 import { profileSurveysApi } from '@/lib/api/profile-surveys';
 import type { CategoryDetail } from '@/lib/api/profile-surveys';
@@ -37,7 +38,7 @@ export default function CategoryPage(): React.JSX.Element {
   if (submitted) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-center">
-        <Heading level={2}>🎉 +{pointsEarned} points!</Heading>
+        <Heading level={2}>{POINTS_ENABLED ? `🎉 +${pointsEarned} points!` : '🎉 Thanks!'}</Heading>
         <Text color="secondary" className="mt-2">You completed the {data.name} survey.</Text>
         <button
           className="text-primary mt-6 text-sm underline"
@@ -62,7 +63,7 @@ export default function CategoryPage(): React.JSX.Element {
           <div className="mb-6 flex items-center gap-3">
             <Heading level={3}>{data.name}</Heading>
             {data.completed && <Badge variant="success">Completed</Badge>}
-            <Badge variant="primary">{data.pointsValue} pts</Badge>
+            {POINTS_ENABLED && <Badge variant="primary">{data.pointsValue} pts</Badge>}
           </div>
           <SurveyForm
             schema={data.schema}

@@ -3,6 +3,7 @@ import type {
   CreatePollInput,
   UpdatePollInput,
   PollResult,
+  VotedPollResult,
   PollSummary,
   PollDetail,
   PollCount,
@@ -91,6 +92,22 @@ export class PollsService {
       where: { pollId_userId: { pollId, userId } },
     });
     return this.buildResult(poll, poll.options, vote?.optionIds ?? []);
+  }
+
+  /** The member's most recent votes, each with the current results. */
+  async listVotedResults(userId: string, limit = 30): Promise<VotedPollResult[]> {
+    const votes = await this.prisma.pollVote.findMany({
+      where: { userId },
+      orderBy: { votedAt: 'desc' },
+      take: limit,
+      include: { poll: { include: { options: { orderBy: { sortOrder: 'asc' } } } } },
+    });
+    return votes.map((v) => ({
+      ...this.buildResult(v.poll, v.poll.options, v.optionIds),
+      question: v.poll.question,
+      sponsorName: v.poll.sponsorName,
+      votedAt: v.votedAt.toISOString(),
+    }));
   }
 
   // ─── Vote (transactional) ─────────────────────────────────────
