@@ -101,5 +101,13 @@
     "subtitle": "내 프로필에 맞는 짧은 설문과 빠른 투표 — 다른 사람들의 답변도 볼 수 있어요.",
     "toastTitle": "나에게 맞는 설문 도착",
     "toastMeta": "쇼핑 습관 · 5분"
+  },
+  "chat": {
+    "assistantRole": "BinaryIQ 어시스턴트",
+    "online": "온라인",
+    "teaserTitle": "안녕하세요, Byte예요",
+    "teaserText": "도움이 필요하세요? 무엇이든 물어보세요.",
+    "dismiss": "닫기",
+    "chatWithByte": "Byte와 채팅"
   }
 }

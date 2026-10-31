@@ -101,5 +101,13 @@
     "subtitle": "Profiline uygun kısa anketler ve hızlı oylamalar — herkesin ne yanıt verdiğini de görürsün.",
     "toastTitle": "Sana uygun anket bulundu",
     "toastMeta": "Alışveriş alışkanlıkları · 5 dk"
+  },
+  "chat": {
+    "assistantRole": "BinaryIQ asistanı",
+    "online": "Çevrimiçi",
+    "teaserTitle": "Merhaba, ben Byte",
+    "teaserText": "Yardım mı lazım? Bana sorabilirsin.",
+    "dismiss": "Kapat",
+    "chatWithByte": "Byte ile sohbet et"
   }
 }

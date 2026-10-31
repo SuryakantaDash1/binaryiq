@@ -101,5 +101,13 @@
     "subtitle": "Korta enkäter och snabba omröstningar som passar din profil — och du ser hur alla svarade.",
     "toastTitle": "Enkät som passar dig",
     "toastMeta": "Shoppingvanor · 5 min"
+  },
+  "chat": {
+    "assistantRole": "BinaryIQ-assistent",
+    "online": "Online",
+    "teaserTitle": "Hej, jag är Byte",
+    "teaserText": "Behöver du hjälp? Fråga mig vad som helst.",
+    "dismiss": "Stäng",
+    "chatWithByte": "Chatta med Byte"
   }
 }

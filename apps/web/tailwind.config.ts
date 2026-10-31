@@ -31,8 +31,22 @@ const config: Config = {
           from: { transform: 'scaleX(0)' },
           to: { transform: 'scaleX(1)' },
         },
+        // Chat assistant: panel/teaser pop-in and the waving hand.
+        'pop-in': {
+          from: { opacity: '0', transform: 'translateY(8px) scale(0.96)' },
+          to: { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+        wave: {
+          '0%, 60%, 100%': { transform: 'rotate(0deg)' },
+          '10%, 30%': { transform: 'rotate(14deg)' },
+          '20%': { transform: 'rotate(-8deg)' },
+          '40%': { transform: 'rotate(-4deg)' },
+          '50%': { transform: 'rotate(10deg)' },
+        },
       },
       animation: {
+        'pop-in': 'pop-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both',
+        wave: 'wave 2.2s ease-in-out infinite',
         'fade-up': 'fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both',
         float: 'float 6s ease-in-out infinite',
         'toast-in': 'toast-in 6s ease-in-out infinite',

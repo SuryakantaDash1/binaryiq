@@ -101,5 +101,13 @@
     "subtitle": "Krótkie ankiety i szybkie sondy dopasowane do Twojego profilu — i widzisz, jak odpowiedzieli inni.",
     "toastTitle": "Ankieta dopasowana do Ciebie",
     "toastMeta": "Nawyki zakupowe · 5 min"
+  },
+  "chat": {
+    "assistantRole": "Asystent BinaryIQ",
+    "online": "Online",
+    "teaserTitle": "Cześć, jestem Byte",
+    "teaserText": "Potrzebujesz pomocy? Zapytaj mnie.",
+    "dismiss": "Zamknij",
+    "chatWithByte": "Czat z Byte"
   }
 }

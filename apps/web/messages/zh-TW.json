@@ -101,5 +101,13 @@
     "subtitle": "與你資料相符的簡短調查和快速投票——還能看到大家的回答。",
     "toastTitle": "為你配對到調查",
     "toastMeta": "購物習慣 · 5 分鐘"
+  },
+  "chat": {
+    "assistantRole": "BinaryIQ 助理",
+    "online": "線上",
+    "teaserTitle": "你好，我是 Byte",
+    "teaserText": "需要幫忙嗎？隨時問我。",
+    "dismiss": "關閉",
+    "chatWithByte": "與 Byte 聊天"
   }
 }

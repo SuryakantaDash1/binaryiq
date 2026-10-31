@@ -56,7 +56,13 @@
     "askQuestion": "اطرح سؤالاً",
     "writeMessage": "اكتب رسالة…",
     "openChat": "فتح الدردشة",
-    "closeChat": "إغلاق الدردشة"
+    "closeChat": "إغلاق الدردشة",
+    "assistantRole": "مساعد BinaryIQ",
+    "online": "متصل",
+    "teaserTitle": "مرحبًا، أنا Byte",
+    "teaserText": "تحتاج مساعدة؟ اسألني أي شيء.",
+    "dismiss": "إغلاق",
+    "chatWithByte": "تحدث مع Byte"
   },
   "auth": {
     "createAccount": "أنشئ حسابك",

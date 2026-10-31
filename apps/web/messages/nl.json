@@ -56,7 +56,13 @@
     "askQuestion": "Een vraag stellen",
     "writeMessage": "Schrijf een reactie…",
     "openChat": "Chat openen",
-    "closeChat": "Chat sluiten"
+    "closeChat": "Chat sluiten",
+    "assistantRole": "BinaryIQ-assistent",
+    "online": "Online",
+    "teaserTitle": "Hoi, ik ben Byte",
+    "teaserText": "Hulp nodig? Vraag me gerust iets.",
+    "dismiss": "Sluiten",
+    "chatWithByte": "Chat met Byte"
   },
   "auth": {
     "createAccount": "Maak uw account aan",

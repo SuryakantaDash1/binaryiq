@@ -56,7 +56,13 @@
     "askQuestion": "Poser une question",
     "writeMessage": "Écrire un message…",
     "openChat": "Ouvrir le chat",
-    "closeChat": "Fermer le chat"
+    "closeChat": "Fermer le chat",
+    "assistantRole": "Assistant BinaryIQ",
+    "online": "En ligne",
+    "teaserTitle": "Bonjour, je suis Byte",
+    "teaserText": "Besoin d’aide ? Posez-moi vos questions.",
+    "dismiss": "Fermer",
+    "chatWithByte": "Discuter avec Byte"
   },
   "auth": {
     "createAccount": "Créez votre compte",

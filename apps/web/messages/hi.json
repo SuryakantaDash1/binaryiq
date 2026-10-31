@@ -56,7 +56,13 @@
     "askQuestion": "एक प्रश्न पूछें",
     "writeMessage": "एक संदेश लिखें…",
     "openChat": "चैट खोलें",
-    "closeChat": "चैट बंद करें"
+    "closeChat": "चैट बंद करें",
+    "assistantRole": "BinaryIQ सहायक",
+    "online": "ऑनलाइन",
+    "teaserTitle": "नमस्ते, मैं Byte हूँ",
+    "teaserText": "मदद चाहिए? मुझसे कुछ भी पूछें।",
+    "dismiss": "बंद करें",
+    "chatWithByte": "Byte से चैट करें"
   },
   "auth": {
     "createAccount": "अपना खाता बनाएं",

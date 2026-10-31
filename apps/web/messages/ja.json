@@ -101,5 +101,13 @@
     "subtitle": "プロフィールに合った短いアンケートとクイック投票。みんなの回答も見られます。",
     "toastTitle": "あなたに合うアンケート",
     "toastMeta": "買い物の習慣 · 5分"
+  },
+  "chat": {
+    "assistantRole": "BinaryIQ アシスタント",
+    "online": "オンライン",
+    "teaserTitle": "こんにちは、Byteです",
+    "teaserText": "お困りですか？何でも聞いてください。",
+    "dismiss": "閉じる",
+    "chatWithByte": "Byteとチャット"
   }
 }

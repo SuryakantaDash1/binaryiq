@@ -56,7 +56,13 @@
     "askQuestion": "Fazer uma pergunta",
     "writeMessage": "Escreva uma mensagem…",
     "openChat": "Abrir chat",
-    "closeChat": "Fechar chat"
+    "closeChat": "Fechar chat",
+    "assistantRole": "Assistente BinaryIQ",
+    "online": "Online",
+    "teaserTitle": "Oi, eu sou o Byte",
+    "teaserText": "Precisa de ajuda? Pergunte o que quiser.",
+    "dismiss": "Fechar",
+    "chatWithByte": "Conversar com o Byte"
   },
   "auth": {
     "createAccount": "Crie sua conta",

@@ -101,5 +101,13 @@
     "subtitle": "Tinjauan ringkas dan undian pantas yang sepadan dengan profil anda — dan lihat jawapan semua orang.",
     "toastTitle": "Tinjauan sesuai untuk anda",
     "toastMeta": "Tabiat membeli-belah · 5 min"
+  },
+  "chat": {
+    "assistantRole": "Pembantu BinaryIQ",
+    "online": "Dalam talian",
+    "teaserTitle": "Hai, saya Byte",
+    "teaserText": "Perlukan bantuan? Tanya saya apa sahaja.",
+    "dismiss": "Tutup",
+    "chatWithByte": "Sembang dengan Byte"
   }
 }

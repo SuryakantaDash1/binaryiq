@@ -101,5 +101,13 @@
     "subtitle": "Krátké průzkumy a rychlé ankety podle vašeho profilu — a uvidíte, jak odpověděli ostatní.",
     "toastTitle": "Průzkum vybraný pro vás",
     "toastMeta": "Nákupní zvyklosti · 5 min"
+  },
+  "chat": {
+    "assistantRole": "Asistent BinaryIQ",
+    "online": "Online",
+    "teaserTitle": "Ahoj, jsem Byte",
+    "teaserText": "Potřebujete pomoct? Zeptejte se mě.",
+    "dismiss": "Zavřít",
+    "chatWithByte": "Chatovat s Byte"
   }
 }

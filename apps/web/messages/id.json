@@ -101,5 +101,13 @@
     "subtitle": "Survei singkat dan polling cepat yang cocok dengan profilmu — dan lihat jawaban semua orang.",
     "toastTitle": "Survei cocok untukmu",
     "toastMeta": "Kebiasaan belanja · 5 mnt"
+  },
+  "chat": {
+    "assistantRole": "Asisten BinaryIQ",
+    "online": "Online",
+    "teaserTitle": "Hai, aku Byte",
+    "teaserText": "Butuh bantuan? Tanya aku apa saja.",
+    "dismiss": "Tutup",
+    "chatWithByte": "Chat dengan Byte"
   }
 }
